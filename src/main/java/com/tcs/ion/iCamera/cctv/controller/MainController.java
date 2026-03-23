@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -46,6 +47,19 @@ public class MainController implements Initializable {
     @FXML private Button btnSettings;
     @FXML private Label lblAlertBadge;
     @FXML private Label lblTcCode;
+
+    private static final Map<String, String> VIEW_TITLES = Map.of(
+            "dashboard",           "Dashboard",
+            "application_details", "Application Details",
+            "cctv_details",        "CCTV Details",
+            "system_hardware",     "System Hardware",
+            "network_monitor",     "Network Monitor",
+            "alerts",              "Alerts",
+            "stream_analytics",    "Stream Analytics",
+            "vms_detection",       "VMS Detection",
+            "discovery",           "Discovery",
+            "settings",            "Settings"
+    );
 
     private final DataStore store = DataStore.getInstance();
     private Timeline refreshTimeline;
@@ -80,9 +94,22 @@ public class MainController implements Initializable {
             contentArea.getChildren().setAll(view);
         } catch (IOException e) {
             log.error("Failed to load view: {}", viewName, e);
-            Label err = new Label("Failed to load: " + viewName);
-            err.getStyleClass().add("error-label");
-            contentArea.getChildren().setAll(err);
+            String sectionTitle = VIEW_TITLES.getOrDefault(viewName, viewName);
+
+            Label icon    = new Label("\u26A0");
+            icon.getStyleClass().add("error-icon");
+
+            Label heading = new Label("Unable to Load \u201C" + sectionTitle + "\u201D");
+            heading.getStyleClass().add("error-heading");
+
+            Label detail  = new Label("This section could not be displayed.\nPlease check the application logs for details.");
+            detail.getStyleClass().add("error-detail");
+            detail.setWrapText(true);
+
+            VBox box = new VBox(14, icon, heading, detail);
+            box.getStyleClass().add("error-page");
+            box.setAlignment(javafx.geometry.Pos.CENTER);
+            contentArea.getChildren().setAll(box);
         }
     }
 

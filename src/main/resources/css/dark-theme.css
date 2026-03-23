@@ -570,6 +570,30 @@
     -fx-padding: 0;
 }
 
+/* --- Error page (view load failure) --- */
+.error-page {
+    -fx-padding: 60 40 60 40;
+}
+
+.error-icon {
+    -fx-font-size: 48px;
+    -fx-text-fill: #F44336;
+}
+
+.error-heading {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #E0E0E0;
+}
+
+.error-detail {
+    -fx-font-size: 13px;
+    -fx-text-fill: #607080;
+    -fx-text-alignment: center;
+    -fx-alignment: center;
+    -fx-max-width: 420px;
+}
+
 /* --- Alert dialog styling --- */
 .dialog-pane {
     -fx-background-color: #13131F;
