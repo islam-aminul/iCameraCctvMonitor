@@ -33,6 +33,7 @@ public class VmsInfo {
     private VmsVendor vendor;
     private String processName;
     private int pid;
+    private String user;
     private double cpuPercent;
     private long memoryMb;
     private String status;        // "RUNNING" | "DETECTED" (found in services but not running)
@@ -56,6 +57,9 @@ public class VmsInfo {
 
     public String getProcessName() { return processName; }
     public void setProcessName(String processName) { this.processName = processName; }
+
+    public String getUser() { return user; }
+    public void setUser(String user) { this.user = user; }
 
     public int getPid() { return pid; }
     public void setPid(int pid) { this.pid = pid; }

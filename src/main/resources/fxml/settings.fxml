@@ -26,14 +26,12 @@
             </GridPane>
         </TitledPane>
 
-        <!-- ffprobe / Jetty -->
+        <!-- Jetty -->
         <TitledPane text="Services" expanded="true" styleClass="settings-pane">
             <GridPane hgap="16" vgap="10">
                 <padding><Insets top="12" left="12" right="12" bottom="12"/></padding>
-                <Label text="ffprobe Path:" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="detail-label"/>
-                <TextField fx:id="txtFfprobePath" GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="320"/>
-                <Label text="REST API Port:" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="detail-label"/>
-                <TextField fx:id="txtJettyPort"   GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                <Label text="REST API Port:" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="detail-label"/>
+                <TextField fx:id="txtJettyPort"   GridPane.columnIndex="1" GridPane.rowIndex="0"/>
             </GridPane>
         </TitledPane>
 

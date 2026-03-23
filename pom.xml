@@ -41,31 +41,26 @@
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>17.0.2</version>
-            <classifier>win</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
             <version>17.0.2</version>
-            <classifier>win</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
             <version>17.0.2</version>
-            <classifier>win</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-base</artifactId>
             <version>17.0.2</version>
-            <classifier>win</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-swing</artifactId>
             <version>17.0.2</version>
-            <classifier>win</classifier>
         </dependency>
 
         <!-- ==================== OSHI – Hardware/OS metrics ==================== -->
@@ -87,22 +82,47 @@
             <version>5.4.0</version>
         </dependency>
 
-        <!-- ==================== JavaCV / FFmpeg ==================== -->
+        <!-- ==================== JavaCV / FFmpeg (Windows x86_64 only) ==================== -->
+        <!-- javacv base: exclude heavy optional modules not needed for RTSP probing -->
         <dependency>
             <groupId>org.bytedeco</groupId>
             <artifactId>javacv</artifactId>
             <version>1.5.9</version>
+            <exclusions>
+                <exclusion><groupId>org.bytedeco</groupId><artifactId>openblas</artifactId></exclusion>
+                <exclusion><groupId>org.bytedeco</groupId><artifactId>openblas-platform</artifactId></exclusion>
+                <exclusion><groupId>org.bytedeco</groupId><artifactId>opencv</artifactId></exclusion>
+                <exclusion><groupId>org.bytedeco</groupId><artifactId>opencv-platform</artifactId></exclusion>
+                <exclusion><groupId>org.bytedeco</groupId><artifactId>leptonica</artifactId></exclusion>
+                <exclusion><groupId>org.bytedeco</groupId><artifactId>leptonica-platform</artifactId></exclusion>
+                <exclusion><groupId>org.bytedeco</groupId><artifactId>tesseract</artifactId></exclusion>
+                <exclusion><groupId>org.bytedeco</groupId><artifactId>tesseract-platform</artifactId></exclusion>
+                <exclusion><groupId>org.bytedeco</groupId><artifactId>ffmpeg-platform</artifactId></exclusion>
+            </exclusions>
+        </dependency>
+        <!-- javacpp: base + Windows x86_64 native -->
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>javacpp</artifactId>
+            <version>1.5.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>javacpp</artifactId>
+            <version>1.5.9</version>
+            <classifier>windows-x86_64</classifier>
+        </dependency>
+        <!-- ffmpeg: base + Windows x86_64 native only -->
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>ffmpeg</artifactId>
+            <version>6.0-1.5.9</version>
         </dependency>
         <dependency>
             <groupId>org.bytedeco</groupId>
             <artifactId>ffmpeg</artifactId>
             <version>6.0-1.5.9</version>
             <classifier>windows-x86_64</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.bytedeco</groupId>
-            <artifactId>ffmpeg-platform</artifactId>
-            <version>6.0-1.5.9</version>
         </dependency>
 
         <!-- ==================== Logging ==================== -->

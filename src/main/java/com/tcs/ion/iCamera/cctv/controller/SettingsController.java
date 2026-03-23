@@ -6,7 +6,6 @@ import com.tcs.ion.iCamera.cctv.util.SettingsManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.layout.Scene;
 import javafx.scene.paint.Color;
 
 import java.net.URL;
@@ -21,7 +20,6 @@ public class SettingsController implements Initializable {
     @FXML private TextField  txtJmxPort;
     @FXML private TextField  txtJmxRetries;
     @FXML private TextField  txtPollInterval;
-    @FXML private TextField  txtFfprobePath;
     @FXML private TextField  txtJettyPort;
     @FXML private TextField  txtExportPath;
     @FXML private ComboBox<String> cmbExportFormat;
@@ -59,7 +57,6 @@ public class SettingsController implements Initializable {
         txtJmxPort.setText(String.valueOf(s.getJmxBasePort()));
         txtJmxRetries.setText(String.valueOf(s.getJmxMaxPortRetries()));
         txtPollInterval.setText(String.valueOf(s.getPollIntervalSeconds()));
-        txtFfprobePath.setText(s.getFfprobePath());
         txtJettyPort.setText(String.valueOf(s.getJettyPort()));
         txtExportPath.setText(s.getExportPath());
         cmbExportFormat.setValue(s.getExportFormat());
@@ -88,7 +85,6 @@ public class SettingsController implements Initializable {
             s.setJmxBasePort(Integer.parseInt(txtJmxPort.getText().trim()));
             s.setJmxMaxPortRetries(Integer.parseInt(txtJmxRetries.getText().trim()));
             s.setPollIntervalSeconds(Integer.parseInt(txtPollInterval.getText().trim()));
-            s.setFfprobePath(txtFfprobePath.getText().trim());
             s.setJettyPort(Integer.parseInt(txtJettyPort.getText().trim()));
             s.setExportPath(txtExportPath.getText().trim());
             s.setExportFormat(cmbExportFormat.getValue());

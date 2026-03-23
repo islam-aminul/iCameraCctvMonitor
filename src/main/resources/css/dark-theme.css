@@ -16,6 +16,57 @@
     -fx-text-fill: #E0E0E0;
 }
 
+/* Ensure all Label nodes are readable on dark background */
+.label {
+    -fx-text-fill: #E0E0E0;
+}
+
+/* Table cells */
+.table-cell {
+    -fx-text-fill: #E0E0E0;
+    -fx-background-color: transparent;
+}
+
+/* TitledPane header and content text */
+.titled-pane > .title > .text {
+    -fx-fill: #B0BEC5;
+    -fx-font-weight: bold;
+}
+.titled-pane > .title {
+    -fx-background-color: #0D0D1A;
+}
+.titled-pane > .content {
+    -fx-background-color: #13131F;
+}
+
+/* ListView / ListCell */
+.list-view {
+    -fx-background-color: #1A1A2E;
+    -fx-border-color: #2E3060;
+    -fx-border-radius: 4;
+}
+.list-cell {
+    -fx-background-color: #1A1A2E;
+    -fx-text-fill: #E0E0E0;
+}
+.list-cell:selected {
+    -fx-background-color: #1A2D4F;
+    -fx-text-fill: #FFFFFF;
+}
+.list-cell:hover {
+    -fx-background-color: #222240;
+}
+
+/* Tooltip */
+.tooltip {
+    -fx-background-color: #1A1A2E;
+    -fx-text-fill: #E0E0E0;
+    -fx-border-color: #2196F3;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-font-size: 12px;
+}
+
 .root-pane {
     -fx-background-color: #0A0A0F;
 }
@@ -53,7 +104,7 @@
 }
 
 .header-meta {
-    -fx-text-fill: #9E9E9E;
+    -fx-text-fill: #B0BEC5;
     -fx-font-size: 11px;
 }
 
@@ -85,14 +136,14 @@
 }
 
 .sidebar-section-header {
-    -fx-text-fill: #607D8B;
+    -fx-text-fill: #78909C;
     -fx-font-size: 10px;
     -fx-font-weight: bold;
     -fx-padding: 4 0 2 4;
 }
 
 .sidebar-footer {
-    -fx-text-fill: #455A64;
+    -fx-text-fill: #607D8B;
     -fx-font-size: 10px;
     -fx-alignment: CENTER;
 }
@@ -205,7 +256,7 @@
 .tile-header {
     -fx-font-size: 11px;
     -fx-font-weight: bold;
-    -fx-text-fill: #78909C;
+    -fx-text-fill: #90A4AE;
     -fx-padding: 0 0 4 0;
 }
 
@@ -217,7 +268,7 @@
 
 .tile-sublabel {
     -fx-font-size: 12px;
-    -fx-text-fill: #9E9E9E;
+    -fx-text-fill: #B0BEC5;
 }
 
 /* --- Summary bar --- */
@@ -240,7 +291,7 @@
 
 /* --- Detail labels --- */
 .detail-label {
-    -fx-text-fill: #78909C;
+    -fx-text-fill: #90A4AE;
     -fx-font-size: 12px;
     -fx-min-width: 140;
 }
@@ -300,7 +351,7 @@
 }
 
 .data-table .column-header .label {
-    -fx-text-fill: #78909C;
+    -fx-text-fill: #B0BEC5;
     -fx-font-weight: bold;
     -fx-font-size: 12px;
 }
@@ -400,8 +451,8 @@
 .network-chart .chart-plot-background { -fx-background-color: #0D0D1A; }
 .network-chart .chart-vertical-grid-lines { -fx-stroke: #1E2040; }
 .network-chart .chart-horizontal-grid-lines { -fx-stroke: #1E2040; }
-.network-chart .axis { -fx-tick-label-fill: #78909C; }
-.network-chart .axis-label { -fx-text-fill: #78909C; }
+.network-chart .axis { -fx-tick-label-fill: #90A4AE; }
+.network-chart .axis-label { -fx-text-fill: #90A4AE; }
 .network-chart .default-color0.chart-series-line { -fx-stroke: #2196F3; -fx-stroke-width: 2; }
 .network-chart .default-color0.chart-line-symbol { -fx-background-color: #2196F3, white; }
 
@@ -418,7 +469,7 @@
 }
 
 .settings-pane > .title > .text {
-    -fx-fill: #2196F3;
+    -fx-fill: #64B5F6;
     -fx-font-weight: bold;
 }
 
@@ -451,7 +502,7 @@
 /* --- Under development label --- */
 .under-dev-label {
     -fx-font-size: 14px;
-    -fx-text-fill: #9E9E9E;
+    -fx-text-fill: #B0BEC5;
     -fx-line-spacing: 4;
 }
 

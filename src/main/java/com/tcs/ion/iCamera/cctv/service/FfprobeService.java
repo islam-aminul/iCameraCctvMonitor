@@ -1,25 +1,27 @@
 package com.tcs.ion.iCamera.cctv.service;
 
-import com.google.gson.*;
 import com.tcs.ion.iCamera.cctv.model.CctvData;
+import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.*;
 
 /**
- * Uses ffprobe to analyse RTSP streams.
- * Probes up to 25-30 streams concurrently via a fixed thread pool.
- *
- * ffprobe path is read from AppSettings; defaults to .\ffprobe.exe
+ * Probes RTSP streams using JavaCV's FFmpegFrameGrabber (libavformat via JavaCPP).
+ * No external ffprobe.exe binary required.
+ * Up to 8 streams are probed concurrently.
  */
 public class FfprobeService {
 
     private static final Logger log = LoggerFactory.getLogger(FfprobeService.class);
-    private static final int PROBE_TIMEOUT_SECONDS = 10;
-    private static final int MAX_THREADS = 8; // parallel probes
+
+    /** Per-stream timeout in milliseconds. */
+    private static final int PROBE_TIMEOUT_MS = 10_000;
+    private static final int MAX_THREADS = 8;
 
     private final DataStore store = DataStore.getInstance();
     private final ExecutorService probePool = Executors.newFixedThreadPool(MAX_THREADS, r -> {
@@ -28,9 +30,7 @@ public class FfprobeService {
         return t;
     });
 
-    /**
-     * Probes all CCTV streams currently in the DataStore concurrently.
-     */
+    /** Probes all CCTV RTSP streams currently held in the DataStore. */
     public void probeAll() {
         Collection<CctvData> cctvList = store.getAllCctv();
         if (cctvList.isEmpty()) return;
@@ -40,141 +40,71 @@ public class FfprobeService {
             if (cctv.getRtspUrl() == null || cctv.getRtspUrl().isEmpty()) continue;
             futures.add(probePool.submit(() -> probeStream(cctv)));
         }
-        // Wait for all probes to complete (with overall timeout)
+        // Wait for all probes (individual streams have their own timeout)
         for (Future<?> f : futures) {
-            try { f.get(PROBE_TIMEOUT_SECONDS + 5, TimeUnit.SECONDS); }
-            catch (TimeoutException e) { f.cancel(true); }
-            catch (Exception e) { log.debug("Probe future error: {}", e.getMessage()); }
+            try {
+                f.get(PROBE_TIMEOUT_MS + 5_000L, TimeUnit.MILLISECONDS);
+            } catch (TimeoutException e) {
+                f.cancel(true);
+            } catch (Exception e) {
+                log.debug("Probe future error: {}", e.getMessage());
+            }
         }
     }
 
-    /**
-     * Runs ffprobe against a single RTSP stream and populates the CctvData fields.
-     */
+    /** Opens the RTSP stream via JavaCV and reads video stream metadata. */
     void probeStream(CctvData cctv) {
-        String ffprobePath = store.getSettings().getFfprobePath();
         String rtsp = cctv.getRtspUrl();
-
-        List<String> cmd = Arrays.asList(
-                ffprobePath,
-                "-v", "quiet",
-                "-print_format", "json",
-                "-show_streams",
-                "-show_format",
-                "-rtsp_transport", "tcp",   // TCP wrapper – better for 25-30 concurrent streams
-                "-timeout", String.valueOf(PROBE_TIMEOUT_SECONDS * 1_000_000), // microseconds
-                rtsp
-        );
-
+        FFmpegFrameGrabber grabber = null;
         try {
-            ProcessBuilder pb = new ProcessBuilder(cmd);
-            pb.redirectErrorStream(true);
-            Process proc = pb.start();
+            grabber = new FFmpegFrameGrabber(rtsp);
+            // Force TCP transport – more reliable for concurrent probing
+            grabber.setOption("rtsp_transport", "tcp");
+            // avformat timeout in microseconds
+            grabber.setTimeout(PROBE_TIMEOUT_MS * 1_000L);
+            // open + probe stream info (avformat_open_input + avformat_find_stream_info)
+            grabber.start();
 
-            StringBuilder output = new StringBuilder();
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(proc.getInputStream()))) {
-                String line;
-                while ((line = br.readLine()) != null) output.append(line);
+            // ---- Codec / encoding ----
+            String codec = grabber.getVideoCodecName();
+            if (codec != null && !codec.isEmpty()) {
+                cctv.setEncoding(codec.toUpperCase());
             }
 
-            boolean finished = proc.waitFor(PROBE_TIMEOUT_SECONDS + 2L, TimeUnit.SECONDS);
-            if (!finished) { proc.destroyForcibly(); throw new TimeoutException("ffprobe timeout"); }
+            // ---- Resolution ----
+            int w = grabber.getImageWidth();
+            int h = grabber.getImageHeight();
+            if (w > 0 && h > 0) {
+                cctv.setResolution(w + "x" + h);
+            }
 
-            if (proc.exitValue() != 0) throw new IOException("ffprobe exit=" + proc.exitValue());
+            // ---- Frame rate ----
+            double fps = grabber.getFrameRate();
+            if (fps > 0) {
+                cctv.setFps(fps);
+            }
 
-            parseProbeOutput(output.toString(), cctv);
+            // ---- Bitrate (bits/s → kbps) ----
+            int bitrateBps = grabber.getVideoBitrate();
+            if (bitrateBps > 0) {
+                cctv.setBitrateKbps(bitrateBps / 1000);
+            }
+
             cctv.setFfprobeSuccess(true);
+            log.debug("Probed {} – codec={} res={}x{} fps={:.2f} bitrate={}kbps",
+                    cctv.getCctvName(), codec, w, h, fps, bitrateBps / 1000);
 
         } catch (Exception e) {
-            log.warn("ffprobe failed for {} ({}): {}", cctv.getCctvName(), rtsp, e.getMessage());
+            log.warn("Stream probe failed for {} ({}): {}", cctv.getCctvName(), rtsp, e.getMessage());
             cctv.setFfprobeSuccess(false);
+        } finally {
+            if (grabber != null) {
+                try { grabber.stop();    } catch (Exception ignored) {}
+                try { grabber.release(); } catch (Exception ignored) {}
+            }
         }
-        // Re-evaluate active status with new ffprobe data
         cctv.evaluateStatus();
         store.updateCctvData(cctv);
-    }
-
-    private void parseProbeOutput(String json, CctvData cctv) {
-        try {
-            JsonObject root = JsonParser.parseString(json).getAsJsonObject();
-            JsonArray streams = root.getAsJsonArray("streams");
-            if (streams == null || streams.size() == 0) return;
-
-            for (JsonElement el : streams) {
-                JsonObject stream = el.getAsJsonObject();
-                String codecType = getStr(stream, "codec_type");
-                if (!"video".equalsIgnoreCase(codecType)) continue;
-
-                // Codec / encoding
-                String codecName = getStr(stream, "codec_name");
-                if (codecName != null) cctv.setEncoding(codecName.toUpperCase());
-
-                // Profile
-                String profile = getStr(stream, "profile");
-                if (profile != null) cctv.setStreamProfile(profile);
-
-                // Resolution
-                int w = getInt(stream, "width");
-                int h = getInt(stream, "height");
-                if (w > 0 && h > 0) cctv.setResolution(w + "x" + h);
-
-                // FPS (avg_frame_rate or r_frame_rate)
-                String fpsStr = getStr(stream, "avg_frame_rate");
-                if (fpsStr == null || fpsStr.equals("0/0")) fpsStr = getStr(stream, "r_frame_rate");
-                cctv.setFps(parseFraction(fpsStr));
-
-                // Bitrate from stream tags or format
-                String bitrate = getStr(stream, "bit_rate");
-                if (bitrate == null || bitrate.isEmpty()) {
-                    JsonObject format = root.getAsJsonObject("format");
-                    if (format != null) bitrate = getStr(format, "bit_rate");
-                }
-                if (bitrate != null && !bitrate.isEmpty()) {
-                    try { cctv.setBitrateKbps((int)(Long.parseLong(bitrate) / 1000)); } catch (NumberFormatException ignored) {}
-                }
-
-                // Keyframe interval
-                String gopStr = getStr(stream, "codec_tag_string");
-                // Try has_b_frames as proxy or disposition
-                String kfStr = null;
-                if (stream.has("tags")) {
-                    JsonObject tags = stream.getAsJsonObject("tags");
-                    kfStr = getStr(tags, "KEY_FRAME_INTERVAL");
-                }
-                if (kfStr != null) {
-                    try { cctv.setKeyFrameInterval(Integer.parseInt(kfStr)); } catch (NumberFormatException ignored) {}
-                }
-
-                break; // only process first video stream
-            }
-        } catch (Exception e) {
-            log.warn("ffprobe JSON parse error for {}: {}", cctv.getCctvName(), e.getMessage());
-        }
-    }
-
-    private String getStr(JsonObject obj, String key) {
-        JsonElement el = obj.get(key);
-        return (el != null && !el.isJsonNull()) ? el.getAsString() : null;
-    }
-
-    private int getInt(JsonObject obj, String key) {
-        JsonElement el = obj.get(key);
-        return (el != null && !el.isJsonNull()) ? el.getAsInt() : 0;
-    }
-
-    /** Parses "25/1" or "30000/1001" into a double. */
-    private double parseFraction(String s) {
-        if (s == null || s.isEmpty()) return 0;
-        String[] parts = s.split("/");
-        if (parts.length == 2) {
-            try {
-                double num = Double.parseDouble(parts[0]);
-                double den = Double.parseDouble(parts[1]);
-                return den == 0 ? 0 : num / den;
-            } catch (NumberFormatException ignored) {}
-        }
-        try { return Double.parseDouble(s); } catch (NumberFormatException ignored) {}
-        return 0;
     }
 
     public void shutdown() {
