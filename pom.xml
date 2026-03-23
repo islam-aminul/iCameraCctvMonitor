@@ -19,108 +19,142 @@
     </organization>
 
     <properties>
+        <!-- Build -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <javafx.version>17.0.2</javafx.version>
+
+        <!-- Application -->
         <app.main.class>com.tcs.ion.iCamera.cctv.Main</app.main.class>
         <app.name>iCamera CCTV Monitor</app.name>
         <app.version>1.0.0</app.version>
-        <!-- Set to true and configure keystore to enable signing -->
-        <app.signing.enabled>false</app.signing.enabled>
         <jre.bundle.dir>${project.basedir}/jre8-win64</jre.bundle.dir>
+
+        <!-- JavaFX -->
+        <javafx.version>17.0.2</javafx.version>
+
+        <!-- JavaCV / JavaCPP / FFmpeg -->
+        <javacpp.version>1.5.9</javacpp.version>
+        <ffmpeg.version>6.0-1.5.9</ffmpeg.version>
+
+        <!-- OSHI -->
+        <oshi.version>6.4.5</oshi.version>
+
+        <!-- Apache POI -->
+        <poi.version>5.4.0</poi.version>
+
+        <!-- Jetty -->
+        <jetty.version>9.4.53.v20231009</jetty.version>
+
+        <!-- JNA -->
+        <jna.version>5.13.0</jna.version>
+
+        <!-- Logging -->
+        <slf4j.version>1.7.36</slf4j.version>
+        <logback.version>1.2.13</logback.version>
+
+        <!-- HTTP / Codec / JSON -->
+        <httpclient.version>4.5.14</httpclient.version>
+        <commons-codec.version>1.15</commons-codec.version>
+        <gson.version>2.8.9</gson.version>
+
+        <!-- Code signing – override on the command line or in settings.xml.
+             Set signing.skip=true to build without signing. -->
+        <signing.skip>false</signing.skip>
+        <signtool.exe>signtool.exe</signtool.exe>
+        <timestamp.url>http://timestamp.digicert.com</timestamp.url>
+        <keystore.filename>iCamera-cctv-keystore.p12</keystore.filename>
+        <keystore.password>changeit</keystore.password>
+        <keystore.alias>TCSiON</keystore.alias>
     </properties>
 
     <dependencies>
-        <!-- ==================== JavaFX 17 ==================== -->
-        <!-- Base jars (no classifier) provide the Java API for compilation.
-             Windows-classifier jars bundle the native .dll files needed at runtime. -->
+        <!-- JavaFX 17 – base jars for compilation, win-classified jars for Windows natives -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>${javafx.version}</version>
+            <classifier>win</classifier>
+        </dependency>
+
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>17.0.2</version>
+            <version>${javafx.version}</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>17.0.2</version>
+            <version>${javafx.version}</version>
             <classifier>win</classifier>
         </dependency>
 
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>17.0.2</version>
+            <version>${javafx.version}</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>17.0.2</version>
+            <version>${javafx.version}</version>
             <classifier>win</classifier>
         </dependency>
 
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
-            <version>17.0.2</version>
+            <version>${javafx.version}</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
-            <version>17.0.2</version>
-            <classifier>win</classifier>
-        </dependency>
-
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-base</artifactId>
-            <version>17.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-base</artifactId>
-            <version>17.0.2</version>
+            <version>${javafx.version}</version>
             <classifier>win</classifier>
         </dependency>
 
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-swing</artifactId>
-            <version>17.0.2</version>
+            <version>${javafx.version}</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-swing</artifactId>
-            <version>17.0.2</version>
+            <version>${javafx.version}</version>
             <classifier>win</classifier>
         </dependency>
 
-        <!-- ==================== OSHI – Hardware/OS metrics ==================== -->
+        <!-- OSHI – hardware/OS metrics -->
         <dependency>
             <groupId>com.github.oshi</groupId>
             <artifactId>oshi-core</artifactId>
-            <version>6.4.5</version>
+            <version>${oshi.version}</version>
         </dependency>
 
-        <!-- ==================== Apache POI – Excel export ==================== -->
+        <!-- Apache POI – Excel export -->
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>5.4.0</version>
+            <version>${poi.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>5.4.0</version>
+            <version>${poi.version}</version>
         </dependency>
 
-        <!-- ==================== JavaCV / FFmpeg (Windows x86_64 only) ==================== -->
-        <!-- javacv base: exclude heavy optional modules not needed for RTSP probing -->
+        <!-- JavaCV / FFmpeg – RTSP probing (Windows x86_64 only) -->
         <dependency>
             <groupId>org.bytedeco</groupId>
             <artifactId>javacv</artifactId>
-            <version>1.5.9</version>
+            <version>${javacpp.version}</version>
             <exclusions>
                 <exclusion><groupId>org.bytedeco</groupId><artifactId>openblas</artifactId></exclusion>
                 <exclusion><groupId>org.bytedeco</groupId><artifactId>openblas-platform</artifactId></exclusion>
@@ -149,63 +183,61 @@
                 <exclusion><groupId>org.bytedeco</groupId><artifactId>artoolkitplus-platform</artifactId></exclusion>
             </exclusions>
         </dependency>
-        <!-- javacpp: base + Windows x86_64 native -->
         <dependency>
             <groupId>org.bytedeco</groupId>
             <artifactId>javacpp</artifactId>
-            <version>1.5.9</version>
+            <version>${javacpp.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bytedeco</groupId>
             <artifactId>javacpp</artifactId>
-            <version>1.5.9</version>
+            <version>${javacpp.version}</version>
             <classifier>windows-x86_64</classifier>
         </dependency>
-        <!-- ffmpeg: base + Windows x86_64 native only -->
         <dependency>
             <groupId>org.bytedeco</groupId>
             <artifactId>ffmpeg</artifactId>
-            <version>6.0-1.5.9</version>
+            <version>${ffmpeg.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bytedeco</groupId>
             <artifactId>ffmpeg</artifactId>
-            <version>6.0-1.5.9</version>
+            <version>${ffmpeg.version}</version>
             <classifier>windows-x86_64</classifier>
         </dependency>
 
-        <!-- ==================== Logging ==================== -->
+        <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.36</version>
+            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.2.13</version>
+            <version>${logback.version}</version>
         </dependency>
 
-        <!-- ==================== HTTP Client ==================== -->
+        <!-- HTTP client -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.14</version>
+            <version>${httpclient.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.15</version>
+            <version>${commons-codec.version}</version>
         </dependency>
 
-        <!-- ==================== JSON ==================== -->
+        <!-- JSON -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.8.9</version>
+            <version>${gson.version}</version>
         </dependency>
 
-        <!-- ==================== SOAP / XML ==================== -->
+        <!-- SOAP / XML -->
         <dependency>
             <groupId>javax.xml.soap</groupId>
             <artifactId>javax.xml.soap-api</artifactId>
@@ -217,40 +249,40 @@
             <version>1.4.0</version>
         </dependency>
 
-        <!-- ==================== Jetty (embedded REST server) ==================== -->
+        <!-- Jetty – embedded REST server -->
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.4.53.v20231009</version>
+            <version>${jetty.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
-            <version>9.4.53.v20231009</version>
+            <version>${jetty.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-webapp</artifactId>
-            <version>9.4.53.v20231009</version>
+            <version>${jetty.version}</version>
         </dependency>
 
-        <!-- ==================== Jakarta Servlet API (required by Jetty 9) ==================== -->
+        <!-- Servlet API (required by Jetty 9) -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
         </dependency>
 
-        <!-- ==================== JNA (required by OSHI) ==================== -->
+        <!-- JNA (required by OSHI) -->
         <dependency>
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna</artifactId>
-            <version>5.13.0</version>
+            <version>${jna.version}</version>
         </dependency>
         <dependency>
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna-platform</artifactId>
-            <version>5.13.0</version>
+            <version>${jna.version}</version>
         </dependency>
     </dependencies>
 
@@ -258,7 +290,7 @@
         <finalName>iCamera-cctv-${project.version}</finalName>
 
         <plugins>
-            <!-- ==================== Compiler ==================== -->
+            <!-- Compiler -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -270,13 +302,42 @@
                 </configuration>
             </plugin>
 
-            <!-- ==================== Resources ==================== -->
+            <!-- Keystore – generate a self-signed PKCS12 keystore for code signing.
+                 Set skipIfExist=true once a CA-issued certificate is in place. -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>keytool-maven-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <id>generate-keystore</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>generateKeyPair</goal>
+                        </goals>
+                        <configuration>
+                            <keystore>${project.build.directory}/${keystore.filename}</keystore>
+                            <storetype>PKCS12</storetype>
+                            <storepass>${keystore.password}</storepass>
+                            <keypass>${keystore.password}</keypass>
+                            <alias>${keystore.alias}</alias>
+                            <dname>CN=TCSiON, OU=iON, O=Tata Consultancy Services, L=Kolkata, S=West Bengal, C=IN</dname>
+                            <sigalg>SHA256withRSA</sigalg>
+                            <keyalg>RSA</keyalg>
+                            <keysize>2048</keysize>
+                            <validity>3650</validity>
+                            <skipIfExist>true</skipIfExist>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Resources – copy bundled JRE into dist/ -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.3.1</version>
                 <executions>
-                    <!-- Copy bundled JRE into dist folder (if present) -->
                     <execution>
                         <id>copy-jre</id>
                         <phase>package</phase>
@@ -297,7 +358,7 @@
                 </executions>
             </plugin>
 
-            <!-- ==================== Shade (Uber-JAR) ==================== -->
+            <!-- Shade – uber-JAR -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -343,7 +404,6 @@
                                         <exclude>module-info.class</exclude>
                                         <exclude>META-INF/versions/*/module-info.class</exclude>
                                         <exclude>META-INF/native-image/**</exclude>
-                                        <!-- Suppress overlapping substrate config from JavaFX jars -->
                                         <exclude>META-INF/substrate/**</exclude>
                                         <exclude>about.html</exclude>
                                     </excludes>
@@ -354,7 +414,7 @@
                 </executions>
             </plugin>
 
-            <!-- ==================== Launch4j (Windows EXE) ==================== -->
+            <!-- Launch4j – Windows EXE wrapper -->
             <plugin>
                 <groupId>com.akathist.maven.plugins.launch4j</groupId>
                 <artifactId>launch4j-maven-plugin</artifactId>
@@ -388,11 +448,11 @@
                             </jre>
                             <versionInfo>
                                 <fileVersion>1.0.0.0</fileVersion>
-                                <txtFileVersion>1.0.0</txtFileVersion>
+                                <txtFileVersion>${app.version}</txtFileVersion>
                                 <fileDescription>${app.name}</fileDescription>
                                 <copyright>Tata Consultancy Services Ltd.</copyright>
                                 <productVersion>1.0.0.0</productVersion>
-                                <txtProductVersion>1.0.0</txtProductVersion>
+                                <txtProductVersion>${app.version}</txtProductVersion>
                                 <productName>${app.name}</productName>
                                 <companyName>Tata Consultancy Services Ltd.</companyName>
                                 <internalName>iCameraCCTVMonitor</internalName>
@@ -409,7 +469,68 @@
                 </executions>
             </plugin>
 
-            <!-- ==================== Assembly (Windows distribution zip) ==================== -->
+            <!-- Code signing – signs JAR then EXE with signtool.exe.
+                 Override signtool.exe, keystore.filename, keystore.password, keystore.alias,
+                 and timestamp.url as needed. Skip with -Dsigning.skip=true. -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>sign-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${signing.skip}</skip>
+                            <executable>${signtool.exe}</executable>
+                            <arguments>
+                                <argument>sign</argument>
+                                <argument>/f</argument>
+                                <argument>${project.build.directory}/${keystore.filename}</argument>
+                                <argument>/p</argument>
+                                <argument>${keystore.password}</argument>
+                                <argument>/n</argument>
+                                <argument>${keystore.alias}</argument>
+                                <argument>/fd</argument>
+                                <argument>SHA256</argument>
+                                <argument>/t</argument>
+                                <argument>${timestamp.url}</argument>
+                                <argument>${project.build.directory}/dist/${project.artifactId}-${project.version}-all.jar</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>sign-exe</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${signing.skip}</skip>
+                            <executable>${signtool.exe}</executable>
+                            <arguments>
+                                <argument>sign</argument>
+                                <argument>/f</argument>
+                                <argument>${project.build.directory}/${keystore.filename}</argument>
+                                <argument>/p</argument>
+                                <argument>${keystore.password}</argument>
+                                <argument>/n</argument>
+                                <argument>${keystore.alias}</argument>
+                                <argument>/fd</argument>
+                                <argument>SHA256</argument>
+                                <argument>/t</argument>
+                                <argument>${timestamp.url}</argument>
+                                <argument>${project.build.directory}/dist/iCamera CCTV Monitor.exe</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Assembly – Windows distribution ZIP (built after signing) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -436,7 +557,7 @@
     </build>
 
     <profiles>
-        <!-- ==================== Windows x64 Build Profile (default) ==================== -->
+        <!-- Windows x64 (default) -->
         <profile>
             <id>windows-x64</id>
             <activation>
@@ -445,57 +566,6 @@
             <properties>
                 <platform>windows-x86_64</platform>
             </properties>
-        </profile>
-
-        <!-- ==================== Code Signing Profile (disabled by default) ==================== -->
-        <profile>
-            <id>sign-exe</id>
-            <activation>
-                <property>
-                    <name>app.signing.enabled</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <!--
-                To sign the EXE, configure:
-                  -Dkeystore.file=/path/to/keystore.p12
-                  -Dkeystore.password=<password>
-                  -Dkeystore.alias=<alias>
-                Then invoke signtool.exe or use a Maven exec plugin execution.
-            -->
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <version>3.1.0</version>
-                        <executions>
-                            <execution>
-                                <id>sign-with-signtool</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>signtool.exe</executable>
-                                    <arguments>
-                                        <argument>sign</argument>
-                                        <argument>/f</argument>
-                                        <argument>${keystore.file}</argument>
-                                        <argument>/p</argument>
-                                        <argument>${keystore.password}</argument>
-                                        <argument>/n</argument>
-                                        <argument>${keystore.alias}</argument>
-                                        <argument>/t</argument>
-                                        <argument>http://timestamp.digicert.com</argument>
-                                        <argument>${project.build.directory}/dist/iCamera CCTV Monitor.exe</argument>
-                                    </arguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
     </profiles>
 </project>
