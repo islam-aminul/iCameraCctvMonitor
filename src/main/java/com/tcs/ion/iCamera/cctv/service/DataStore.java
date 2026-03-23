@@ -43,6 +43,10 @@ public class DataStore {
     // --- Last successful poll time ---
     private volatile Instant lastPollTime;
 
+    // --- URL connectivity & SSL check results ---
+    private final CopyOnWriteArrayList<com.tcs.ion.iCamera.cctv.model.UrlCheckResult> urlCheckResults =
+            new CopyOnWriteArrayList<>();
+
     // --- VMS Detection ---
     private final CopyOnWriteArrayList<VmsInfo> vmsData = new CopyOnWriteArrayList<>();
     private volatile Instant lastVmsScanTime;
@@ -178,6 +182,17 @@ public class DataStore {
     }
 
     public Instant getLastPollTime() { return lastPollTime; }
+
+    // ---- URL connectivity & SSL ----
+
+    public void updateUrlCheckResults(List<com.tcs.ion.iCamera.cctv.model.UrlCheckResult> results) {
+        urlCheckResults.clear();
+        urlCheckResults.addAll(results);
+    }
+
+    public List<com.tcs.ion.iCamera.cctv.model.UrlCheckResult> getUrlCheckResults() {
+        return Collections.unmodifiableList(urlCheckResults);
+    }
 
     // ---- VMS Detection ----
 

@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -25,6 +26,7 @@ public class AlertService {
         evaluateSystem();
         evaluateCctv();
         evaluateNetwork();
+        evaluateUrlChecks();
     }
 
     private void evaluateProxy() {
@@ -113,6 +115,36 @@ public class AlertService {
                 AlertData.Severity.WARNING, AlertData.Category.NETWORK,
                 "Network", "UPLOAD_SPEED",
                 "Upload speed is 0 MB/s – possible network issue");
+    }
+
+    private void evaluateUrlChecks() {
+        List<UrlCheckResult> results = store.getUrlCheckResults();
+        if (results.isEmpty()) return;
+
+        for (UrlCheckResult r : results) {
+            String h = r.getHost();
+
+            // Connectivity down → CRITICAL
+            raiseOrClear("URL_DOWN_" + h, !r.isReachable(),
+                    AlertData.Severity.CRITICAL, AlertData.Category.NETWORK,
+                    h, "CONNECTIVITY",
+                    "Connectivity to " + h + " is DOWN – host unreachable on port 443");
+
+            // SSL invalid → WARNING (only when host is reachable)
+            boolean sslFailed = r.isReachable() && !r.isSslValid();
+            String sslMsg = "SSL certificate validation failed for " + h
+                    + (r.getErrorMessage().isEmpty() ? "" : ": " + r.getErrorMessage());
+            raiseOrClear("SSL_INVALID_" + h, sslFailed,
+                    AlertData.Severity.WARNING, AlertData.Category.NETWORK,
+                    h, "SSL_CERTIFICATE", sslMsg);
+
+            // SSL expiring within 30 days → WARNING
+            boolean expiringSoon = r.isReachable() && r.isSslValid() && r.getSslDaysLeft() < 30;
+            raiseOrClear("SSL_EXPIRING_" + h, expiringSoon,
+                    AlertData.Severity.WARNING, AlertData.Category.NETWORK,
+                    h, "SSL_EXPIRY",
+                    "SSL certificate for " + h + " expires in " + r.getSslDaysLeft() + " days");
+        }
     }
 
     // Overload without numeric value

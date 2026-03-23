@@ -3,15 +3,16 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.chart.*?>
 <?import javafx.geometry.*?>
-<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.tcs.ion.iCamera.cctv.controller.NetworkMonitorController"
-      styleClass="page-root" spacing="16">
+<ScrollPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.tcs.ion.iCamera.cctv.controller.NetworkMonitorController"
+            fitToWidth="true" styleClass="page-scroll">
+<VBox styleClass="page-root" spacing="16">
     <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
 
     <Label text="Network Monitor" styleClass="page-title"/>
     <Separator/>
 
-    <!-- Current speed metrics -->
+    <!-- ── Upload speed metrics ─────────────────────────────────── -->
     <HBox spacing="24" styleClass="summary-bar">
         <VBox spacing="4">
             <Label text="Current Upload Speed" styleClass="tile-header"/>
@@ -27,18 +28,36 @@
         </VBox>
     </HBox>
 
-    <!-- Line chart -->
-    <LineChart fx:id="chartUploadSpeed" VBox.vgrow="ALWAYS" styleClass="network-chart"
+    <!-- ── Line chart ───────────────────────────────────────────── -->
+    <LineChart fx:id="chartUploadSpeed" prefHeight="220" styleClass="network-chart"
                animated="false" legendVisible="true">
         <xAxis><CategoryAxis fx:id="xAxis" label="Time"/></xAxis>
         <yAxis><NumberAxis fx:id="yAxis"   label="MB/s" lowerBound="0" autoRanging="true"/></yAxis>
     </LineChart>
 
-    <!-- History table -->
-    <TableView fx:id="tableHistory" prefHeight="200" styleClass="data-table">
+    <!-- ── Speed history table ──────────────────────────────────── -->
+    <TableView fx:id="tableHistory" prefHeight="180" styleClass="data-table">
         <columns>
-            <TableColumn fx:id="colTime"  text="Timestamp"  prefWidth="160"/>
-            <TableColumn fx:id="colSpeed" text="Upload Speed" prefWidth="160"/>
+            <TableColumn fx:id="colTime"  text="Timestamp"    prefWidth="160"/>
+            <TableColumn fx:id="colSpeed" text="Upload Speed"  prefWidth="160"/>
         </columns>
     </TableView>
+
+    <!-- ── URL Connectivity &amp; SSL Certificates ───────────────── -->
+    <Label text="URL Connectivity &amp; SSL Certificates" styleClass="section-header"/>
+    <TableView fx:id="tableUrlChecks" prefHeight="160" styleClass="data-table">
+        <columns>
+            <TableColumn fx:id="urlColHost"    text="Host"          prefWidth="175"/>
+            <TableColumn fx:id="urlColStatus"  text="Connectivity"  prefWidth="110"/>
+            <TableColumn fx:id="urlColHttp"    text="HTTP"          prefWidth="70"/>
+            <TableColumn fx:id="urlColSsl"     text="SSL"           prefWidth="90"/>
+            <TableColumn fx:id="urlColIssuer"  text="Issuer"        prefWidth="200"/>
+            <TableColumn fx:id="urlColExpiry"  text="Expiry"        prefWidth="110"/>
+            <TableColumn fx:id="urlColDays"    text="Days Left"     prefWidth="85"/>
+            <TableColumn fx:id="urlColChecked" text="Checked"       prefWidth="75"/>
+        </columns>
+        <placeholder><Label text="Checking connectivity…" styleClass="tile-sublabel"/></placeholder>
+    </TableView>
+
 </VBox>
+</ScrollPane>

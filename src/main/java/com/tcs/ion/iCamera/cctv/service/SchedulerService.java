@@ -27,6 +27,7 @@ public class SchedulerService {
     private final AtomicBoolean ffprobePollRunning  = new AtomicBoolean(false);
     private final AtomicBoolean alertPollRunning    = new AtomicBoolean(false);
     private final AtomicBoolean vmsPollRunning      = new AtomicBoolean(false);
+    private final AtomicBoolean urlCheckRunning     = new AtomicBoolean(false);
 
     private final JmxService           jmxService;
     private final OshiService          oshiService;
@@ -34,10 +35,11 @@ public class SchedulerService {
     private final AlertService         alertService;
     private final WindowsServiceReader wsReader;
     private final VmsDetectionService  vmsService;
+    private final UrlCheckService      urlCheckService = new UrlCheckService();
     private final DataStore            store = DataStore.getInstance();
 
     private ScheduledFuture<?> jmxFuture, oshiFuture, ffprobeFuture, alertFuture,
-                                staleFuture, vmsFuture;
+                                staleFuture, vmsFuture, urlCheckFuture;
 
     public SchedulerService(JmxService jmxService,
                             OshiService oshiService,
@@ -135,11 +137,26 @@ public class SchedulerService {
             }
         }, 3, 60, TimeUnit.SECONDS);
 
+        // URL connectivity & SSL checks (initial run after 5 s, then every 60 s)
+        urlCheckFuture = executor.scheduleAtFixedRate(() -> {
+            if (urlCheckRunning.compareAndSet(false, true)) {
+                try {
+                    urlCheckService.checkAll();
+                } catch (Exception e) {
+                    log.error("URL check scheduler error", e);
+                } finally {
+                    urlCheckRunning.set(false);
+                }
+            } else {
+                log.debug("URL check skipped – previous cycle still running");
+            }
+        }, 5, 60, TimeUnit.SECONDS);
+
         log.info("SchedulerService started (pollInterval={}s)", pollSec);
     }
 
     public void stop() {
-        cancelIfNotNull(jmxFuture, oshiFuture, ffprobeFuture, alertFuture, staleFuture, vmsFuture);
+        cancelIfNotNull(jmxFuture, oshiFuture, ffprobeFuture, alertFuture, staleFuture, vmsFuture, urlCheckFuture);
         executor.shutdown();
         try { executor.awaitTermination(5, TimeUnit.SECONDS); } catch (InterruptedException ignored) {}
         log.info("SchedulerService stopped");
