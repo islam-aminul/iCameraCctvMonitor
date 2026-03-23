@@ -8,6 +8,7 @@
     <VBox styleClass="page-root" spacing="16">
         <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
 
+        <!-- Header row -->
         <HBox alignment="CENTER_LEFT" spacing="12">
             <Label text="System Hardware Monitor" styleClass="page-title"/>
             <Region HBox.hgrow="ALWAYS"/>
@@ -15,6 +16,7 @@
         </HBox>
         <Separator/>
 
+        <!-- ====== Row 1: CPU + RAM ====== -->
         <HBox spacing="16">
             <!-- CPU Info -->
             <VBox styleClass="tile" spacing="8" HBox.hgrow="ALWAYS" style="-fx-padding:16;">
@@ -33,20 +35,70 @@
             <!-- RAM Info -->
             <VBox styleClass="tile" spacing="8" HBox.hgrow="ALWAYS" style="-fx-padding:16;">
                 <Label text="Memory" styleClass="section-header"/>
-                <Label fx:id="lblRamTotal"    styleClass="detail-value"/>
-                <Label fx:id="lblRamAvail"    styleClass="detail-value"/>
-                <Label fx:id="lblRamType"     styleClass="detail-value"/>
+                <Label fx:id="lblRamTotal"       styleClass="detail-value"/>
+                <Label fx:id="lblRamAvail"       styleClass="detail-value"/>
+                <Label fx:id="lblRamType"        styleClass="detail-value"/>
                 <Separator/>
-                <Label fx:id="lblRamUsage"    styleClass="detail-value"/>
-                <ProgressBar fx:id="pbRam"    progress="0" maxWidth="Infinity"/>
-                <Label fx:id="lblProxyRamUsage" styleClass="detail-value text-blue"/>
+                <Label fx:id="lblRamUsage"       styleClass="detail-value"/>
+                <ProgressBar fx:id="pbRam"       progress="0" maxWidth="Infinity"/>
+                <Label fx:id="lblProxyRamUsage"  styleClass="detail-value text-blue"/>
             </VBox>
         </HBox>
 
-        <!-- Drives -->
+        <!-- ====== Row 2: Drives ====== -->
         <VBox styleClass="tile" spacing="8" style="-fx-padding:16;">
-            <Label text="Storage" styleClass="section-header"/>
+            <Label text="Storage Drives" styleClass="section-header"/>
             <VBox fx:id="vboxDrives" spacing="8"/>
         </VBox>
+
+        <!-- ====== Row 3: Top-5 process tables ====== -->
+        <Label text="Top Processes" styleClass="section-header"/>
+
+        <!-- Top-5 CPU -->
+        <VBox styleClass="tile" spacing="6" style="-fx-padding:12;">
+            <Label text="Top 5 by CPU Usage" styleClass="tile-header"/>
+            <TableView fx:id="tblTopCpu" prefHeight="185" styleClass="data-table">
+                <columns>
+                    <TableColumn fx:id="cpuColPid"  text="PID"    prefWidth="70"/>
+                    <TableColumn fx:id="cpuColName" text="Process" prefWidth="220"/>
+                    <TableColumn fx:id="cpuColUser" text="User"    prefWidth="130"/>
+                    <TableColumn fx:id="cpuColCpu"  text="CPU %"   prefWidth="90"/>
+                    <TableColumn fx:id="cpuColMem"  text="Memory"  prefWidth="100"/>
+                </columns>
+                <placeholder><Label text="No data yet" styleClass="tile-sublabel"/></placeholder>
+            </TableView>
+        </VBox>
+
+        <!-- Top-5 Memory -->
+        <VBox styleClass="tile" spacing="6" style="-fx-padding:12;">
+            <Label text="Top 5 by Memory Usage" styleClass="tile-header"/>
+            <TableView fx:id="tblTopMem" prefHeight="185" styleClass="data-table">
+                <columns>
+                    <TableColumn fx:id="memColPid"  text="PID"    prefWidth="70"/>
+                    <TableColumn fx:id="memColName" text="Process" prefWidth="220"/>
+                    <TableColumn fx:id="memColUser" text="User"    prefWidth="130"/>
+                    <TableColumn fx:id="memColMem"  text="Memory"  prefWidth="100"/>
+                    <TableColumn fx:id="memColCpu"  text="CPU %"   prefWidth="90"/>
+                </columns>
+                <placeholder><Label text="No data yet" styleClass="tile-sublabel"/></placeholder>
+            </TableView>
+        </VBox>
+
+        <!-- Top-5 Disk I/O -->
+        <VBox styleClass="tile" spacing="6" style="-fx-padding:12;">
+            <Label text="Top 5 by Disk I/O" styleClass="tile-header"/>
+            <TableView fx:id="tblTopDisk" prefHeight="185" styleClass="data-table">
+                <columns>
+                    <TableColumn fx:id="diskColPid"   text="PID"       prefWidth="70"/>
+                    <TableColumn fx:id="diskColName"  text="Process"    prefWidth="200"/>
+                    <TableColumn fx:id="diskColUser"  text="User"       prefWidth="120"/>
+                    <TableColumn fx:id="diskColRead"  text="Disk Read"  prefWidth="110"/>
+                    <TableColumn fx:id="diskColWrite" text="Disk Write" prefWidth="110"/>
+                    <TableColumn fx:id="diskColMem"   text="Memory"     prefWidth="100"/>
+                </columns>
+                <placeholder><Label text="No data yet" styleClass="tile-sublabel"/></placeholder>
+            </TableView>
+        </VBox>
+
     </VBox>
 </ScrollPane>

@@ -26,15 +26,18 @@ public class SchedulerService {
     private final AtomicBoolean oshiPollRunning     = new AtomicBoolean(false);
     private final AtomicBoolean ffprobePollRunning  = new AtomicBoolean(false);
     private final AtomicBoolean alertPollRunning    = new AtomicBoolean(false);
+    private final AtomicBoolean vmsPollRunning      = new AtomicBoolean(false);
 
-    private final JmxService          jmxService;
-    private final OshiService         oshiService;
-    private final FfprobeService      ffprobeService;
-    private final AlertService        alertService;
+    private final JmxService           jmxService;
+    private final OshiService          oshiService;
+    private final FfprobeService       ffprobeService;
+    private final AlertService         alertService;
     private final WindowsServiceReader wsReader;
-    private final DataStore           store = DataStore.getInstance();
+    private final VmsDetectionService  vmsService;
+    private final DataStore            store = DataStore.getInstance();
 
-    private ScheduledFuture<?> jmxFuture, oshiFuture, ffprobeFuture, alertFuture, staleFuture;
+    private ScheduledFuture<?> jmxFuture, oshiFuture, ffprobeFuture, alertFuture,
+                                staleFuture, vmsFuture;
 
     public SchedulerService(JmxService jmxService,
                             OshiService oshiService,
@@ -46,6 +49,7 @@ public class SchedulerService {
         this.ffprobeService  = ffprobeService;
         this.alertService    = alertService;
         this.wsReader        = wsReader;
+        this.vmsService      = new VmsDetectionService();
     }
 
     public void start() {
@@ -115,11 +119,27 @@ public class SchedulerService {
         staleFuture = executor.scheduleAtFixedRate(store::markStaleIfExpired,
                 pollSec, pollSec, TimeUnit.SECONDS);
 
+        // VMS detection – initial scan at startup, then every 60 seconds
+        // (or immediately on manual rescan request)
+        vmsFuture = executor.scheduleAtFixedRate(() -> {
+            boolean manualRequest = store.isVmsRescanRequested();
+            if (manualRequest || vmsPollRunning.compareAndSet(false, true)) {
+                store.clearVmsRescanFlag();
+                try {
+                    vmsService.scan();
+                } catch (Exception e) {
+                    log.error("VMS scan error", e);
+                } finally {
+                    vmsPollRunning.set(false);
+                }
+            }
+        }, 3, 60, TimeUnit.SECONDS);
+
         log.info("SchedulerService started (pollInterval={}s)", pollSec);
     }
 
     public void stop() {
-        cancelIfNotNull(jmxFuture, oshiFuture, ffprobeFuture, alertFuture, staleFuture);
+        cancelIfNotNull(jmxFuture, oshiFuture, ffprobeFuture, alertFuture, staleFuture, vmsFuture);
         executor.shutdown();
         try { executor.awaitTermination(5, TimeUnit.SECONDS); } catch (InterruptedException ignored) {}
         log.info("SchedulerService stopped");

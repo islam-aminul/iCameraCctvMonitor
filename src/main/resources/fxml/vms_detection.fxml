@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.tcs.ion.iCamera.cctv.controller.VmsDetectionController"
+      styleClass="page-root" spacing="12">
+    <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <Label text="VMS Detection" styleClass="page-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnRescan" text="Re-scan Now" onAction="#onRescan" styleClass="btn-primary"/>
+    </HBox>
+    <Separator/>
+
+    <!-- Summary bar -->
+    <HBox spacing="20" styleClass="summary-bar" alignment="CENTER_LEFT">
+        <VBox spacing="2">
+            <Label text="STATUS" styleClass="tile-header"/>
+            <Label fx:id="lblScanStatus" styleClass="detail-value text-green" wrapText="true"/>
+        </VBox>
+        <Separator orientation="VERTICAL"/>
+        <Label fx:id="lblTotalDetected" styleClass="summary-chip"/>
+        <Label fx:id="lblRunning"       styleClass="summary-chip text-yellow"/>
+        <Label fx:id="lblStopped"       styleClass="summary-chip text-white"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="lblLastScan" styleClass="header-meta"/>
+    </HBox>
+
+    <!-- "No VMS" panel -->
+    <VBox fx:id="paneNoVms" styleClass="tile" alignment="CENTER" spacing="16"
+          prefHeight="200" visible="true">
+        <Label text="✓" style="-fx-font-size:48; -fx-text-fill:#00E676;"/>
+        <Label text="No Video Management Software detected on this machine."
+               styleClass="detail-value text-green" wrapText="true" textAlignment="CENTER"/>
+        <Label text="Scanned: Milestone, Hikvision, Dahua, Avigilon, Genetec, Axis, Bosch,&#10;Hanwha, Pelco, Exacq, NUUO, Digifort"
+               styleClass="header-meta" textAlignment="CENTER" wrapText="true"/>
+    </VBox>
+
+    <!-- Main split: table + detail card -->
+    <HBox spacing="12" VBox.vgrow="ALWAYS">
+
+        <!-- Table -->
+        <TableView fx:id="tableVms" HBox.hgrow="ALWAYS" styleClass="data-table" visible="false">
+            <columns>
+                <TableColumn fx:id="colVendor"  text="Vendor / Software"  prefWidth="200"/>
+                <TableColumn fx:id="colProcess" text="Process / Service"  prefWidth="180"/>
+                <TableColumn fx:id="colStatus"  text="Status"             prefWidth="110"/>
+                <TableColumn fx:id="colPid"     text="PID"               prefWidth="70"/>
+                <TableColumn fx:id="colCpu"     text="CPU"               prefWidth="75"/>
+                <TableColumn fx:id="colMemory"  text="Memory"            prefWidth="90"/>
+                <TableColumn fx:id="colPath"    text="Path / Service"    prefWidth="260"/>
+            </columns>
+            <placeholder>
+                <Label text="No VMS software detected" styleClass="tile-sublabel"/>
+            </placeholder>
+        </TableView>
+
+        <!-- Detail card (shown when a row is selected) -->
+        <VBox fx:id="paneDetails" styleClass="tile" spacing="10" prefWidth="280" visible="false">
+            <padding><Insets top="16" left="16" right="16" bottom="16"/></padding>
+            <Label text="DETAILS" styleClass="section-header"/>
+            <Separator/>
+            <GridPane hgap="10" vgap="8">
+                <Label text="Vendor:"   GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="detail-label"/>
+                <Label fx:id="lblDetailVendor"  GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="detail-value" wrapText="true"/>
+
+                <Label text="Process:"  GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="detail-label"/>
+                <Label fx:id="lblDetailProcess" GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="detail-value" wrapText="true"/>
+
+                <Label text="Status:"   GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="detail-label"/>
+                <Label fx:id="lblDetailStatus"  GridPane.columnIndex="1" GridPane.rowIndex="2" styleClass="detail-value"/>
+
+                <Label text="PID:"      GridPane.columnIndex="0" GridPane.rowIndex="3" styleClass="detail-label"/>
+                <Label fx:id="lblDetailPid"     GridPane.columnIndex="1" GridPane.rowIndex="3" styleClass="detail-value"/>
+
+                <Label text="CPU:"      GridPane.columnIndex="0" GridPane.rowIndex="4" styleClass="detail-label"/>
+                <Label fx:id="lblDetailCpu"     GridPane.columnIndex="1" GridPane.rowIndex="4" styleClass="detail-value"/>
+
+                <Label text="Memory:"   GridPane.columnIndex="0" GridPane.rowIndex="5" styleClass="detail-label"/>
+                <Label fx:id="lblDetailMemory"  GridPane.columnIndex="1" GridPane.rowIndex="5" styleClass="detail-value"/>
+
+                <Label text="User:"     GridPane.columnIndex="0" GridPane.rowIndex="6" styleClass="detail-label"/>
+                <Label fx:id="lblDetailUser"    GridPane.columnIndex="1" GridPane.rowIndex="6" styleClass="detail-value"/>
+
+                <Label text="Path:"     GridPane.columnIndex="0" GridPane.rowIndex="7" styleClass="detail-label"/>
+                <Label fx:id="lblDetailPath"    GridPane.columnIndex="1" GridPane.rowIndex="7" styleClass="detail-value"
+                       wrapText="true" maxWidth="180"/>
+            </GridPane>
+        </VBox>
+    </HBox>
+
+    <!-- Vendor legend -->
+    <TitledPane text="Monitored VMS Software" expanded="false" styleClass="settings-pane">
+        <FlowPane hgap="12" vgap="8" style="-fx-padding:10;">
+            <Label text="Milestone XProtect"         styleClass="summary-chip"/>
+            <Label text="Hikvision iVMS / HikCentral" styleClass="summary-chip"/>
+            <Label text="Dahua DSS / SmartPSS"       styleClass="summary-chip"/>
+            <Label text="Avigilon ACC"                styleClass="summary-chip"/>
+            <Label text="Genetec Security Center"     styleClass="summary-chip"/>
+            <Label text="Axis Camera Station"         styleClass="summary-chip"/>
+            <Label text="Bosch BVMS"                  styleClass="summary-chip"/>
+            <Label text="Hanwha Wisenet SSM"          styleClass="summary-chip"/>
+            <Label text="Pelco VideoXpert"            styleClass="summary-chip"/>
+            <Label text="Exacq Vision"                styleClass="summary-chip"/>
+            <Label text="NUUO Crystal"                styleClass="summary-chip"/>
+            <Label text="Digifort"                    styleClass="summary-chip"/>
+        </FlowPane>
+    </TitledPane>
+</VBox>

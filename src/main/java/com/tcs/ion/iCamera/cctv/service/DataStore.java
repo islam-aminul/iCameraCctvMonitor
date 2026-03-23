@@ -43,6 +43,13 @@ public class DataStore {
     // --- Last successful poll time ---
     private volatile Instant lastPollTime;
 
+    // --- VMS Detection ---
+    private final CopyOnWriteArrayList<VmsInfo> vmsData = new CopyOnWriteArrayList<>();
+    private volatile Instant lastVmsScanTime;
+    // Tracks alert keys already raised to avoid duplicates
+    private final java.util.Set<String> raisedAlertKeys =
+            java.util.Collections.synchronizedSet(new java.util.HashSet<>());
+
     private DataStore() {}
 
     public static DataStore getInstance() { return INSTANCE; }
@@ -171,4 +178,36 @@ public class DataStore {
     }
 
     public Instant getLastPollTime() { return lastPollTime; }
+
+    // ---- VMS Detection ----
+
+    public void updateVmsData(List<VmsInfo> data) {
+        vmsData.clear();
+        vmsData.addAll(data);
+        lastVmsScanTime = Instant.now();
+    }
+
+    public List<VmsInfo> getVmsData() {
+        return Collections.unmodifiableList(vmsData);
+    }
+
+    public Instant getLastVmsScanTime() { return lastVmsScanTime; }
+
+    /** Signals that VmsDetectionService should run a fresh scan on next scheduler tick. */
+    private volatile boolean vmsRescanRequested = false;
+    public void triggerVmsRescan() { vmsRescanRequested = true; }
+    public boolean isVmsRescanRequested() { return vmsRescanRequested; }
+    public void clearVmsRescanFlag() { vmsRescanRequested = false; }
+
+    /**
+     * Adds an alert only if the given key has not been raised before.
+     * Used by VmsDetectionService to avoid duplicate VMS alerts.
+     */
+    public void addAlertIfNew(String key, AlertData alert) {
+        if (raisedAlertKeys.add(key)) {
+            addAlert(alert);
+        }
+    }
+
+    public void clearAlertKey(String key) { raisedAlertKeys.remove(key); }
 }

@@ -41,6 +41,7 @@ public class MainController implements Initializable {
     @FXML private Button btnNetworkMonitor;
     @FXML private Button btnAlerts;
     @FXML private Button btnStreamAnalytics;
+    @FXML private Button btnVmsDetection;
     @FXML private Button btnDiscovery;
     @FXML private Button btnSettings;
     @FXML private Label lblAlertBadge;
@@ -67,6 +68,7 @@ public class MainController implements Initializable {
     @FXML private void showNetworkMonitor()  { navigateTo("network_monitor");  setActive(btnNetworkMonitor); }
     @FXML private void showAlerts()          { navigateTo("alerts");           setActive(btnAlerts); }
     @FXML private void showStreamAnalytics() { navigateTo("stream_analytics"); setActive(btnStreamAnalytics); }
+    @FXML private void showVmsDetection()    { navigateTo("vms_detection");    setActive(btnVmsDetection); }
     @FXML private void showDiscovery()       { navigateTo("discovery");        setActive(btnDiscovery); }
     @FXML private void showSettings()        { navigateTo("settings");         setActive(btnSettings); }
 

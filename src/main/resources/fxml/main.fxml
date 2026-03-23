@@ -50,6 +50,8 @@
 
             <Button fx:id="btnStreamAnalytics" text="▶  Stream Analytics"    onAction="#showStreamAnalytics"
                     maxWidth="Infinity" styleClass="nav-btn"/>
+            <Button fx:id="btnVmsDetection"    text="⬡  VMS Detection"       onAction="#showVmsDetection"
+                    maxWidth="Infinity" styleClass="nav-btn"/>
 
             <Separator styleClass="sidebar-sep"/>
             <Label text="TOOLS" styleClass="sidebar-section-header"/>

@@ -3,6 +3,7 @@ package com.tcs.ion.iCamera.cctv.model;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
 
 /**
  * System-level hardware and OS metrics, combined from JMX and OSHI.
@@ -16,6 +17,11 @@ public class SystemMetrics {
 
     // Drive details from JMX / OSHI
     private List<DriveInfo> drives = new ArrayList<>();
+
+    // Top-5 process lists (populated by OshiService)
+    private List<ProcessInfo> topCpuProcesses    = new ArrayList<>();
+    private List<ProcessInfo> topMemoryProcesses = new ArrayList<>();
+    private List<ProcessInfo> topDiskIoProcesses = new ArrayList<>();
 
     // OSHI hardware details
     private String cpuName;
@@ -128,4 +134,13 @@ public class SystemMetrics {
 
     public boolean isStale() { return stale; }
     public void setStale(boolean stale) { this.stale = stale; }
+
+    public List<ProcessInfo> getTopCpuProcesses()    { return Collections.unmodifiableList(topCpuProcesses); }
+    public void setTopCpuProcesses(List<ProcessInfo> p)    { this.topCpuProcesses = p != null ? p : new ArrayList<>(); }
+
+    public List<ProcessInfo> getTopMemoryProcesses() { return Collections.unmodifiableList(topMemoryProcesses); }
+    public void setTopMemoryProcesses(List<ProcessInfo> p) { this.topMemoryProcesses = p != null ? p : new ArrayList<>(); }
+
+    public List<ProcessInfo> getTopDiskIoProcesses() { return Collections.unmodifiableList(topDiskIoProcesses); }
+    public void setTopDiskIoProcesses(List<ProcessInfo> p) { this.topDiskIoProcesses = p != null ? p : new ArrayList<>(); }
 }
