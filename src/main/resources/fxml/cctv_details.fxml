@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.tcs.ion.iCamera.cctv.controller.CctvDetailsController"
+      styleClass="page-root" spacing="12">
+    <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+
+    <Label text="CCTV Details" styleClass="page-title"/>
+    <Separator/>
+
+    <!-- Summary bar -->
+    <HBox spacing="24" alignment="CENTER_LEFT" styleClass="summary-bar">
+        <Label fx:id="lblTotal"    styleClass="summary-chip"/>
+        <Label fx:id="lblActive"   styleClass="summary-chip text-green"/>
+        <Label fx:id="lblInactive" styleClass="summary-chip text-red"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <TextField fx:id="txtSearch" promptText="Search name / IP / status…" prefWidth="240" styleClass="search-field"/>
+    </HBox>
+
+    <!-- Warning banner -->
+    <Label fx:id="lblWarning" styleClass="warning-banner" visible="false" wrapText="true"/>
+
+    <!-- Table (fills remaining space) -->
+    <TableView fx:id="tableCctv" VBox.vgrow="ALWAYS" styleClass="data-table">
+        <columns>
+            <TableColumn fx:id="colId"         text="ID"          prefWidth="55"/>
+            <TableColumn fx:id="colName"       text="Name"        prefWidth="160"/>
+            <TableColumn fx:id="colIp"         text="IP"          prefWidth="120"/>
+            <TableColumn fx:id="colRtsp"       text="RTSP URL"    prefWidth="200"/>
+            <TableColumn fx:id="colReachable"  text="Reachable"   prefWidth="80"/>
+            <TableColumn fx:id="colFileGen"    text="File Gen"    prefWidth="80"/>
+            <TableColumn fx:id="colFileUpload" text="Upload"      prefWidth="80"/>
+            <TableColumn fx:id="colEncoding"   text="Encoding"    prefWidth="80"/>
+            <TableColumn fx:id="colProfile"    text="Profile"     prefWidth="80"/>
+            <TableColumn fx:id="colFps"        text="FPS"         prefWidth="60"/>
+            <TableColumn fx:id="colResolution" text="Resolution"  prefWidth="100"/>
+            <TableColumn fx:id="colStatus"     text="Status"      prefWidth="90"/>
+        </columns>
+    </TableView>
+</VBox>

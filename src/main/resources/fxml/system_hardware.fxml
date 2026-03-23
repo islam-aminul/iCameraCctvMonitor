@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<ScrollPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.tcs.ion.iCamera.cctv.controller.SystemHardwareController"
+            fitToWidth="true" styleClass="page-scroll">
+    <VBox styleClass="page-root" spacing="16">
+        <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+
+        <HBox alignment="CENTER_LEFT" spacing="12">
+            <Label text="System Hardware Monitor" styleClass="page-title"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="lblOverallHealth" styleClass="tile-value-large text-green"/>
+        </HBox>
+        <Separator/>
+
+        <HBox spacing="16">
+            <!-- CPU Info -->
+            <VBox styleClass="tile" spacing="8" HBox.hgrow="ALWAYS" style="-fx-padding:16;">
+                <Label text="CPU" styleClass="section-header"/>
+                <Label fx:id="lblCpuName"    styleClass="detail-value"/>
+                <Label fx:id="lblCpuCores"   styleClass="detail-value"/>
+                <Label fx:id="lblCpuThreads" styleClass="detail-value"/>
+                <Label fx:id="lblCpuFreq"    styleClass="detail-value"/>
+                <Separator/>
+                <Label fx:id="lblCpuUsage"       styleClass="detail-value"/>
+                <ProgressBar fx:id="pbCpuSystem" progress="0" maxWidth="Infinity"/>
+                <Label fx:id="lblProxyCpuUsage"  styleClass="detail-value text-blue"/>
+                <ProgressBar fx:id="pbCpuProxy"  progress="0" maxWidth="Infinity"/>
+            </VBox>
+
+            <!-- RAM Info -->
+            <VBox styleClass="tile" spacing="8" HBox.hgrow="ALWAYS" style="-fx-padding:16;">
+                <Label text="Memory" styleClass="section-header"/>
+                <Label fx:id="lblRamTotal"    styleClass="detail-value"/>
+                <Label fx:id="lblRamAvail"    styleClass="detail-value"/>
+                <Label fx:id="lblRamType"     styleClass="detail-value"/>
+                <Separator/>
+                <Label fx:id="lblRamUsage"    styleClass="detail-value"/>
+                <ProgressBar fx:id="pbRam"    progress="0" maxWidth="Infinity"/>
+                <Label fx:id="lblProxyRamUsage" styleClass="detail-value text-blue"/>
+            </VBox>
+        </HBox>
+
+        <!-- Drives -->
+        <VBox styleClass="tile" spacing="8" style="-fx-padding:16;">
+            <Label text="Storage" styleClass="section-header"/>
+            <VBox fx:id="vboxDrives" spacing="8"/>
+        </VBox>
+    </VBox>
+</ScrollPane>

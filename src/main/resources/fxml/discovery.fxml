@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.tcs.ion.iCamera.cctv.controller.DiscoveryController"
+      styleClass="page-root" spacing="16" alignment="CENTER">
+    <padding><Insets top="40" left="40" right="40" bottom="40"/></padding>
+
+    <Label text="Discovery" styleClass="page-title"/>
+    <Separator/>
+
+    <VBox styleClass="tile" spacing="16" alignment="CENTER" maxWidth="600">
+        <padding><Insets top="40" left="40" right="40" bottom="40"/></padding>
+        <Label text="🔍" style="-fx-font-size:64;"/>
+        <Label fx:id="lblUnderDevelopment" styleClass="under-dev-label"
+               wrapText="true" textAlignment="CENTER"/>
+    </VBox>
+</VBox>

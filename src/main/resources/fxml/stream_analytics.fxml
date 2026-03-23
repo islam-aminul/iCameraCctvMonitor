@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.tcs.ion.iCamera.cctv.controller.StreamAnalyticsController"
+      styleClass="page-root" spacing="12">
+    <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+
+    <Label text="Stream Analytics" styleClass="page-title"/>
+    <Separator/>
+
+    <HBox spacing="16" alignment="CENTER_LEFT">
+        <Label fx:id="lblTotalStreams" styleClass="summary-chip"/>
+        <Label fx:id="lblLastProbeTime" styleClass="detail-value"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <TextField fx:id="txtSearch" promptText="Search name / IP / encoding…" prefWidth="240" styleClass="search-field"/>
+    </HBox>
+
+    <TableView fx:id="tableStreams" VBox.vgrow="ALWAYS" styleClass="data-table">
+        <columns>
+            <TableColumn fx:id="colId"          text="ID"         prefWidth="55"/>
+            <TableColumn fx:id="colName"         text="Name"       prefWidth="150"/>
+            <TableColumn fx:id="colIp"           text="IP"         prefWidth="120"/>
+            <TableColumn fx:id="colRtsp"         text="RTSP URL"   prefWidth="200"/>
+            <TableColumn fx:id="colEncoding"     text="Codec"      prefWidth="80"/>
+            <TableColumn fx:id="colProfile"      text="Profile"    prefWidth="80"/>
+            <TableColumn fx:id="colFps"          text="FPS"        prefWidth="80"/>
+            <TableColumn fx:id="colResolution"   text="Resolution" prefWidth="100"/>
+            <TableColumn fx:id="colBitrate"      text="Bitrate"    prefWidth="90"/>
+            <TableColumn fx:id="colKeyframe"     text="Keyframe"   prefWidth="80"/>
+            <TableColumn fx:id="colProbeStatus"  text="Probe"      prefWidth="70"/>
+        </columns>
+    </TableView>
+</VBox>

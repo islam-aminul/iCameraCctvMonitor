@@ -1,0 +1,47 @@
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.2.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.2.0
+              https://maven.apache.org/xsd/assembly-2.2.0.xsd">
+
+    <id>windows-dist</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <includeBaseDirectory>true</includeBaseDirectory>
+    <baseDirectory>iCamera CCTV Monitor</baseDirectory>
+
+    <!-- Include the generated EXE from target/dist -->
+    <fileSets>
+        <fileSet>
+            <directory>${project.build.directory}/dist</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>iCamera CCTV Monitor.exe</include>
+            </includes>
+        </fileSet>
+        <!-- Bundled JRE (if present) -->
+        <fileSet>
+            <directory>${project.build.directory}/dist/jre</directory>
+            <outputDirectory>/jre</outputDirectory>
+            <fileMode>0755</fileMode>
+        </fileSet>
+        <!-- Config files -->
+        <fileSet>
+            <directory>${project.basedir}/src/main/resources</directory>
+            <outputDirectory>/config</outputDirectory>
+            <includes>
+                <include>application.properties</include>
+                <include>logback.xml</include>
+            </includes>
+        </fileSet>
+        <!-- README -->
+        <fileSet>
+            <directory>${project.basedir}</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>README.md</include>
+                <include>BUILD.md</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+</assembly>

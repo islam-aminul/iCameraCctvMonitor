@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.*?>
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.tcs.ion.iCamera.cctv.controller.MainController"
+            styleClass="root-pane">
+
+    <!-- ===== Top header bar ===== -->
+    <top>
+        <HBox styleClass="header-bar" alignment="CENTER_LEFT" spacing="12">
+            <Label fx:id="lblTitle" styleClass="app-title" text="iCamera CCTV Monitor"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="lblTcCode" styleClass="tc-code-label"/>
+            <Label fx:id="lblJmxStatus" styleClass="status-ok" text="JMX: Connecting..."/>
+            <Separator orientation="VERTICAL" styleClass="header-sep"/>
+            <Label fx:id="lblLastRefresh" styleClass="header-meta" text="Last refresh: —"/>
+        </HBox>
+    </top>
+
+    <!-- ===== Left navigation sidebar ===== -->
+    <left>
+        <VBox styleClass="sidebar" spacing="4" prefWidth="200">
+            <padding><Insets top="16" left="8" right="8" bottom="16"/></padding>
+
+            <!-- Sidebar header -->
+            <Label text="NAVIGATION" styleClass="sidebar-section-header"/>
+            <Separator styleClass="sidebar-sep"/>
+
+            <Button fx:id="btnDashboard"       text="⊞  Dashboard"          onAction="#showDashboard"
+                    maxWidth="Infinity" styleClass="nav-btn, nav-btn-active"/>
+            <Button fx:id="btnAppDetails"      text="⊙  Application Details" onAction="#showAppDetails"
+                    maxWidth="Infinity" styleClass="nav-btn"/>
+            <Button fx:id="btnCctvDetails"     text="◈  CCTV Details"        onAction="#showCctvDetails"
+                    maxWidth="Infinity" styleClass="nav-btn"/>
+            <Button fx:id="btnSystemHardware"  text="⬡  System Hardware"     onAction="#showSystemHardware"
+                    maxWidth="Infinity" styleClass="nav-btn"/>
+            <Button fx:id="btnNetworkMonitor"  text="⇆  Network Monitor"     onAction="#showNetworkMonitor"
+                    maxWidth="Infinity" styleClass="nav-btn"/>
+
+            <!-- Alerts with badge -->
+            <StackPane>
+                <Button fx:id="btnAlerts" text="⚠  Alerts" onAction="#showAlerts"
+                        maxWidth="Infinity" styleClass="nav-btn"/>
+                <Label fx:id="lblAlertBadge" styleClass="alert-badge" visible="false"
+                       StackPane.alignment="TOP_RIGHT"/>
+            </StackPane>
+
+            <Button fx:id="btnStreamAnalytics" text="▶  Stream Analytics"    onAction="#showStreamAnalytics"
+                    maxWidth="Infinity" styleClass="nav-btn"/>
+
+            <Separator styleClass="sidebar-sep"/>
+            <Label text="TOOLS" styleClass="sidebar-section-header"/>
+            <Separator styleClass="sidebar-sep"/>
+
+            <Button fx:id="btnDiscovery"       text="⊕  Discovery"           onAction="#showDiscovery"
+                    maxWidth="Infinity" styleClass="nav-btn"/>
+            <Button fx:id="btnSettings"        text="⚙  Settings"            onAction="#showSettings"
+                    maxWidth="Infinity" styleClass="nav-btn"/>
+
+            <Region VBox.vgrow="ALWAYS"/>
+            <Label text="v1.0.0 | TCS iON" styleClass="sidebar-footer"/>
+        </VBox>
+    </left>
+
+    <!-- ===== Main content area ===== -->
+    <center>
+        <StackPane fx:id="contentArea" styleClass="content-area"/>
+    </center>
+</BorderPane>

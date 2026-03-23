@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.tcs.ion.iCamera.cctv.controller.AlertsController"
+      styleClass="page-root" spacing="12">
+    <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+
+    <Label text="Alerts" styleClass="page-title"/>
+    <Separator/>
+
+    <!-- Summary + filter row -->
+    <HBox spacing="16" alignment="CENTER_LEFT">
+        <Label fx:id="lblTotalAlerts" styleClass="summary-chip"/>
+        <Label fx:id="lblCritical"   styleClass="summary-chip text-red"/>
+        <Label fx:id="lblWarnings"   styleClass="summary-chip text-yellow"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <TextField fx:id="txtSearch" promptText="Search…" prefWidth="200" styleClass="search-field"/>
+        <ComboBox fx:id="cmbFilter" prefWidth="130" styleClass="search-field"/>
+    </HBox>
+
+    <!-- Action buttons -->
+    <HBox spacing="8">
+        <Button text="Resolve Selected" onAction="#onResolveSelected" styleClass="btn-primary"/>
+        <Button fx:id="btnClearResolved" text="Clear Resolved" onAction="#onClearResolved" styleClass="btn-secondary"/>
+        <Button fx:id="btnExportAlerts"  text="Export JSON"   onAction="#onExportAlerts"  styleClass="btn-secondary"/>
+        <Button fx:id="btnPushToCloud"   text="Push to Cloud" onAction="#onPushToCloud"   styleClass="btn-warning"/>
+    </HBox>
+
+    <!-- Alerts table -->
+    <TableView fx:id="tableAlerts" VBox.vgrow="ALWAYS" styleClass="data-table">
+        <columns>
+            <TableColumn fx:id="colTime"     text="Timestamp"  prefWidth="150"/>
+            <TableColumn fx:id="colSeverity" text="Severity"   prefWidth="90"/>
+            <TableColumn fx:id="colCategory" text="Category"   prefWidth="100"/>
+            <TableColumn fx:id="colSource"   text="Source"     prefWidth="160"/>
+            <TableColumn fx:id="colMessage"  text="Message"    prefWidth="400"/>
+            <TableColumn fx:id="colResolved" text="Resolved"   prefWidth="80"/>
+        </columns>
+    </TableView>
+</VBox>

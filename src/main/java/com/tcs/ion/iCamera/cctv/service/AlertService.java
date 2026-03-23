@@ -1,0 +1,149 @@
+package com.tcs.ion.iCamera.cctv.service;
+
+import com.tcs.ion.iCamera.cctv.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * Evaluates current DataStore snapshot and raises alerts for anomalous conditions.
+ * Uses a "active alerts" set to avoid duplicate alerts for the same condition.
+ */
+public class AlertService {
+
+    private static final Logger log = LoggerFactory.getLogger(AlertService.class);
+    private static final double ALERT_THRESHOLD = 85.0;
+
+    private final DataStore store = DataStore.getInstance();
+    // Track which conditions currently have an active alert (to avoid duplicates)
+    private final Set<String> activeAlertKeys = new HashSet<>();
+
+    public void evaluate() {
+        evaluateProxy();
+        evaluateSystem();
+        evaluateCctv();
+        evaluateNetwork();
+    }
+
+    private void evaluateProxy() {
+        ProxyData pd = store.getProxyData();
+        if (pd == null) return;
+
+        raiseOrClear("PROXY_DOWN", !"UP".equals(pd.getStatus()),
+                AlertData.Severity.CRITICAL, AlertData.Category.PROXY,
+                "Proxy-" + pd.getProxyId(), "PROXY_STATUS",
+                "iCamera Proxy is " + pd.getStatus() + ". Reason: " + pd.getDownReason());
+
+        raiseOrClear("HSQLDB_DOWN", !"UP".equals(pd.getHsqldbStatus()),
+                AlertData.Severity.CRITICAL, AlertData.Category.HSQLDB,
+                "Proxy-" + pd.getProxyId(), "HSQLDB_STATUS",
+                "HSQLDB service is " + pd.getHsqldbStatus());
+
+        raiseOrClear("MAC_MISMATCH", pd.isMacMismatch(),
+                AlertData.Severity.WARNING, AlertData.Category.MAC,
+                "Proxy-" + pd.getProxyId(), "MAC_ADDRESS",
+                "MAC address mismatch: current=" + pd.getCurrentMacAddress()
+                        + " last=" + pd.getLastMacAddress());
+
+        raiseOrClear("PROXY_CPU_HIGH", pd.getProcessCpuPercent() > ALERT_THRESHOLD,
+                AlertData.Severity.WARNING, AlertData.Category.PROXY,
+                "Proxy-" + pd.getProxyId(), "PROCESS_CPU",
+                String.format("Proxy CPU usage %.1f%% exceeds %.0f%%",
+                        pd.getProcessCpuPercent(), ALERT_THRESHOLD),
+                pd.getProcessCpuPercent(), ALERT_THRESHOLD);
+
+        raiseOrClear("PROXY_MEM_HIGH", pd.getProcessMemoryMb() > 2048,
+                AlertData.Severity.WARNING, AlertData.Category.PROXY,
+                "Proxy-" + pd.getProxyId(), "PROCESS_MEMORY",
+                String.format("Proxy memory usage %.0f MB is high", pd.getProcessMemoryMb()),
+                pd.getProcessMemoryMb(), 2048);
+    }
+
+    private void evaluateSystem() {
+        SystemMetrics sm = store.getSystemMetrics();
+        if (sm == null) return;
+
+        raiseOrClear("CPU_HIGH", sm.getSystemCpuPercent() > ALERT_THRESHOLD,
+                AlertData.Severity.WARNING, AlertData.Category.SYSTEM,
+                "System", "CPU_USAGE",
+                String.format("System CPU %.1f%% > %.0f%%", sm.getSystemCpuPercent(), ALERT_THRESHOLD),
+                sm.getSystemCpuPercent(), ALERT_THRESHOLD);
+
+        raiseOrClear("MEM_HIGH", sm.getMemoryUsedPercent() > ALERT_THRESHOLD,
+                AlertData.Severity.WARNING, AlertData.Category.SYSTEM,
+                "System", "MEMORY_USAGE",
+                String.format("Memory used %.1f%% > %.0f%%", sm.getMemoryUsedPercent(), ALERT_THRESHOLD),
+                sm.getMemoryUsedPercent(), ALERT_THRESHOLD);
+
+        for (SystemMetrics.DriveInfo di : sm.getDrives()) {
+            String key = "DISK_HIGH_" + di.getName();
+            raiseOrClear(key, di.getUsedPercent() > ALERT_THRESHOLD,
+                    AlertData.Severity.WARNING, AlertData.Category.SYSTEM,
+                    "Disk-" + di.getName(), "DISK_USAGE",
+                    String.format("Disk %s used %.1f%% > %.0f%%",
+                            di.getName(), di.getUsedPercent(), ALERT_THRESHOLD),
+                    di.getUsedPercent(), ALERT_THRESHOLD);
+        }
+    }
+
+    private void evaluateCctv() {
+        int total = store.getTotalCctvCount();
+        if (total > 25) {
+            raiseOrClear("CCTV_COUNT_HIGH", true,
+                    AlertData.Severity.WARNING, AlertData.Category.CCTV,
+                    "CCTV", "CCTV_COUNT",
+                    "Total CCTV count (" + total + ") exceeds recommended limit of 25 per Proxy");
+        }
+
+        for (CctvData cctv : store.getAllCctv()) {
+            String key = "CCTV_INACTIVE_" + cctv.getCctvId();
+            raiseOrClear(key, !cctv.isActive(),
+                    AlertData.Severity.WARNING, AlertData.Category.CCTV,
+                    "CCTV-" + cctv.getCctvId() + "-" + cctv.getCctvName(), "CCTV_STATUS",
+                    "CCTV " + cctv.getCctvName() + " is INACTIVE: " + cctv.getInactiveReason());
+        }
+    }
+
+    private void evaluateNetwork() {
+        SystemMetrics sm = store.getSystemMetrics();
+        if (sm == null) return;
+        raiseOrClear("NET_ZERO", sm.getNetworkSpeedMbps() == 0,
+                AlertData.Severity.WARNING, AlertData.Category.NETWORK,
+                "Network", "UPLOAD_SPEED",
+                "Upload speed is 0 MB/s – possible network issue");
+    }
+
+    // Overload without numeric value
+    private void raiseOrClear(String key, boolean condition,
+                               AlertData.Severity severity, AlertData.Category category,
+                               String source, String param, String message) {
+        raiseOrClear(key, condition, severity, category, source, param, message, 0, 0);
+    }
+
+    private void raiseOrClear(String key, boolean condition,
+                               AlertData.Severity severity, AlertData.Category category,
+                               String source, String param, String message,
+                               double currentVal, double threshold) {
+        if (condition) {
+            if (!activeAlertKeys.contains(key)) {
+                AlertData alert = new AlertData(severity, category, source, param, message);
+                alert.setCurrentValue(currentVal);
+                alert.setThreshold(threshold);
+                store.addAlert(alert);
+                activeAlertKeys.add(key);
+            }
+        } else {
+            // Condition cleared – resolve existing alert
+            if (activeAlertKeys.contains(key)) {
+                for (AlertData a : store.getAlerts()) {
+                    if (a.getSource().equals(source) && a.getParameter().equals(param) && !a.isResolved()) {
+                        a.setResolved(true);
+                    }
+                }
+                activeAlertKeys.remove(key);
+            }
+        }
+    }
+}
