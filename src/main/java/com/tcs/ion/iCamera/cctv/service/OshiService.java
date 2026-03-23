@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.HashSet;
 
 /**
  * Uses OSHI to collect hardware and OS-level metrics,
@@ -91,11 +92,27 @@ public class OshiService {
 
     // ---- Top-N processes ----
 
+    /** Process names (lower-case) that must never appear in top-N lists. */
+    private static final Set<String> EXCLUDED_NAMES = new HashSet<>(Arrays.asList(
+        "system idle process", "idle", "system"
+    ));
+
+    private boolean isExcluded(OSProcess p) {
+        String name = p.getName();
+        return name == null || EXCLUDED_NAMES.contains(name.toLowerCase());
+    }
+
     private void collectTopProcesses(SystemMetrics sm) {
         List<OSProcess> allProcs = os.getProcesses();
 
+        // Filter out System Idle Process and kernel pseudo-processes BEFORE sorting
+        List<OSProcess> userProcs = new ArrayList<>();
+        for (OSProcess p : allProcs) {
+            if (!isExcluded(p)) userProcs.add(p);
+        }
+
         // Sort by CPU (cumulative load, descending)
-        List<ProcessInfo> topCpu = allProcs.stream()
+        List<ProcessInfo> topCpu = userProcs.stream()
                 .sorted(Comparator.comparingDouble(OSProcess::getProcessCpuLoadCumulative).reversed())
                 .limit(TOP_N)
                 .map(this::toProcessInfo)
@@ -103,7 +120,7 @@ public class OshiService {
         sm.setTopCpuProcesses(topCpu);
 
         // Sort by RSS memory (descending)
-        List<ProcessInfo> topMem = allProcs.stream()
+        List<ProcessInfo> topMem = userProcs.stream()
                 .sorted(Comparator.comparingLong(OSProcess::getResidentSetSize).reversed())
                 .limit(TOP_N)
                 .map(this::toProcessInfo)
@@ -114,7 +131,7 @@ public class OshiService {
         long now = System.currentTimeMillis();
         List<ProcessInfo> topDisk = new ArrayList<>();
 
-        for (OSProcess p : allProcs) {
+        for (OSProcess p : userProcs) {
             int pid = p.getProcessID();
             long reads  = p.getBytesRead();
             long writes = p.getBytesWritten();
