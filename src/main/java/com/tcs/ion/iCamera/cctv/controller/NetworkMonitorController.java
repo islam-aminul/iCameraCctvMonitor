@@ -73,7 +73,7 @@ public class NetworkMonitorController implements Initializable {
 
         // Connectivity column – colour coded
         urlColStatus.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().status));
-        urlColStatus.setCellFactory(col -> new TableCell<>() {
+        urlColStatus.setCellFactory(col -> new TableCell<UrlRow, String>() {
             @Override protected void updateItem(String val, boolean empty) {
                 super.updateItem(val, empty);
                 getStyleClass().removeAll("text-green", "text-red");
@@ -85,7 +85,7 @@ public class NetworkMonitorController implements Initializable {
 
         // SSL column – colour coded
         urlColSsl.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().ssl));
-        urlColSsl.setCellFactory(col -> new TableCell<>() {
+        urlColSsl.setCellFactory(col -> new TableCell<UrlRow, String>() {
             @Override protected void updateItem(String val, boolean empty) {
                 super.updateItem(val, empty);
                 getStyleClass().removeAll("text-green", "text-red");
@@ -97,7 +97,7 @@ public class NetworkMonitorController implements Initializable {
         });
 
         // Days Left column – colour coded by urgency
-        urlColDays.setCellFactory(col -> new TableCell<>() {
+        urlColDays.setCellFactory(col -> new TableCell<UrlRow, String>() {
             @Override protected void updateItem(String val, boolean empty) {
                 super.updateItem(val, empty);
                 getStyleClass().removeAll("text-green", "text-yellow", "text-red");

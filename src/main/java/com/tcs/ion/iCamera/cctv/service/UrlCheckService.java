@@ -18,6 +18,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -34,11 +36,11 @@ public class UrlCheckService {
     private static final Logger log = LoggerFactory.getLogger(UrlCheckService.class);
     private static final int TIMEOUT_MS = 8_000;
 
-    static final List<String> MONITORED_HOSTS = List.of(
+    static final List<String> MONITORED_HOSTS = Collections.unmodifiableList(Arrays.asList(
             "g01.tcsion.com",
             "cctv4.tcsion.com",
             "cctv8.tcsion.com"
-    );
+    ));
 
     private final DataStore store = DataStore.getInstance();
 

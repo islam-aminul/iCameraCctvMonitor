@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Timer;
@@ -48,18 +50,21 @@ public class MainController implements Initializable {
     @FXML private Label lblAlertBadge;
     @FXML private Label lblTcCode;
 
-    private static final Map<String, String> VIEW_TITLES = Map.of(
-            "dashboard",           "Dashboard",
-            "application_details", "Application Details",
-            "cctv_details",        "CCTV Details",
-            "system_hardware",     "System Hardware",
-            "network_monitor",     "Network Monitor",
-            "alerts",              "Alerts",
-            "stream_analytics",    "Stream Analytics",
-            "vms_detection",       "VMS Detection",
-            "discovery",           "Discovery",
-            "settings",            "Settings"
-    );
+    private static final Map<String, String> VIEW_TITLES;
+    static {
+        Map<String, String> m = new HashMap<>();
+        m.put("dashboard",           "Dashboard");
+        m.put("application_details", "Application Details");
+        m.put("cctv_details",        "CCTV Details");
+        m.put("system_hardware",     "System Hardware");
+        m.put("network_monitor",     "Network Monitor");
+        m.put("alerts",              "Alerts");
+        m.put("stream_analytics",    "Stream Analytics");
+        m.put("vms_detection",       "VMS Detection");
+        m.put("discovery",           "Discovery");
+        m.put("settings",            "Settings");
+        VIEW_TITLES = Collections.unmodifiableMap(m);
+    }
 
     private final DataStore store = DataStore.getInstance();
     private Timeline refreshTimeline;
