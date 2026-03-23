@@ -21,8 +21,8 @@ import java.util.*;
  * VMS Detection page.
  *
  * Shows all Video Management Software detected on this machine – both running
- * processes and installed Windows services – with live status, resource usage,
- * and a manual re-scan trigger.
+ * processes and installed Windows services – in a compact scrollable table.
+ * No details card; the table shows 2-3 rows visible at a time and is scrollable.
  */
 public class VmsDetectionController implements Initializable {
 
@@ -42,18 +42,6 @@ public class VmsDetectionController implements Initializable {
     @FXML private TableColumn<VmsRow, String>    colMemory;
     @FXML private TableColumn<VmsRow, String>    colPath;
 
-    // Info card for selected VMS
-    @FXML private VBox   paneDetails;
-    @FXML private Label  lblDetailVendor;
-    @FXML private Label  lblDetailProcess;
-    @FXML private Label  lblDetailStatus;
-    @FXML private Label  lblDetailPid;
-    @FXML private Label  lblDetailCpu;
-    @FXML private Label  lblDetailMemory;
-    @FXML private Label  lblDetailPath;
-    @FXML private Label  lblDetailUser;
-
-    // "No VMS found" panel
     @FXML private VBox   paneNoVms;
 
     private final DataStore store = DataStore.getInstance();
@@ -63,8 +51,6 @@ public class VmsDetectionController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         setupTable();
-        tableVms.getSelectionModel().selectedItemProperty().addListener((obs, o, n) -> showDetails(n));
-
         refreshTimeline = new Timeline(new KeyFrame(Duration.seconds(10), e -> refresh()));
         refreshTimeline.setCycleCount(Animation.INDEFINITE);
         refreshTimeline.play();
@@ -114,7 +100,6 @@ public class VmsDetectionController implements Initializable {
 
         tableVms.setItems(rows);
         tableVms.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        paneDetails.setVisible(false);
     }
 
     private void refresh() {
@@ -132,13 +117,12 @@ public class VmsDetectionController implements Initializable {
         paneNoVms.setVisible(total == 0);
         tableVms.setVisible(total > 0);
 
-        // Overall scan status
         if (total == 0) {
             lblScanStatus.setText("No VMS software detected on this machine");
             lblScanStatus.getStyleClass().removeAll("text-green", "text-red", "text-yellow");
             lblScanStatus.getStyleClass().add("text-green");
         } else if (running > 0) {
-            lblScanStatus.setText(running + " VMS software is actively running");
+            lblScanStatus.setText(running + " VMS software actively running");
             lblScanStatus.getStyleClass().removeAll("text-green", "text-red", "text-yellow");
             lblScanStatus.getStyleClass().add("text-yellow");
         } else {
@@ -152,21 +136,6 @@ public class VmsDetectionController implements Initializable {
                     .atZone(java.time.ZoneId.systemDefault())
                     .format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss")));
         }
-    }
-
-    private void showDetails(VmsRow row) {
-        if (row == null) { paneDetails.setVisible(false); return; }
-        paneDetails.setVisible(true);
-        lblDetailVendor.setText(row.vendor.get());
-        lblDetailProcess.setText(row.process.get());
-        lblDetailStatus.setText(row.status.get());
-        lblDetailStatus.getStyleClass().removeAll("text-green", "text-yellow");
-        lblDetailStatus.getStyleClass().add("RUNNING".equalsIgnoreCase(row.status.get()) ? "text-green" : "text-yellow");
-        lblDetailPid.setText(row.pid.get().isEmpty() || "—".equals(row.pid.get()) ? "N/A" : row.pid.get());
-        lblDetailCpu.setText(row.cpu.get());
-        lblDetailMemory.setText(row.memory.get());
-        lblDetailPath.setText(row.path.get());
-        lblDetailUser.setText(row.user.get());
     }
 
     @FXML
@@ -193,7 +162,6 @@ public class VmsDetectionController implements Initializable {
         final StringProperty cpu     = new SimpleStringProperty();
         final StringProperty memory  = new SimpleStringProperty();
         final StringProperty path    = new SimpleStringProperty();
-        final StringProperty user    = new SimpleStringProperty();
 
         VmsRow(VmsInfo v) {
             vendor.set(v.getVendorDisplayName());
@@ -203,7 +171,6 @@ public class VmsDetectionController implements Initializable {
             cpu.set(v.getCpuPercent() > 0 ? String.format("%.1f%%", v.getCpuPercent()) : "—");
             memory.set(v.getMemoryMb() > 0 ? v.getMemoryMb() + " MB" : "—");
             path.set(nvl(v.getInstallPath(), "Unknown"));
-            user.set(nvl(v.getUser(), "—"));
         }
 
         private static String nvl(String s) { return nvl(s, "N/A"); }

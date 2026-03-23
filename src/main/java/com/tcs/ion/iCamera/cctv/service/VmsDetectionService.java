@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.HashSet;
 
 /**
  * Detects Video Management Software (VMS) running on the local Windows machine.
@@ -82,7 +83,8 @@ public class VmsDetectionService {
         PROCESS_MAP.put("genetec.exe",                  VmsVendor.GENETEC);
         PROCESS_MAP.put("genetec.server.exe",           VmsVendor.GENETEC);
         SERVICE_MAP.put("genetec",                      VmsVendor.GENETEC);
-        SERVICE_MAP.put("security center",              VmsVendor.GENETEC);
+        SERVICE_MAP.put("genetec security center",      VmsVendor.GENETEC);
+        SERVICE_MAP.put("genetec omnicast",             VmsVendor.GENETEC);
 
         // ----- Axis -----
         PROCESS_MAP.put("axiscamerastation.exe",        VmsVendor.AXIS);
@@ -246,9 +248,21 @@ public class VmsDetectionService {
         return found;
     }
 
+    /** Windows built-in service names that must never be flagged as VMS. */
+    private static final Set<String> SERVICE_DENY_LIST = new HashSet<>(Arrays.asList(
+        "wscsvc",        // Windows Security Center
+        "wsc",
+        "securityhealthservice",
+        "wsearch",
+        "wuauserv",
+        "windefend"
+    ));
+
     private VmsVendor matchService(String displayName, String serviceName) {
         String dl = displayName.toLowerCase();
         String sl = serviceName != null ? serviceName.toLowerCase() : "";
+        // Skip well-known Windows built-in services
+        if (SERVICE_DENY_LIST.contains(sl)) return null;
         for (Map.Entry<String, VmsVendor> entry : SERVICE_MAP.entrySet()) {
             if (dl.contains(entry.getKey()) || sl.contains(entry.getKey())) {
                 return entry.getValue();

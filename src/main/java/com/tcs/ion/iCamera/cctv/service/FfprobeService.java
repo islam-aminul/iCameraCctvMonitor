@@ -61,7 +61,7 @@ public class FfprobeService {
             // Force TCP transport – more reliable for concurrent probing
             grabber.setOption("rtsp_transport", "tcp");
             // avformat timeout in microseconds
-            grabber.setTimeout(PROBE_TIMEOUT_MS * 1_000L);
+            grabber.setTimeout(PROBE_TIMEOUT_MS * 1_000); // int arithmetic – 10s in microseconds
             // open + probe stream info (avformat_open_input + avformat_find_stream_info)
             grabber.start();
 

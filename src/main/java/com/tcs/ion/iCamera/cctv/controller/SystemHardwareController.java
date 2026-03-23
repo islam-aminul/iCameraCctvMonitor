@@ -13,6 +13,7 @@ import javafx.util.Duration;
 
 import java.net.URL;
 import java.util.*;
+import java.util.LinkedHashMap;
 
 /**
  * System Hardware Monitor – CPU, RAM, Disk details with real-time utilisation bars
@@ -44,6 +45,15 @@ public class SystemHardwareController implements Initializable {
     // --- Overall health ---
     @FXML private Label lblOverallHealth;
 
+    // --- Top processes – All (merged default tab) ---
+    @FXML private TableView<ProcRow>           tblTopAll;
+    @FXML private TableColumn<ProcRow, String> allColPid;
+    @FXML private TableColumn<ProcRow, String> allColName;
+    @FXML private TableColumn<ProcRow, String> allColUser;
+    @FXML private TableColumn<ProcRow, String> allColCpu;
+    @FXML private TableColumn<ProcRow, String> allColMem;
+    @FXML private TableColumn<ProcRow, String> allColRead;
+
     // --- Top-5 CPU processes ---
     @FXML private TableView<ProcRow>           tblTopCpu;
     @FXML private TableColumn<ProcRow, String> cpuColPid;
@@ -72,6 +82,7 @@ public class SystemHardwareController implements Initializable {
     private final DataStore store = DataStore.getInstance();
     private Timeline timeline;
 
+    private final ObservableList<ProcRow> allRows  = FXCollections.observableArrayList();
     private final ObservableList<ProcRow> cpuRows  = FXCollections.observableArrayList();
     private final ObservableList<ProcRow> memRows  = FXCollections.observableArrayList();
     private final ObservableList<ProcRow> diskRows = FXCollections.observableArrayList();
@@ -85,7 +96,29 @@ public class SystemHardwareController implements Initializable {
         refresh();
     }
 
+    private static final String IDLE_PROCESS = "system idle process";
+
+    private List<ProcessInfo> filterIdle(List<ProcessInfo> list) {
+        List<ProcessInfo> out = new ArrayList<>();
+        for (ProcessInfo p : list) {
+            if (p.getName() != null && !p.getName().toLowerCase().contains(IDLE_PROCESS))
+                out.add(p);
+        }
+        return out;
+    }
+
     private void setupProcessTables() {
+        // All (merged) table
+        allColPid.setCellValueFactory(d -> d.getValue().pid);
+        allColName.setCellValueFactory(d -> d.getValue().name);
+        allColUser.setCellValueFactory(d -> d.getValue().user);
+        allColCpu.setCellValueFactory(d -> d.getValue().cpu);
+        allColMem.setCellValueFactory(d -> d.getValue().memory);
+        allColRead.setCellValueFactory(d -> d.getValue().diskRead);
+        applyAlertColouring(allColCpu, 20.0, 5.0);
+        tblTopAll.setItems(allRows);
+        tblTopAll.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
         // CPU table
         cpuColPid.setCellValueFactory(d -> d.getValue().pid);
         cpuColName.setCellValueFactory(d -> d.getValue().name);
@@ -208,9 +241,20 @@ public class SystemHardwareController implements Initializable {
         lblOverallHealth.getStyleClass().add(healthy ? "text-green" : "text-red");
 
         // ---- Top-5 process tables ----
-        cpuRows.setAll(toRows(sm.getTopCpuProcesses()));
-        memRows.setAll(toRows(sm.getTopMemoryProcesses()));
-        diskRows.setAll(toRows(sm.getTopDiskIoProcesses()));
+        List<ProcessInfo> cpuList  = filterIdle(sm.getTopCpuProcesses());
+        List<ProcessInfo> memList  = filterIdle(sm.getTopMemoryProcesses());
+        List<ProcessInfo> diskList = filterIdle(sm.getTopDiskIoProcesses());
+
+        // Merged "All" tab: deduplicate by PID, keep order (CPU first)
+        Map<Integer, ProcessInfo> merged = new LinkedHashMap<>();
+        for (ProcessInfo p : cpuList)  merged.putIfAbsent(p.getPid(), p);
+        for (ProcessInfo p : memList)  merged.putIfAbsent(p.getPid(), p);
+        for (ProcessInfo p : diskList) merged.putIfAbsent(p.getPid(), p);
+        allRows.setAll(toRows(new ArrayList<>(merged.values())));
+
+        cpuRows.setAll(toRows(cpuList));
+        memRows.setAll(toRows(memList));
+        diskRows.setAll(toRows(diskList));
     }
 
     private List<ProcRow> toRows(List<ProcessInfo> procs) {
