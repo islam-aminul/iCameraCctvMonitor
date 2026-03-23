@@ -130,20 +130,13 @@ public class AlertService {
                     h, "CONNECTIVITY",
                     "Connectivity to " + h + " is DOWN – host unreachable on port 443");
 
-            // SSL invalid → WARNING (only when host is reachable)
+            // SSL invalid/expired → WARNING (only when host is reachable)
             boolean sslFailed = r.isReachable() && !r.isSslValid();
             String sslMsg = "SSL certificate validation failed for " + h
                     + (r.getErrorMessage().isEmpty() ? "" : ": " + r.getErrorMessage());
             raiseOrClear("SSL_INVALID_" + h, sslFailed,
                     AlertData.Severity.WARNING, AlertData.Category.NETWORK,
                     h, "SSL_CERTIFICATE", sslMsg);
-
-            // SSL expiring within 30 days → WARNING
-            boolean expiringSoon = r.isReachable() && r.isSslValid() && r.getSslDaysLeft() < 30;
-            raiseOrClear("SSL_EXPIRING_" + h, expiringSoon,
-                    AlertData.Severity.WARNING, AlertData.Category.NETWORK,
-                    h, "SSL_EXPIRY",
-                    "SSL certificate for " + h + " expires in " + r.getSslDaysLeft() + " days");
         }
     }
 

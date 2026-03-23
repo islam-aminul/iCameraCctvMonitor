@@ -88,14 +88,11 @@ public class NetworkMonitorController implements Initializable {
         urlColSsl.setCellFactory(col -> new TableCell<>() {
             @Override protected void updateItem(String val, boolean empty) {
                 super.updateItem(val, empty);
-                getStyleClass().removeAll("text-green", "text-red", "text-yellow");
+                getStyleClass().removeAll("text-green", "text-red");
                 if (empty || val == null) { setText(null); return; }
                 setText(val);
-                switch (val) {
-                    case "VALID"   -> getStyleClass().add("text-green");
-                    case "INVALID" -> getStyleClass().add("text-red");
-                    case "EXPIRING"-> getStyleClass().add("text-yellow");
-                }
+                if      ("VALID".equals(val))   getStyleClass().add("text-green");
+                else if ("INVALID".equals(val)) getStyleClass().add("text-red");
             }
         });
 
@@ -188,12 +185,8 @@ public class NetworkMonitorController implements Initializable {
 
             if (!r.isReachable()) {
                 ssl = "-";
-            } else if (!r.isSslValid()) {
-                ssl = "INVALID";
-            } else if (r.getSslDaysLeft() < 30) {
-                ssl = "EXPIRING";
             } else {
-                ssl = "VALID";
+                ssl = r.isSslValid() ? "VALID" : "INVALID";
             }
 
             issuer   = r.getSslIssuer();
