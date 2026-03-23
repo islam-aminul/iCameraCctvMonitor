@@ -517,6 +517,59 @@
     -fx-font-weight: bold;
 }
 
+/* --- TabPane --- */
+.tab-pane .tab-header-area {
+    -fx-background-color: #0D0D1A;
+    -fx-padding: 4 0 0 0;
+}
+
+.tab-pane .tab-header-background {
+    -fx-background-color: #0D0D1A;
+}
+
+/* Each tab: generous horizontal padding makes them wide and easy to click */
+.tab-pane .tab {
+    -fx-background-color: #0D0D1A;
+    -fx-background-insets: 0;
+    -fx-background-radius: 4 4 0 0;
+    -fx-padding: 10 30 10 30;
+    -fx-cursor: hand;
+}
+
+.tab-pane .tab .tab-label {
+    -fx-text-fill: #607080;
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.tab-pane .tab:hover {
+    -fx-background-color: #161626;
+}
+
+.tab-pane .tab:hover .tab-label {
+    -fx-text-fill: #B0C8D8;
+}
+
+/* Selected: #13131F content bg with a 3 px #2196F3 accent strip at the bottom */
+.tab-pane .tab:selected,
+.tab-pane:focused .tab:selected {
+    -fx-background-color: #2196F3, #13131F;
+    -fx-background-insets: 0, 0 0 3 0;
+    -fx-background-radius: 4 4 0 0, 3 3 0 0;
+}
+
+.tab-pane .tab:selected .tab-label,
+.tab-pane:focused .tab:selected .tab-label {
+    -fx-text-fill: #FFFFFF;
+}
+
+.tab-pane .tab-content-area {
+    -fx-background-color: #13131F;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
 /* --- Alert dialog styling --- */
 .dialog-pane {
     -fx-background-color: #13131F;

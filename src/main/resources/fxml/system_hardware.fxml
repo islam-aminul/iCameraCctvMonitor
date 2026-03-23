@@ -54,8 +54,7 @@
         <!-- ====== Row 3: Top processes – tabbed view ====== -->
         <Label text="Top Processes" styleClass="section-header"/>
         <VBox styleClass="tile" spacing="0" style="-fx-padding:0;">
-            <TabPane fx:id="tabPaneProcs" tabClosingPolicy="UNAVAILABLE"
-                     style="-fx-background-color:#13131F;">
+            <TabPane fx:id="tabPaneProcs" tabClosingPolicy="UNAVAILABLE">
 
                 <!-- ── Tab 1: All (merged, default) ── -->
                 <Tab text="All">
