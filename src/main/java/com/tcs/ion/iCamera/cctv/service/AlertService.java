@@ -33,15 +33,40 @@ public class AlertService {
         ProxyData pd = store.getProxyData();
         if (pd == null) return;
 
-        raiseOrClear("PROXY_DOWN", !"UP".equals(pd.getStatus()),
+        String status = pd.getStatus();
+
+        // PROXY_DOWN: service is fully DOWN or UNKNOWN (not DEGRADED, not UP)
+        raiseOrClear("PROXY_DOWN", "DOWN".equals(status) || "UNKNOWN".equals(status),
                 AlertData.Severity.CRITICAL, AlertData.Category.PROXY,
                 "Proxy-" + pd.getProxyId(), "PROXY_STATUS",
-                "iCamera Proxy is " + pd.getStatus() + ". Reason: " + pd.getDownReason());
+                "iCameraProxy is " + status + ". Reason: " + pd.getDownReason());
 
+        // PROXY_DEGRADED: service is RUNNING but JMX is not reachable – degraded mode
+        raiseOrClear("PROXY_DEGRADED", "DEGRADED".equals(status),
+                AlertData.Severity.WARNING, AlertData.Category.PROXY,
+                "Proxy-" + pd.getProxyId(), "PROXY_DEGRADED",
+                "iCameraProxy is running degraded – JMX is unavailable. "
+                        + "PID: " + pd.getServicePid()
+                        + ", Service: " + pd.getServiceStatus()
+                        + ". " + pd.getDownReason());
+
+        // HSQLDB_DOWN: iCameraHSOLDB Windows service is not UP
         raiseOrClear("HSQLDB_DOWN", !"UP".equals(pd.getHsqldbStatus()),
                 AlertData.Severity.CRITICAL, AlertData.Category.HSQLDB,
                 "Proxy-" + pd.getProxyId(), "HSQLDB_STATUS",
-                "HSQLDB service is " + pd.getHsqldbStatus());
+                "iCameraHSOLDB service is " + pd.getHsqldbStatus());
+
+        // HSQLDB_CONFLICT: JMX reports DB as DOWN but local service + port check says it is UP
+        // This indicates a proxy-side DB connection issue rather than a DB failure
+        boolean hsqldbConflict = "DOWN".equals(pd.getHsqldbJmxStatus())
+                && "UP".equals(pd.getHsqldbStatus())
+                && pd.isHsqldbDirectlyReachable();
+        raiseOrClear("HSQLDB_CONFLICT", hsqldbConflict,
+                AlertData.Severity.WARNING, AlertData.Category.HSQLDB,
+                "Proxy-" + pd.getProxyId(), "HSQLDB_CONFLICT",
+                "HSQLDB is reachable locally (port " + pd.getHsqldbPort()
+                        + ") but iCameraProxy JMX reports DB as DOWN – "
+                        + "possible proxy-side database connection issue");
 
         raiseOrClear("MAC_MISMATCH", pd.isMacMismatch(),
                 AlertData.Severity.WARNING, AlertData.Category.MAC,
