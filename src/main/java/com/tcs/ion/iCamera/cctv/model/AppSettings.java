@@ -1,5 +1,6 @@
 package com.tcs.ion.iCamera.cctv.model;
 
+import com.tcs.ion.iCamera.cctv.util.AppDirs;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class AppSettings {
     private List<String> dashboardTiles = new ArrayList<>();
 
     // Export
-    private String exportPath = System.getProperty("user.home") + "\\iCameraExports";
+    private String exportPath = AppDirs.getExportsDir().toString();
     private String exportFormat = "XLSX"; // XLSX | CSV | JSON
 
     // Jetty REST port
