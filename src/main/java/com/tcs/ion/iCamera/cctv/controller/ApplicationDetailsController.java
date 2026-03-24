@@ -38,7 +38,7 @@ public class ApplicationDetailsController implements Initializable {
     @FXML private ProgressBar pbProxyCpu;
     @FXML private ProgressBar pbProxyMem;
     @FXML private Pane  paneProxyStatus;
-    @FXML private Label lblDownReasonRow;
+    @FXML private HBox  lblDownReasonRow;
 
     // HSQLDB section
     @FXML private Label lblHsqldbStatus;
