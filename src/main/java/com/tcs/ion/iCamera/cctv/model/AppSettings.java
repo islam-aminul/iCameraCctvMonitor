@@ -10,7 +10,7 @@ public class AppSettings {
 
     // JMX
     private String jmxHost = "localhost";
-    private int jmxBasePort = 1999;
+    private int jmxBasePort = 1099;
     private int jmxMaxPortRetries = 5;
 
     // Polling
