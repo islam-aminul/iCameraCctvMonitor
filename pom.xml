@@ -482,42 +482,39 @@
                 </executions>
             </plugin>
 
-            <!-- JAR signing – uses jarsigner (JDK tool) with the PKCS12 keystore.
-                 signtool.exe cannot sign JAR files; it is only used for the Windows EXE below.
-                 Skip with -Dsigning.skip=true. -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jarsigner-plugin</artifactId>
-                <version>3.0.0</version>
-                <executions>
-                    <execution>
-                        <id>sign-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${signing.skip}</skip>
-                            <archive>${project.build.directory}/dist/${project.artifactId}-${project.version}-all.jar</archive>
-                            <keystore>${project.build.directory}/${keystore.filename}</keystore>
-                            <storetype>PKCS12</storetype>
-                            <storepass>${keystore.password}</storepass>
-                            <keypass>${keystore.password}</keypass>
-                            <alias>${keystore.alias}</alias>
-                            <tsa>${timestamp.url}</tsa>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- EXE signing – signtool.exe signs the Windows EXE wrapper only.
-                 Override signtool.exe, keystore.filename, keystore.password, keystore.alias,
-                 and timestamp.url as needed. Skip with -Dsigning.skip=true. -->
+            <!-- JAR + EXE signing – exec-maven-plugin invokes JDK jarsigner for the JAR
+                 and signtool.exe for the Windows EXE wrapper.
+                 Skip both with -Dsigning.skip=true. -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.0</version>
                 <executions>
+                    <execution>
+                        <id>sign-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${signing.skip}</skip>
+                            <executable>jarsigner</executable>
+                            <arguments>
+                                <argument>-keystore</argument>
+                                <argument>${project.build.directory}/${keystore.filename}</argument>
+                                <argument>-storetype</argument>
+                                <argument>PKCS12</argument>
+                                <argument>-storepass</argument>
+                                <argument>${keystore.password}</argument>
+                                <argument>-keypass</argument>
+                                <argument>${keystore.password}</argument>
+                                <argument>-tsa</argument>
+                                <argument>${timestamp.url}</argument>
+                                <argument>${project.build.directory}/dist/${project.artifactId}-${project.version}-all.jar</argument>
+                                <argument>${keystore.alias}</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>sign-exe</id>
                         <phase>package</phase>
