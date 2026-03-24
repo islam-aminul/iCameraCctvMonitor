@@ -28,7 +28,7 @@ public class AppSettings {
     private List<String> dashboardTiles = new ArrayList<>();
 
     // Export
-    private String exportPath = AppDirs.getDataDir().toString();
+    private String exportPath = AppDirs.getExportsDir().toString();
     private String exportFormat = "XLSX"; // XLSX | CSV | JSON
 
     // Jetty REST port

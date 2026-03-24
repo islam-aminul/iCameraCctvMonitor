@@ -41,8 +41,11 @@ public final class AppDirs {
     /** Root directory of the application (where the JAR/EXE lives). */
     public static Path getAppDir() { return APP_DIR; }
 
-    /** {@code <app-dir>/data} – settings, exports, and future data files. */
+    /** {@code <app-dir>/data} – settings.json and future data files. */
     public static Path getDataDir() { return APP_DIR.resolve("data"); }
+
+    /** {@code <app-dir>/exports} – Excel, CSV, and JSON exports. */
+    public static Path getExportsDir() { return APP_DIR.resolve("exports"); }
 
     /** {@code <app-dir>/logs} – rolling log files. */
     public static Path getLogsDir() { return APP_DIR.resolve("logs"); }
