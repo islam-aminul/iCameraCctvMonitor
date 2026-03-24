@@ -12,14 +12,14 @@ import java.nio.file.*;
 
 /**
  * Loads and persists AppSettings from/to JSON on disk.
- * Location: <user.home>/.icamera/settings.json
+ * Location: <app-dir>/data/settings.json
  */
 public class SettingsManager {
 
     private static final Logger log = LoggerFactory.getLogger(SettingsManager.class);
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    private static final Path SETTINGS_DIR  = Paths.get(System.getProperty("user.home"), ".icamera");
+    private static final Path SETTINGS_DIR  = AppDirs.getDataDir();
     private static final Path SETTINGS_FILE = SETTINGS_DIR.resolve("settings.json");
 
     public static AppSettings load() {
