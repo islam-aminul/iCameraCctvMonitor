@@ -50,11 +50,11 @@ public class AlertService {
                         + ", Service: " + pd.getServiceStatus()
                         + ". " + pd.getDownReason());
 
-        // HSQLDB_DOWN: iCameraHSOLDB Windows service is not UP
+        // HSQLDB_DOWN: iCameraHSQLDB Windows service is not UP
         raiseOrClear("HSQLDB_DOWN", !"UP".equals(pd.getHsqldbStatus()),
                 AlertData.Severity.CRITICAL, AlertData.Category.HSQLDB,
                 "Proxy-" + pd.getProxyId(), "HSQLDB_STATUS",
-                "iCameraHSOLDB service is " + pd.getHsqldbStatus());
+                "iCameraHSQLDB service is " + pd.getHsqldbStatus());
 
         // HSQLDB_CONFLICT: JMX reports DB as DOWN but local service + port check says it is UP
         // This indicates a proxy-side DB connection issue rather than a DB failure

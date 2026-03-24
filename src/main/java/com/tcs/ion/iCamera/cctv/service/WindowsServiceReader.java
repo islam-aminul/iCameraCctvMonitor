@@ -24,15 +24,17 @@ import java.util.regex.Pattern;
  *
  * Services:
  *   - "iCameraProxy"   (Apache procrun, StartMode=jvm)
- *   - "iCameraHSOLDB"  (Apache procrun, StartMode=java)
+ *   - "iCameraHSQLDB"  (Apache procrun, StartMode=java)
  *
  * Strategy:
- *   1. Use OSHI OSService list for status + PID.
- *   2. Use OSHI OSProcess for process start time.
- *   3. Use "sc query <name>" for WIN32_EXIT_CODE when stopped (sc.exe is not wmic).
- *   4. Use "sc qc <name>" to read BINARY_PATH_NAME → derive install path.
- *   5. Read {installPath}\hsqldb\server.properties to find HSQLDB port.
- *   6. Socket-connect to HSQLDB port to verify direct reachability.
+ *   1. Use OSHI OSService list for status + PID (requires admin; may return empty list for non-admin).
+ *   2. If OSHI returns NOT_FOUND, fall back to "sc queryex <name>" which works for non-admin
+ *      users (only needs SERVICE_QUERY_STATUS, not SC_MANAGER_ENUMERATE_SERVICE).
+ *   3. Use OSHI OSProcess for process start time (PID lookup works for non-admin).
+ *   4. Use "sc queryex <name>" WIN32_EXIT_CODE when stopped.
+ *   5. Use "sc qc <name>" to read BINARY_PATH_NAME → derive install path.
+ *   6. Read {installPath}\hsqldb\server.properties to find HSQLDB port.
+ *   7. Socket-connect to HSQLDB port to verify direct reachability.
  *
  * DEGRADED state:
  *   - If iCameraProxy service is RUNNING but JMX is not connected → status = "DEGRADED".
@@ -43,7 +45,7 @@ public class WindowsServiceReader {
     private static final Logger log = LoggerFactory.getLogger(WindowsServiceReader.class);
 
     private static final String PROXY_SERVICE_NAME  = "iCameraProxy";
-    private static final String HSQLDB_SERVICE_NAME = "iCameraHSOLDB";
+    private static final String HSQLDB_SERVICE_NAME = "iCameraHSQLDB";
 
     private static final int HSQLDB_SOCKET_TIMEOUT_MS = 3000;
 
@@ -113,7 +115,7 @@ public class WindowsServiceReader {
             pd.setDownReason("Service status could not be determined");
         }
 
-        // ── iCameraHSOLDB service ────────────────────────────────────────────
+        // ── iCameraHSQLDB service ────────────────────────────────────────────
         ServiceInfo hsqlInfo = queryServiceViaOshi(HSQLDB_SERVICE_NAME);
         if ("RUNNING".equals(hsqlInfo.status)) {
             pd.setHsqldbStatus("UP");
@@ -143,8 +145,12 @@ public class WindowsServiceReader {
     // ── OSHI-based service query ─────────────────────────────────────────────
 
     /**
-     * Queries service status and PID via OSHI (no wmic, no sc query for status).
-     * Falls back to sc query only for the WIN32_EXIT_CODE when service is stopped.
+     * Queries service status and PID via OSHI first.
+     * OSHI's getServices() calls OpenSCManager with SC_MANAGER_ENUMERATE_SERVICE which
+     * requires admin rights – it returns an empty list for non-admin users, causing every
+     * service to appear as NOT_FOUND. When that happens, falls back to "sc queryex" which
+     * only needs SERVICE_QUERY_STATUS and works for normal (non-admin) users querying a
+     * specific service by name.
      */
     private ServiceInfo queryServiceViaOshi(String serviceName) {
         ServiceInfo info = new ServiceInfo();
@@ -164,31 +170,36 @@ public class WindowsServiceReader {
                         }
                     } else if (state == OSService.State.STOPPED) {
                         info.status   = "STOPPED";
-                        info.exitCode = queryExitCodeViaSc(serviceName);
+                        info.exitCode = queryScEx(serviceName).exitCode;
                     } else {
                         info.status = "UNKNOWN";
                     }
                     return info;
                 }
             }
-            // Service not found in OSHI list
-            info.status = "NOT_FOUND";
+            // Service not found in OSHI list – likely running as SYSTEM / non-admin enumeration
+            // blocked. Fall back to sc queryex which works without admin for a named service.
+            log.debug("'{}' not in OSHI service list (non-admin?); falling back to sc queryex", serviceName);
+            return queryScEx(serviceName);
         } catch (Exception e) {
-            log.warn("OSHI service query failed for '{}': {}", serviceName, e.getMessage());
-            info.status = "UNKNOWN";
+            log.warn("OSHI service query failed for '{}': {} – falling back to sc queryex",
+                    serviceName, e.getMessage());
+            return queryScEx(serviceName);
         }
-        return info;
     }
 
-    // ── Exit code via sc query (not wmic) ────────────────────────────────────
+    // ── sc queryex fallback (works for non-admin on named service) ────────────
 
     /**
-     * Uses "sc query <serviceName>" to read WIN32_EXIT_CODE.
-     * sc.exe is the Windows Service Control utility – not wmic.
+     * Runs "sc queryex {serviceName}" and parses STATE, WIN32_EXIT_CODE, and PID.
+     * sc queryex only needs SERVICE_QUERY_STATUS access (no admin required for a specific
+     * service name), unlike OSHI getServices() which needs SC_MANAGER_ENUMERATE_SERVICE.
+     * If the service is RUNNING and a PID is returned, OSHI OSProcess is used for start time.
      */
-    private int queryExitCodeViaSc(String serviceName) {
+    private ServiceInfo queryScEx(String serviceName) {
+        ServiceInfo info = new ServiceInfo();
         try {
-            ProcessBuilder pb = new ProcessBuilder("sc", "query", serviceName);
+            ProcessBuilder pb = new ProcessBuilder("sc", "queryex", serviceName);
             pb.redirectErrorStream(true);
             Process proc = pb.start();
             StringBuilder sb = new StringBuilder();
@@ -197,11 +208,44 @@ public class WindowsServiceReader {
                 while ((line = br.readLine()) != null) sb.append(line).append("\n");
             }
             proc.waitFor();
-            return parseExitCode(sb.toString());
+            String output = sb.toString();
+
+            // sc returns "FAILED 1060" when the service does not exist
+            if (output.contains("1060") || output.toLowerCase().contains("does not exist")) {
+                info.status = "NOT_FOUND";
+                return info;
+            }
+
+            // Parse STATE:  "STATE              : 4  RUNNING"
+            Matcher stateMatcher = Pattern.compile("STATE\\s*:\\s*\\d+\\s+(\\w+)").matcher(output);
+            if (stateMatcher.find()) {
+                String stateWord = stateMatcher.group(1);
+                if ("RUNNING".equals(stateWord)) {
+                    info.status = "RUNNING";
+                    // Parse PID: "PID                : 1234"
+                    Matcher pidMatcher = Pattern.compile("PID\\s*:\\s*(\\d+)").matcher(output);
+                    if (pidMatcher.find()) {
+                        info.pid = Integer.parseInt(pidMatcher.group(1));
+                        if (info.pid > 0) {
+                            OSProcess oproc = os.getProcess(info.pid);
+                            if (oproc != null) info.startTimeMs = oproc.getStartTime();
+                        }
+                    }
+                } else if ("STOPPED".equals(stateWord)) {
+                    info.status   = "STOPPED";
+                    info.exitCode = parseExitCode(output);
+                } else {
+                    info.status = "UNKNOWN";
+                }
+            } else {
+                log.warn("sc queryex for '{}' returned unexpected output: {}", serviceName, output.trim());
+                info.status = "UNKNOWN";
+            }
         } catch (Exception e) {
-            log.debug("Could not read exit code for '{}': {}", serviceName, e.getMessage());
-            return -1;
+            log.warn("sc queryex failed for '{}': {}", serviceName, e.getMessage());
+            info.status = "UNKNOWN";
         }
+        return info;
     }
 
     private int parseExitCode(String scOutput) {
