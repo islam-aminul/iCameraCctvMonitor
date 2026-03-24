@@ -97,6 +97,8 @@ public class JmxService {
             String tcCode       = getStringAttr("TcCode");
             String systemStr    = getStringAttr("SystemMetrics");
             String cctvStr      = getStringAttr("CctvMetrics");
+            // DbStatusFlag: iCameraProxy's view of HSQLDB connectivity ("UP"/"DOWN"/null)
+            String dbStatusFlag = getStringAttr("DbStatusFlag");
 
             // --- Build ProxyData ---
             ProxyData pd = store.getProxyData() != null ? store.getProxyData() : new ProxyData();
@@ -106,6 +108,13 @@ public class JmxService {
             pd.setProxyName(proxyName != null ? proxyName.trim() : "N/A");
             pd.setTcCode(tcCode != null ? tcCode.trim() : "N/A");
             pd.setStatus("UP"); // If we can reach JMX, proxy is up
+
+            // Store DB connectivity status as seen by iCameraProxy
+            if (dbStatusFlag != null && !dbStatusFlag.equalsIgnoreCase("Unavailable")) {
+                pd.setHsqldbJmxStatus(dbStatusFlag.trim().toUpperCase());
+            } else {
+                pd.setHsqldbJmxStatus(null);
+            }
 
             // --- Parse SystemMetrics string ---
             SystemMetrics sm = new SystemMetrics();

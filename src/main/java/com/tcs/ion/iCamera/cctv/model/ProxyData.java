@@ -10,14 +10,16 @@ public class ProxyData {
     private int proxyId;
     private String proxyName;
     private String tcCode;
-    private String status;           // "UP" | "DOWN" | "UNKNOWN"
+    private String status;           // "UP" | "DEGRADED" | "DOWN" | "UNKNOWN"
     private String downReason;
     private long startTimeMillis;    // epoch ms
     private long uptimeMillis;
 
-    // From Windows Service Manager
+    // From Windows Service Manager (via OSHI)
     private String serviceStatus;    // RUNNING | STOPPED | NOT_FOUND | UNKNOWN
     private int serviceExitCode;
+    private int servicePid;          // PID of the proxy process (0 if not running)
+    private String installPath;      // Base install directory (e.g. C:\iCamera), from sc qc binary path
 
     // Resource utilization (from JMX)
     private double processCpuPercent;
@@ -27,9 +29,12 @@ public class ProxyData {
     private String currentMacAddress;
     private String lastMacAddress;
 
-    // HSQLDB
-    private String hsqldbStatus;     // "UP" | "DOWN" | "UNKNOWN"
+    // HSQLDB – multi-layer status
+    private String hsqldbStatus;          // "UP" | "DOWN" | "UNKNOWN" – Windows service state
     private long hsqldbStartTimeMillis;
+    private String hsqldbJmxStatus;       // DB connectivity flag reported by iCameraProxy JMX ("UP"/"DOWN"/null)
+    private int hsqldbPort;               // Port parsed from hsqldb/server.properties (-1 if unknown)
+    private boolean hsqldbDirectlyReachable; // true if local socket connect to hsqldbPort succeeded
 
     // Snapshot metadata
     private Instant snapshotTime;
@@ -69,6 +74,12 @@ public class ProxyData {
     public int getServiceExitCode() { return serviceExitCode; }
     public void setServiceExitCode(int serviceExitCode) { this.serviceExitCode = serviceExitCode; }
 
+    public int getServicePid() { return servicePid; }
+    public void setServicePid(int servicePid) { this.servicePid = servicePid; }
+
+    public String getInstallPath() { return installPath; }
+    public void setInstallPath(String installPath) { this.installPath = installPath; }
+
     public double getProcessCpuPercent() { return processCpuPercent; }
     public void setProcessCpuPercent(double processCpuPercent) { this.processCpuPercent = processCpuPercent; }
 
@@ -91,6 +102,15 @@ public class ProxyData {
 
     public long getHsqldbStartTimeMillis() { return hsqldbStartTimeMillis; }
     public void setHsqldbStartTimeMillis(long hsqldbStartTimeMillis) { this.hsqldbStartTimeMillis = hsqldbStartTimeMillis; }
+
+    public String getHsqldbJmxStatus() { return hsqldbJmxStatus; }
+    public void setHsqldbJmxStatus(String hsqldbJmxStatus) { this.hsqldbJmxStatus = hsqldbJmxStatus; }
+
+    public int getHsqldbPort() { return hsqldbPort; }
+    public void setHsqldbPort(int hsqldbPort) { this.hsqldbPort = hsqldbPort; }
+
+    public boolean isHsqldbDirectlyReachable() { return hsqldbDirectlyReachable; }
+    public void setHsqldbDirectlyReachable(boolean hsqldbDirectlyReachable) { this.hsqldbDirectlyReachable = hsqldbDirectlyReachable; }
 
     public Instant getSnapshotTime() { return snapshotTime; }
     public void setSnapshotTime(Instant snapshotTime) { this.snapshotTime = snapshotTime; }

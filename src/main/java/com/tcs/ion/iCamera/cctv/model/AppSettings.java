@@ -14,7 +14,7 @@ public class AppSettings {
     private int jmxMaxPortRetries = 5;
 
     // Polling
-    private int pollIntervalSeconds = 30;
+    private int pollIntervalSeconds = 60;
 
     // ffprobe
     private String ffprobePath = ".\\ffprobe.exe"; // to be updated with actual path
