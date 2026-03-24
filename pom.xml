@@ -482,7 +482,35 @@
                 </executions>
             </plugin>
 
-            <!-- Code signing – signs JAR then EXE with signtool.exe.
+            <!-- JAR signing – uses jarsigner (JDK tool) with the PKCS12 keystore.
+                 signtool.exe cannot sign JAR files; it is only used for the Windows EXE below.
+                 Skip with -Dsigning.skip=true. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jarsigner-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>sign-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${signing.skip}</skip>
+                            <archive>${project.build.directory}/dist/${project.artifactId}-${project.version}-all.jar</archive>
+                            <keystore>${project.build.directory}/${keystore.filename}</keystore>
+                            <storetype>PKCS12</storetype>
+                            <storepass>${keystore.password}</storepass>
+                            <keypass>${keystore.password}</keypass>
+                            <alias>${keystore.alias}</alias>
+                            <tsa>${timestamp.url}</tsa>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- EXE signing – signtool.exe signs the Windows EXE wrapper only.
                  Override signtool.exe, keystore.filename, keystore.password, keystore.alias,
                  and timestamp.url as needed. Skip with -Dsigning.skip=true. -->
             <plugin>
@@ -490,31 +518,6 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.0</version>
                 <executions>
-                    <execution>
-                        <id>sign-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${signing.skip}</skip>
-                            <executable>${signtool.exe}</executable>
-                            <arguments>
-                                <argument>sign</argument>
-                                <argument>/f</argument>
-                                <argument>${project.build.directory}/${keystore.filename}</argument>
-                                <argument>/p</argument>
-                                <argument>${keystore.password}</argument>
-                                <argument>/n</argument>
-                                <argument>${keystore.alias}</argument>
-                                <argument>/fd</argument>
-                                <argument>SHA256</argument>
-                                <argument>/t</argument>
-                                <argument>${timestamp.url}</argument>
-                                <argument>${project.build.directory}/dist/${project.artifactId}-${project.version}-all.jar</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
                     <execution>
                         <id>sign-exe</id>
                         <phase>package</phase>
