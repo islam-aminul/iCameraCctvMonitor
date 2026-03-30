@@ -173,15 +173,16 @@ public class JmxService {
         // --- SystemMetrics (proxy bean type) ---
         // Use fully qualified com.tcs.monitoring.beans.SystemMetrics to avoid
         // a name clash with com.tcs.ion.iCamera.cctv.model.SystemMetrics.
+        // Fields are direct public fields (same pattern as CctvMetrics).
         com.tcs.monitoring.beans.SystemMetrics pSm = proxy.getSystemMetrics();
         if (pSm != null) {
-            sm.setSystemCpuPercent(pSm.getTotalCpu());
-            pd.setProcessCpuPercent(pSm.getProcessCpu());
-            sm.setTotalMemoryMb(pSm.getTotalRam());
-            sm.setFreeMemoryMb(pSm.getFreeRam());
-            pd.setProcessMemoryMb(pSm.getProcessRam());
-            sm.setNetworkSpeedMbps(pSm.getFileUploadSpeed());
-            // pSm.getDiskDetailsList() is intentionally skipped: OSHI is the
+            sm.setSystemCpuPercent(pSm.totalCpu);
+            pd.setProcessCpuPercent(pSm.processCpu);
+            sm.setTotalMemoryMb(pSm.totalRam);
+            sm.setFreeMemoryMb(pSm.freeRam);
+            pd.setProcessMemoryMb(pSm.processRam);
+            sm.setNetworkSpeedMbps(pSm.fileUploadSpeed);
+            // pSm.diskDetailsList is intentionally skipped: OSHI is the
             // authoritative source for local disk information and avoids the
             // unnecessary remote-parsing complexity that JMX would introduce.
         }
