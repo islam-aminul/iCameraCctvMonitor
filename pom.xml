@@ -442,10 +442,7 @@
                                 <minVersion>1.8.0</minVersion>
                                 <opts>
                                     <opt>-Djava.library.path=.</opt>
-                                    <opt>-Dapp.name=${app.name}</opt>
-                                    <opt>--add-opens java.base/java.lang=ALL-UNNAMED</opt>
-                                    <opt>--add-opens java.base/java.util=ALL-UNNAMED</opt>
-                                    <opt>--add-opens javafx.graphics/com.sun.javafx.application=ALL-UNNAMED</opt>
+                                    <opt>-Dapp.name="${app.name}"</opt>
                                 </opts>
                             </jre>
                             <versionInfo>
