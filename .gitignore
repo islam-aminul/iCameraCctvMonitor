@@ -1,0 +1,38 @@
+# Build output
+target/
+proxy-common-utils/target/
+
+# IDE
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+*.swp
+*.swo
+.vscode/
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Maven
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+
+# Bundled JRE (large binary, not for VCS)
+jre8-win64/
+
+# Keystore / signing
+*.p12
+*.jks
+*.keystore
+
+# Logs
+*.log
+logs/
