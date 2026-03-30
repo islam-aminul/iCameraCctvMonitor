@@ -201,11 +201,12 @@ public class JmxService {
      * Falls back to cctvStatusMap when startHitMap does not provide sufficient detail.
      */
     private void extractCctvFromTyped(com.tcs.monitoring.beans.CctvMetrics pCm) {
+        // CctvMetrics exposes direct public fields (not getters)
         Map<Long, com.tcs.proxy.database.api.tables.ResourceFieldValues> startHitMap =
-                pCm.getStartHitMap();
-        Map<Long, Boolean> statusMap           = pCm.getCctvStatusMap();
-        Map<Long, Long>    lastModifiedMap     = pCm.getCctvFileLastModifiedMap();
-        Map<Long, Long>    lastUploadedMap     = pCm.getCctvFileLastUploadedMap();
+                pCm.startHitMap;
+        Map<Long, Boolean> statusMap       = pCm.cctvStatusMap;
+        Map<Long, Long>    lastModifiedMap = pCm.cctvFileLastModifiedMap;
+        Map<Long, Long>    lastUploadedMap = pCm.cctvFileLastUploadedMap;
 
         if (startHitMap != null && !startHitMap.isEmpty()) {
             for (Map.Entry<Long, com.tcs.proxy.database.api.tables.ResourceFieldValues> entry
@@ -217,11 +218,10 @@ public class JmxService {
                 cctv.setCctvId((int) id);
 
                 if (rfv != null) {
-                    // ResourceFieldValues exposes typed getters for the resource record fields.
-                    // Adjust method names below to match the actual ResourceFieldValues API once
-                    // the Proxy-Common-Utils JAR is available (e.g. getRtspUrl() / getRtspIp()).
-                    String name = rfv.getResourceName();
-                    String rtsp = rfv.getRtspUrl();
+                    // ResourceFieldValues typed getters: getName() → CCTV display name,
+                    // getKey3() → RTSP URL stored in the resource key-3 field.
+                    String name = rfv.getName();
+                    String rtsp = rfv.getKey3();
                     if (name != null) cctv.setCctvName(name);
                     if (rtsp != null) cctv.setRtspUrl(rtsp);
                 }
