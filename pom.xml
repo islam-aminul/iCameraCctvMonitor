@@ -297,6 +297,21 @@
             <artifactId>jna-platform</artifactId>
             <version>${jna.version}</version>
         </dependency>
+
+        <!-- Proxy Common Utils – provides compile-time MBean types (CctvMetrics, SystemMetrics,
+             ResourceFieldValues, Drivedetailbean, ProxyMonitoringMBean).
+             All transitive dependencies are excluded via wildcard to avoid classpath pollution. -->
+        <dependency>
+            <groupId>com.tcs</groupId>
+            <artifactId>Proxy-Common-Utils</artifactId>
+            <version>2.9-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
 
     <build>
