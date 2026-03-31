@@ -8,7 +8,7 @@
         <format>zip</format>
     </formats>
     <includeBaseDirectory>true</includeBaseDirectory>
-    <baseDirectory>iCamera CCTV Monitor</baseDirectory>
+    <baseDirectory>icamera-cctv-monitor</baseDirectory>
 
     <!-- Include the generated EXE from target/dist -->
     <fileSets>
@@ -16,7 +16,7 @@
             <directory>${project.build.directory}/dist</directory>
             <outputDirectory>/</outputDirectory>
             <includes>
-                <include>iCamera CCTV Monitor.exe</include>
+                <include>icamera-cctv-monitor-*.exe</include>
             </includes>
         </fileSet>
         <!-- Bundled JRE (if present) -->

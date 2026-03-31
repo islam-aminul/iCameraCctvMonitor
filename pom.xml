@@ -37,6 +37,11 @@
         <app.internal.name>iCameraCCTVMonitor</app.internal.name>
         <app.version>1.0.0</app.version>
         <jre.bundle.dir>${project.basedir}/jre8-win64</jre.bundle.dir>
+        <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
+
+        <!-- Artifact naming (lowercase, dash-separated, no spaces) -->
+        <app.jar.name>icamera-cctv-monitor-all</app.jar.name>
+        <app.exe.name>icamera-cctv-monitor-${platform}</app.exe.name>
 
         <!-- JavaFX -->
         <javafx.version>27-ea+6</javafx.version>
@@ -371,7 +376,7 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <outputFile>${project.build.directory}/dist/${project.artifactId}-${project.version}-all.jar</outputFile>
+                            <outputFile>${project.build.directory}/dist/${app.jar.name}.jar</outputFile>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>${app.main.class}</mainClass>
@@ -379,6 +384,7 @@
                                         <Implementation-Title>${app.name}</Implementation-Title>
                                         <Implementation-Version>${project.version}</Implementation-Version>
                                         <Implementation-Vendor>${org.name}</Implementation-Vendor>
+                                        <Build-Date>${maven.build.timestamp}</Build-Date>
                                     </manifestEntries>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
@@ -430,8 +436,8 @@
                         </goals>
                         <configuration>
                             <headerType>gui</headerType>
-                            <outfile>${project.build.directory}/dist/${app.name}.exe</outfile>
-                            <jar>${project.build.directory}/dist/${project.artifactId}-${project.version}-all.jar</jar>
+                            <outfile>${project.build.directory}/dist/${app.exe.name}.exe</outfile>
+                            <jar>${project.build.directory}/dist/${app.jar.name}.jar</jar>
                             <errTitle>${app.name}</errTitle>
                             <icon>${project.basedir}/src/main/resources/icon.ico</icon>
                             <classPath>
@@ -455,7 +461,7 @@
                                 <productName>${app.name}</productName>
                                 <companyName>${org.name}</companyName>
                                 <internalName>${app.internal.name}</internalName>
-                                <originalFilename>${app.name}.exe</originalFilename>
+                                <originalFilename>${app.exe.name}.exe</originalFilename>
                             </versionInfo>
                             <messages>
                                 <startupErr>An error occurred while starting ${app.name}.</startupErr>
@@ -535,7 +541,7 @@
                                 <argument>${keystore.password}</argument>
                                 <argument>-tsa</argument>
                                 <argument>${timestamp.url}</argument>
-                                <argument>${project.build.directory}/dist/${project.artifactId}-${project.version}-all.jar</argument>
+                                <argument>${project.build.directory}/dist/${app.jar.name}.jar</argument>
                                 <argument>${keystore.alias}</argument>
                             </arguments>
                         </configuration>
@@ -561,7 +567,7 @@
                                 <argument>SHA256</argument>
                                 <argument>/t</argument>
                                 <argument>${timestamp.url}</argument>
-                                <argument>${project.build.directory}/dist/${app.name}.exe</argument>
+                                <argument>${project.build.directory}/dist/${app.exe.name}.exe</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -584,7 +590,7 @@
                             <descriptors>
                                 <descriptor>${project.basedir}/assembly/windows-dist.xml</descriptor>
                             </descriptors>
-                            <finalName>${app.name}-${project.version}-win64</finalName>
+                            <finalName>icamera-cctv-monitor-${project.version}-${platform}</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                             <outputDirectory>${project.build.directory}</outputDirectory>
                         </configuration>
