@@ -62,13 +62,13 @@ public class Launcher extends Application {
 
     private void showMainWindow(Stage stage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
-        Scene scene = new Scene(loader.load(), 1280, 768);
+        Scene scene = new Scene(loader.load(), 1440, 800);
         scene.getStylesheets().add(getClass().getResource("/css/dark-theme.css").toExternalForm());
 
         stage.setTitle("iCamera CCTV Monitor");
         stage.setScene(scene);
-        stage.setMinWidth(1024);
-        stage.setMinHeight(640);
+        stage.setMinWidth(1200);
+        stage.setMinHeight(700);
 
         // Set application icon
         try (InputStream iconStream = getClass().getResourceAsStream("/icon.ico")) {

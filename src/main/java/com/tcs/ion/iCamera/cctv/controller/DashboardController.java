@@ -13,7 +13,8 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 /**
- * Dashboard page – tiles showing high-level health summary.
+ * Dashboard page – hierarchical health tiles with tri-state RAG (GREEN/AMBER/RED)
+ * supporting DEGRADED status for Proxy and HSQLDB.
  */
 public class DashboardController implements Initializable {
 
@@ -21,38 +22,44 @@ public class DashboardController implements Initializable {
     @FXML private Label lblProxyStatus;
     @FXML private Label lblProxyId;
     @FXML private Label lblProxyName;
-    @FXML private Pane  paneProxyTile;
+    @FXML private VBox paneProxyTile;
+    @FXML private Label lblServiceStatus;
+    @FXML private Label lblJmxStatus;
 
     // --- HSQLDB Tile ---
     @FXML private Label lblHsqldbStatus;
-    @FXML private Pane  paneHsqldbTile;
+    @FXML private VBox paneHsqldbTile;
+    @FXML private Label lblHsqldbServiceStatus;
+    @FXML private Label lblHsqldbJmxStatus;
+    @FXML private Label lblHsqldbDirect;
 
     // --- CCTV Tile ---
     @FXML private Label lblCctvActive;
     @FXML private Label lblCctvTotal;
     @FXML private ProgressBar pbCctvActive;
+    @FXML private Label lblCctvWarning;
 
     // --- System Health ---
     @FXML private Label lblSystemHealth;
-    @FXML private Pane  paneSystemTile;
+    @FXML private VBox paneSystemTile;
 
     // --- CPU ---
-    @FXML private Label       lblCpuPercent;
+    @FXML private Label lblCpuPercent;
     @FXML private ProgressBar pbCpu;
-    @FXML private Pane        paneCpuTile;
+    @FXML private VBox paneCpuTile;
 
     // --- Memory ---
-    @FXML private Label       lblMemPercent;
+    @FXML private Label lblMemPercent;
     @FXML private ProgressBar pbMem;
-    @FXML private Pane        paneMemTile;
+    @FXML private VBox paneMemTile;
 
     // --- Disk ---
     @FXML private Label lblDiskSummary;
-    @FXML private VBox  vboxDisks;
+    @FXML private VBox vboxDisks;
 
     // --- Network ---
     @FXML private Label lblNetworkSpeed;
-    @FXML private Pane  paneNetworkTile;
+    @FXML private VBox paneNetworkTile;
 
     // --- MAC ---
     @FXML private Label lblCurrentMac;
@@ -78,19 +85,42 @@ public class DashboardController implements Initializable {
         ProxyData pd = store.getProxyData();
         SystemMetrics sm = store.getSystemMetrics();
 
-        // ---- Proxy tile ----
+        // ---- Proxy tile (tri-state: UP/DEGRADED/DOWN) ----
         if (pd != null) {
             lblProxyId.setText("ID: " + pd.getProxyId());
             lblProxyName.setText(pd.getProxyName());
             lblTcCodeBanner.setText("TC Code: " + pd.getTcCode());
-            boolean up = "UP".equals(pd.getStatus());
-            lblProxyStatus.setText(up ? "UP" : pd.getStatus());
-            setStatusStyle(paneProxyTile, lblProxyStatus, up);
 
-            // HSQLDB
-            boolean hsqlUp = "UP".equals(pd.getHsqldbStatus());
-            lblHsqldbStatus.setText(hsqlUp ? "UP" : pd.getHsqldbStatus());
-            setStatusStyle(paneHsqldbTile, lblHsqldbStatus, hsqlUp);
+            String status = pd.getStatus() != null ? pd.getStatus() : "UNKNOWN";
+            lblProxyStatus.setText(status);
+            applyTriState(paneProxyTile, lblProxyStatus, status);
+
+            // Sub-items: service status and JMX
+            String svcStatus = pd.getServiceStatus() != null ? pd.getServiceStatus() : "UNKNOWN";
+            lblServiceStatus.setText(svcStatus);
+            applySubItemColor(lblServiceStatus, "RUNNING".equals(svcStatus));
+
+            boolean jmxConnected = store.isJmxConnected();
+            lblJmxStatus.setText(jmxConnected ? "Connected" : "Disconnected");
+            applySubItemColor(lblJmxStatus, jmxConnected);
+
+            // HSQLDB (tri-state based on multi-layer status)
+            String hsqldbOverall = determineHsqldbOverallStatus(pd);
+            lblHsqldbStatus.setText(hsqldbOverall);
+            applyTriState(paneHsqldbTile, lblHsqldbStatus, hsqldbOverall);
+
+            // HSQLDB sub-items
+            String hsqlSvc = pd.getHsqldbStatus() != null ? pd.getHsqldbStatus() : "UNKNOWN";
+            lblHsqldbServiceStatus.setText(hsqlSvc);
+            applySubItemColor(lblHsqldbServiceStatus, "UP".equals(hsqlSvc));
+
+            String hsqlJmx = pd.getHsqldbJmxStatus() != null ? pd.getHsqldbJmxStatus() : "N/A";
+            lblHsqldbJmxStatus.setText(hsqlJmx);
+            applySubItemColor(lblHsqldbJmxStatus, "UP".equals(hsqlJmx));
+
+            boolean directReachable = pd.isHsqldbDirectlyReachable();
+            lblHsqldbDirect.setText(directReachable ? "Reachable" : "Unreachable");
+            applySubItemColor(lblHsqldbDirect, directReachable);
 
             // MAC
             lblCurrentMac.setText("Current: " + nvl(pd.getCurrentMacAddress()));
@@ -98,14 +128,29 @@ public class DashboardController implements Initializable {
             lblMacWarning.setVisible(pd.isMacMismatch());
         } else {
             lblProxyStatus.setText("No Data");
+            lblServiceStatus.setText("--");
+            lblJmxStatus.setText("--");
+            lblHsqldbStatus.setText("--");
+            lblHsqldbServiceStatus.setText("--");
+            lblHsqldbJmxStatus.setText("--");
+            lblHsqldbDirect.setText("--");
         }
 
         // ---- CCTV tile ----
-        int total  = store.getTotalCctvCount();
+        int total = store.getTotalCctvCount();
         long active = store.getActiveCctvCount();
         lblCctvActive.setText("Active: " + active);
         lblCctvTotal.setText("Total:  " + total);
         pbCctvActive.setProgress(total > 0 ? (double) active / total : 0);
+
+        if (total > 25) {
+            lblCctvWarning.setText("\u26A0 " + total + " cameras exceed recommended limit of 25");
+            lblCctvWarning.setVisible(true);
+            lblCctvWarning.setManaged(true);
+        } else {
+            lblCctvWarning.setVisible(false);
+            lblCctvWarning.setManaged(false);
+        }
 
         // ---- System / CPU / Memory ----
         if (sm != null) {
@@ -124,7 +169,7 @@ public class DashboardController implements Initializable {
             vboxDisks.getChildren().clear();
             for (SystemMetrics.DriveInfo di : sm.getDrives()) {
                 HBox row = new HBox(8);
-                Label lName  = new Label(di.getName());
+                Label lName = new Label(di.getName());
                 lName.getStyleClass().add("tile-sublabel");
                 ProgressBar pb = new ProgressBar(di.getUsedPercent() / 100.0);
                 pb.setPrefWidth(120);
@@ -140,18 +185,66 @@ public class DashboardController implements Initializable {
             // System health
             boolean healthy = sm.isHealthy();
             lblSystemHealth.setText(healthy ? "STABLE" : "UNSTABLE");
-            setStatusStyle(paneSystemTile, lblSystemHealth, healthy);
+            applyTriState(paneSystemTile, lblSystemHealth, healthy ? "UP" : "DOWN");
         }
     }
 
-    private void setStatusStyle(Pane tile, Label label, boolean ok) {
-        tile.getStyleClass().removeAll("tile-up", "tile-down");
-        tile.getStyleClass().add(ok ? "tile-up" : "tile-down");
+    /**
+     * Determines overall HSQLDB status from multi-layer checks.
+     * UP = service UP + JMX reports UP + directly reachable
+     * DEGRADED = service UP but JMX reports DOWN (or conflict scenario)
+     * DOWN = service DOWN
+     */
+    private String determineHsqldbOverallStatus(ProxyData pd) {
+        String svcStatus = pd.getHsqldbStatus();
+        String jmxStatus = pd.getHsqldbJmxStatus();
+        boolean directReachable = pd.isHsqldbDirectlyReachable();
+
+        if (!"UP".equals(svcStatus)) return "DOWN";
+
+        // Service is UP
+        if ("DOWN".equals(jmxStatus) && directReachable) {
+            // Service running, DB reachable, but proxy can't connect = DEGRADED
+            return "DEGRADED";
+        }
+        if ("DOWN".equals(jmxStatus)) {
+            return "DEGRADED";
+        }
+        return "UP";
+    }
+
+    /**
+     * Applies tri-state coloring: UP=GREEN, DEGRADED=AMBER, DOWN/UNKNOWN=RED
+     */
+    private void applyTriState(Region tile, Label label, String status) {
+        tile.getStyleClass().removeAll("tile-up", "tile-down", "tile-warn");
+        label.getStyleClass().removeAll("text-green", "text-red", "text-yellow");
+
+        switch (status) {
+            case "UP":
+                tile.getStyleClass().add("tile-up");
+                label.getStyleClass().add("text-green");
+                break;
+            case "DEGRADED":
+                tile.getStyleClass().add("tile-warn");
+                label.getStyleClass().add("text-yellow");
+                break;
+            default: // DOWN, UNKNOWN
+                tile.getStyleClass().add("tile-down");
+                label.getStyleClass().add("text-red");
+                break;
+        }
+    }
+
+    /**
+     * Colors sub-item labels (service, JMX, etc.) based on OK/not-OK.
+     */
+    private void applySubItemColor(Label label, boolean ok) {
         label.getStyleClass().removeAll("text-green", "text-red");
         label.getStyleClass().add(ok ? "text-green" : "text-red");
     }
 
-    private void applyThreshold(Pane tile, double value) {
+    private void applyThreshold(Region tile, double value) {
         tile.getStyleClass().removeAll("tile-up", "tile-down", "tile-warn");
         tile.getStyleClass().add(value > 85 ? "tile-down" : value > 60 ? "tile-warn" : "tile-up");
     }

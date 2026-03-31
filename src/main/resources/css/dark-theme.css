@@ -3,7 +3,7 @@
    Primary:  #0A0A0F  (deep black background)
    Accent:   #2196F3  (blue)
    Success:  #00E676  (green)
-   Warning:  #FFD600  (yellow)
+   Warning:  #FFD600  (yellow/amber)
    Danger:   #F44336  (red)
    Text:     #E0E0E0  (white/light grey)
    ============================================================ */
@@ -16,18 +16,16 @@
     -fx-text-fill: #E0E0E0;
 }
 
-/* Ensure all Label nodes are readable on dark background */
 .label {
     -fx-text-fill: #E0E0E0;
 }
 
-/* Table cells */
 .table-cell {
     -fx-text-fill: #E0E0E0;
     -fx-background-color: transparent;
 }
 
-/* TitledPane header and content text */
+/* TitledPane */
 .titled-pane > .title > .text {
     -fx-fill: #B0BEC5;
     -fx-font-weight: bold;
@@ -65,6 +63,7 @@
     -fx-border-radius: 4;
     -fx-background-radius: 4;
     -fx-font-size: 12px;
+    -fx-padding: 8 12 8 12;
 }
 
 .root-pane {
@@ -85,7 +84,9 @@
     -fx-background-color: #1A1A2E;
 }
 
-/* --- Header Bar --- */
+/* ============================================================
+   HEADER BAR
+   ============================================================ */
 .header-bar {
     -fx-background-color: #0D0D1A;
     -fx-padding: 0 16 0 16;
@@ -116,7 +117,7 @@
 .tc-code-label {
     -fx-text-fill: #2196F3;
     -fx-font-weight: bold;
-    -fx-font-size: 13px;
+    -fx-font-size: 14px;
 }
 
 .tc-code-banner {
@@ -128,56 +129,126 @@
     -fx-background-radius: 4;
 }
 
-/* --- Sidebar --- */
-.sidebar {
+/* Live clock in header */
+.header-clock {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Consolas", "Courier New", monospace;
+}
+
+/* Proxy status pill in header */
+.proxy-status-pill {
+    -fx-padding: 2 8 2 8;
+    -fx-background-color: #13131F;
+    -fx-background-radius: 12;
+    -fx-border-color: #2E3060;
+    -fx-border-radius: 12;
+}
+
+/* Overall RAG pill in header */
+.overall-rag-pill {
+    -fx-padding: 2 8 2 8;
+    -fx-background-color: #13131F;
+    -fx-background-radius: 12;
+    -fx-border-color: #2E3060;
+    -fx-border-radius: 12;
+}
+
+/* RAG pill labels */
+.rag-pill {
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-padding: 2 6 2 6;
+    -fx-background-radius: 8;
+}
+
+.rag-green {
+    -fx-text-fill: #00E676;
+}
+
+.rag-amber {
+    -fx-text-fill: #FFD600;
+}
+
+.rag-red {
+    -fx-text-fill: #F44336;
+}
+
+/* ============================================================
+   TAB NAVIGATION (replaces sidebar)
+   ============================================================ */
+
+/* Level 1: Main tab bar */
+.tab-bar {
     -fx-background-color: #0D0D1A;
     -fx-border-color: #1E2040;
-    -fx-border-width: 0 1 0 0;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 0 8 0 8;
+    -fx-min-height: 40;
 }
 
-.sidebar-section-header {
-    -fx-text-fill: #78909C;
-    -fx-font-size: 10px;
-    -fx-font-weight: bold;
-    -fx-padding: 4 0 2 4;
-}
-
-.sidebar-footer {
-    -fx-text-fill: #607D8B;
-    -fx-font-size: 10px;
-    -fx-alignment: CENTER;
-}
-
-.sidebar-sep {
-    -fx-background-color: #1E2040;
-    -fx-padding: 0;
-}
-
-/* --- Navigation Buttons --- */
-.nav-btn {
+.main-tab {
     -fx-background-color: transparent;
     -fx-text-fill: #B0BEC5;
     -fx-font-size: 13px;
-    -fx-alignment: CENTER_LEFT;
-    -fx-padding: 8 12 8 12;
-    -fx-background-radius: 6;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20 10 20;
+    -fx-background-radius: 4 4 0 0;
     -fx-cursor: hand;
-    -fx-border-radius: 6;
+    -fx-border-width: 0;
 }
 
-.nav-btn:hover {
+.main-tab:hover {
     -fx-background-color: #1A1A3E;
     -fx-text-fill: #FFFFFF;
 }
 
-.nav-btn-active {
-    -fx-background-color: linear-gradient(to right, #1A1F4F, #0D1030);
+.main-tab-active {
+    -fx-background-color: #13131F;
     -fx-text-fill: #2196F3;
-    -fx-font-weight: bold;
     -fx-border-color: #2196F3;
-    -fx-border-width: 0 0 0 3;
+    -fx-border-width: 0 0 3 0;
     -fx-border-radius: 0;
-    -fx-background-radius: 0 6 6 0;
+    -fx-background-radius: 4 4 0 0;
+}
+
+.tab-bar-version {
+    -fx-text-fill: #607D8B;
+    -fx-font-size: 10px;
+}
+
+/* Level 2: Sub-tab bar */
+.sub-tab-bar {
+    -fx-background-color: #10101C;
+    -fx-border-color: #1A1A30;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 0 8 0 8;
+    -fx-min-height: 34;
+}
+
+.sub-tab {
+    -fx-background-color: transparent;
+    -fx-text-fill: #90A4AE;
+    -fx-font-size: 12px;
+    -fx-padding: 8 16 8 16;
+    -fx-background-radius: 4 4 0 0;
+    -fx-cursor: hand;
+    -fx-border-width: 0;
+}
+
+.sub-tab:hover {
+    -fx-background-color: #1A1A2E;
+    -fx-text-fill: #FFFFFF;
+}
+
+.sub-tab-active {
+    -fx-background-color: #0F0F1A;
+    -fx-text-fill: #64B5F6;
+    -fx-border-color: #64B5F6;
+    -fx-border-width: 0 0 2 0;
+    -fx-border-radius: 0;
+    -fx-background-radius: 3 3 0 0;
 }
 
 /* --- Alert Badge --- */
@@ -192,13 +263,14 @@
     -fx-alignment: CENTER;
 }
 
-/* --- Content Area --- */
+/* ============================================================
+   CONTENT AREA
+   ============================================================ */
 .content-area {
     -fx-background-color: #0F0F1A;
     -fx-padding: 0;
 }
 
-/* --- Page root --- */
 .page-root {
     -fx-background-color: #0F0F1A;
 }
@@ -207,7 +279,6 @@
     -fx-background-color: #0F0F1A;
 }
 
-/* --- Page title --- */
 .page-title {
     -fx-font-size: 20px;
     -fx-font-weight: bold;
@@ -215,7 +286,6 @@
     -fx-padding: 0 0 4 0;
 }
 
-/* --- Section header --- */
 .section-header {
     -fx-font-size: 15px;
     -fx-font-weight: bold;
@@ -227,7 +297,172 @@
     -fx-background-color: #1E2040;
 }
 
-/* --- Tiles --- */
+/* ============================================================
+   ACTIVE ISSUES PANEL (right side, permanently visible)
+   ============================================================ */
+.issues-panel {
+    -fx-background-color: #0D0D1A;
+    -fx-border-color: #1E2040;
+    -fx-border-width: 0 0 0 1;
+}
+
+.issues-panel-header {
+    -fx-background-color: #0A0A14;
+    -fx-border-color: #1E2040;
+    -fx-border-width: 0 0 1 0;
+}
+
+.issues-panel-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #FFFFFF;
+}
+
+.issues-panel-sep {
+    -fx-background-color: #1E2040;
+}
+
+.issues-scroll {
+    -fx-background-color: #0D0D1A;
+}
+
+.issues-scroll > .viewport {
+    -fx-background-color: #0D0D1A;
+}
+
+.issues-list {
+    -fx-background-color: #0D0D1A;
+}
+
+/* Issue count badge */
+.issue-count-badge {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 2 8 2 8;
+    -fx-background-radius: 10;
+    -fx-min-width: 24;
+    -fx-alignment: CENTER;
+}
+
+.issue-count-critical {
+    -fx-background-color: #F44336;
+    -fx-text-fill: #FFFFFF;
+}
+
+.issue-count-warning {
+    -fx-background-color: #FFD600;
+    -fx-text-fill: #000000;
+}
+
+.issue-count-ok {
+    -fx-background-color: #00E676;
+    -fx-text-fill: #000000;
+}
+
+/* Issue cards */
+.issue-card {
+    -fx-background-color: #13131F;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-cursor: hand;
+}
+
+.issue-card:hover {
+    -fx-background-color: #1A1A2E;
+}
+
+.issue-card-critical {
+    -fx-border-color: #F44336;
+    -fx-border-width: 0 0 0 3;
+}
+
+.issue-card-warning {
+    -fx-border-color: #FFD600;
+    -fx-border-width: 0 0 0 3;
+}
+
+/* Issue severity pill */
+.issue-severity-pill {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 1 6 1 6;
+    -fx-background-radius: 8;
+}
+
+.severity-critical {
+    -fx-background-color: #3D0A0A;
+    -fx-text-fill: #F44336;
+    -fx-border-color: #F44336;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+}
+
+.severity-warning {
+    -fx-background-color: #3D3000;
+    -fx-text-fill: #FFD600;
+    -fx-border-color: #FFD600;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+}
+
+.issue-title {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #FFFFFF;
+}
+
+.issue-cause {
+    -fx-font-size: 11px;
+    -fx-text-fill: #90A4AE;
+}
+
+.issue-age {
+    -fx-font-size: 10px;
+    -fx-text-fill: #607D8B;
+}
+
+.issue-expand-link {
+    -fx-font-size: 11px;
+    -fx-text-fill: #64B5F6;
+    -fx-cursor: hand;
+    -fx-padding: 2 0 0 0;
+}
+
+.issue-expand-link:hover {
+    -fx-text-fill: #90CAF9;
+    -fx-underline: true;
+}
+
+.no-issues-label {
+    -fx-text-fill: #4CAF50;
+    -fx-font-size: 13px;
+    -fx-font-style: italic;
+}
+
+/* Export section at bottom of issues panel */
+.export-section {
+    -fx-background-color: #0D0D1A;
+}
+
+.btn-export {
+    -fx-background-color: #1565C0;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-padding: 10 20 10 20;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(21,101,192,0.4), 6, 0, 0, 2);
+}
+
+.btn-export:hover {
+    -fx-background-color: #1976D2;
+    -fx-effect: dropshadow(gaussian, rgba(25,118,210,0.6), 8, 0, 0, 3);
+}
+
+/* ============================================================
+   TILES
+   ============================================================ */
 .tile {
     -fx-background-color: #13131F;
     -fx-background-radius: 8;
@@ -271,6 +506,21 @@
     -fx-text-fill: #B0BEC5;
 }
 
+/* Tile section headers (Application Health, System Resources, etc.) */
+.tile-section-header {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #78909C;
+    -fx-padding: 8 0 2 4;
+    -fx-border-color: #1E2040;
+    -fx-border-width: 0 0 1 0;
+}
+
+/* Hierarchy indent for sub-items within tiles */
+.hierarchy-indent {
+    -fx-padding: 2 0 0 12;
+}
+
 /* --- Summary bar --- */
 .summary-bar {
     -fx-background-color: #13131F;
@@ -289,11 +539,11 @@
     -fx-background-radius: 12;
 }
 
-/* --- Detail labels --- */
+/* --- Detail labels (used in tiles and detail pages) --- */
 .detail-label {
     -fx-text-fill: #90A4AE;
     -fx-font-size: 12px;
-    -fx-min-width: 140;
+    -fx-min-width: 70;
 }
 
 .detail-value {
@@ -312,14 +562,17 @@
 .status-ok    { -fx-text-fill: #00E676; -fx-font-size: 12px; }
 .status-error { -fx-text-fill: #F44336; -fx-font-size: 12px; }
 
-/* --- Blinking animation for alerts --- */
-.blinking {
-    -fx-opacity: 1;
-    animation: blink 1s infinite;
+/* DEGRADED status styling */
+.status-degraded {
+    -fx-text-fill: #FFD600;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
 }
 
-/* JavaFX keyframe animation via Timeline is handled in Java code;
-   this CSS class is a marker used for identification */
+/* --- Blinking animation --- */
+.blinking {
+    -fx-opacity: 1;
+}
 
 /* --- Progress Bars --- */
 .progress-bar {
@@ -336,7 +589,9 @@
 .progress-red > .bar { -fx-background-color: #F44336; }
 .progress-normal > .bar { -fx-background-color: #2196F3; }
 
-/* --- Tables --- */
+/* ============================================================
+   TABLES
+   ============================================================ */
 .data-table {
     -fx-background-color: #13131F;
     -fx-border-color: #1E2040;
@@ -517,7 +772,9 @@
     -fx-font-weight: bold;
 }
 
-/* --- TabPane --- */
+/* ============================================================
+   TAB PANE (used within pages like System Hardware)
+   ============================================================ */
 .tab-pane .tab-header-area {
     -fx-background-color: #0D0D1A;
     -fx-padding: 4 0 0 0;
@@ -527,7 +784,6 @@
     -fx-background-color: #0D0D1A;
 }
 
-/* Each tab: generous horizontal padding makes them wide and easy to click */
 .tab-pane .tab {
     -fx-background-color: #0D0D1A;
     -fx-background-insets: 0;
@@ -551,7 +807,6 @@
     -fx-text-fill: #B0C8D8;
 }
 
-/* Selected: #13131F content bg with a 3 px #2196F3 accent strip at the bottom */
 .tab-pane .tab:selected,
 .tab-pane:focused .tab:selected {
     -fx-background-color: #2196F3, #13131F;
@@ -570,7 +825,9 @@
     -fx-padding: 0;
 }
 
-/* --- Error page (view load failure) --- */
+/* ============================================================
+   ERROR PAGE (view load failure)
+   ============================================================ */
 .error-page {
     -fx-padding: 60 40 60 40;
 }
@@ -594,7 +851,9 @@
     -fx-max-width: 420px;
 }
 
-/* --- Alert dialog styling --- */
+/* ============================================================
+   DIALOG STYLING
+   ============================================================ */
 .dialog-pane {
     -fx-background-color: #13131F;
 }
