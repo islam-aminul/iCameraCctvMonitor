@@ -8,34 +8,31 @@
     <VBox styleClass="page-root" spacing="16">
         <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
 
-        <Label text="Settings" styleClass="page-title"/>
-        <Separator/>
-
-        <!-- JMX Settings -->
+        <!-- JMX Settings (disabled for now) -->
         <TitledPane text="JMX Connection" expanded="true" styleClass="settings-pane">
             <GridPane hgap="16" vgap="10">
                 <padding><Insets top="12" left="12" right="12" bottom="12"/></padding>
                 <Label text="JMX Host:"    GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="detail-label"/>
-                <TextField fx:id="txtJmxHost"    GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="240"/>
+                <TextField fx:id="txtJmxHost"    GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="240" disable="true"/>
                 <Label text="Base Port:"  GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="detail-label"/>
-                <TextField fx:id="txtJmxPort"    GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                <TextField fx:id="txtJmxPort"    GridPane.columnIndex="1" GridPane.rowIndex="1" disable="true"/>
                 <Label text="Port Retries:" GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="detail-label"/>
-                <TextField fx:id="txtJmxRetries" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-                <Label text="Poll Interval (s):" GridPane.columnIndex="0" GridPane.rowIndex="3" styleClass="detail-label"/>
-                <TextField fx:id="txtPollInterval" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                <TextField fx:id="txtJmxRetries" GridPane.columnIndex="1" GridPane.rowIndex="2" disable="true"/>
+                <Label text="Poll Interval (seconds):" GridPane.columnIndex="0" GridPane.rowIndex="3" styleClass="detail-label"/>
+                <TextField fx:id="txtPollInterval" GridPane.columnIndex="1" GridPane.rowIndex="3" disable="true"/>
             </GridPane>
         </TitledPane>
 
-        <!-- Jetty -->
+        <!-- Services (disabled for now) -->
         <TitledPane text="Services" expanded="true" styleClass="settings-pane">
             <GridPane hgap="16" vgap="10">
                 <padding><Insets top="12" left="12" right="12" bottom="12"/></padding>
                 <Label text="REST API Port:" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="detail-label"/>
-                <TextField fx:id="txtJettyPort"   GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                <TextField fx:id="txtJettyPort"   GridPane.columnIndex="1" GridPane.rowIndex="0" disable="true"/>
             </GridPane>
         </TitledPane>
 
-        <!-- Theme -->
+        <!-- Appearance (live changes) -->
         <TitledPane text="Appearance" expanded="true" styleClass="settings-pane">
             <GridPane hgap="16" vgap="10">
                 <padding><Insets top="12" left="12" right="12" bottom="12"/></padding>
@@ -44,44 +41,10 @@
                 <Label text="Accent Colour:" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="detail-label"/>
                 <ColorPicker fx:id="cpAccent" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
                 <Label text="Font Family:"  GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="detail-label"/>
-                <TextField fx:id="txtFontFamily" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                <ComboBox fx:id="cmbFontFamily" GridPane.columnIndex="1" GridPane.rowIndex="2" prefWidth="240"/>
                 <Label text="Font Size:"    GridPane.columnIndex="0" GridPane.rowIndex="3" styleClass="detail-label"/>
                 <Spinner fx:id="spFontSize" GridPane.columnIndex="1" GridPane.rowIndex="3" prefWidth="100" editable="true"/>
             </GridPane>
         </TitledPane>
-
-        <!-- Dashboard tiles -->
-        <TitledPane text="Dashboard Tiles" expanded="false" styleClass="settings-pane">
-            <VBox spacing="8">
-                <padding><Insets top="12" left="12" right="12" bottom="12"/></padding>
-                <CheckBox fx:id="cbProxyTile"   text="Proxy Status"/>
-                <CheckBox fx:id="cbHsqldbTile"  text="HSQLDB Status"/>
-                <CheckBox fx:id="cbCctvTile"    text="CCTV Cameras"/>
-                <CheckBox fx:id="cbSystemTile"  text="System Health"/>
-                <CheckBox fx:id="cbCpuTile"     text="CPU Usage"/>
-                <CheckBox fx:id="cbMemTile"     text="Memory Usage"/>
-                <CheckBox fx:id="cbDiskTile"    text="Disk Usage"/>
-                <CheckBox fx:id="cbNetworkTile" text="Network Status"/>
-                <CheckBox fx:id="cbMacTile"     text="MAC Address"/>
-            </VBox>
-        </TitledPane>
-
-        <!-- Export -->
-        <TitledPane text="Export" expanded="false" styleClass="settings-pane">
-            <GridPane hgap="16" vgap="10">
-                <padding><Insets top="12" left="12" right="12" bottom="12"/></padding>
-                <Label text="Export Path:"   GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="detail-label"/>
-                <TextField fx:id="txtExportPath" GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="320"/>
-                <Label text="Format:"        GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="detail-label"/>
-                <ComboBox fx:id="cmbExportFormat" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-            </GridPane>
-        </TitledPane>
-
-        <!-- Action buttons -->
-        <HBox spacing="12">
-            <Button text="Save Settings"    onAction="#onSaveSettings"  styleClass="btn-primary"/>
-            <Button text="Reset Defaults"   onAction="#onResetDefaults" styleClass="btn-secondary"/>
-        </HBox>
-        <Label fx:id="lblStatus" styleClass="detail-value"/>
     </VBox>
 </ScrollPane>

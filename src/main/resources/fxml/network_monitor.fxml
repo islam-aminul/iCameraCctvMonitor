@@ -9,9 +9,6 @@
 <VBox styleClass="page-root" spacing="16">
     <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
 
-    <Label text="Network Monitor" styleClass="page-title"/>
-    <Separator/>
-
     <!-- ── Upload speed metrics ─────────────────────────────────── -->
     <HBox spacing="24" styleClass="summary-bar">
         <VBox spacing="4">

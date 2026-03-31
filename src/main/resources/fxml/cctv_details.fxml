@@ -7,9 +7,6 @@
       styleClass="page-root" spacing="12">
     <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
 
-    <Label text="CCTV Details" styleClass="page-title"/>
-    <Separator/>
-
     <!-- Summary bar -->
     <HBox spacing="24" alignment="CENTER_LEFT" styleClass="summary-bar">
         <Label fx:id="lblTotal"    styleClass="summary-chip"/>

@@ -5,6 +5,7 @@ import com.tcs.ion.iCamera.cctv.service.DataStore;
 import javafx.animation.*;
 import javafx.beans.property.*;
 import javafx.collections.*;
+import javafx.scene.Node;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -41,9 +42,6 @@ public class SystemHardwareController implements Initializable {
 
     // --- Disk ---
     @FXML private VBox vboxDrives;
-
-    // --- Overall health ---
-    @FXML private Label lblOverallHealth;
 
     // --- Top processes – All (merged default tab) ---
     @FXML private TableView<ProcRow>           tblTopAll;
@@ -208,8 +206,8 @@ public class SystemHardwareController implements Initializable {
             lblProxyRamUsage.setText(String.format("iCamera Process RAM: %.1f MB", pd.getProcessMemoryMb()));
         }
 
-        // ---- Drives ----
-        vboxDrives.getChildren().clear();
+        // ---- Drives (atomic swap to avoid flicker) ----
+        List<Node> newDriveNodes = new ArrayList<>();
         for (SystemMetrics.DriveInfo di : sm.getDrives()) {
             VBox driveBox = new VBox(4);
             driveBox.getStyleClass().add("drive-box");
@@ -231,14 +229,9 @@ public class SystemHardwareController implements Initializable {
             pb.getStyleClass().add(di.getUsedPercent() > 85 ? "progress-red" : "progress-normal");
 
             driveBox.getChildren().addAll(lName, details, pb);
-            vboxDrives.getChildren().add(driveBox);
+            newDriveNodes.add(driveBox);
         }
-
-        // ---- Overall health ----
-        boolean healthy = sm.isHealthy();
-        lblOverallHealth.setText("System Health: " + (healthy ? "STABLE" : "CRITICAL"));
-        lblOverallHealth.getStyleClass().removeAll("text-green", "text-red");
-        lblOverallHealth.getStyleClass().add(healthy ? "text-green" : "text-red");
+        vboxDrives.getChildren().setAll(newDriveNodes);
 
         // ---- Top-5 process tables ----
         List<ProcessInfo> cpuList  = filterIdle(sm.getTopCpuProcesses());
@@ -250,11 +243,19 @@ public class SystemHardwareController implements Initializable {
         for (ProcessInfo p : cpuList)  merged.putIfAbsent(p.getPid(), p);
         for (ProcessInfo p : memList)  merged.putIfAbsent(p.getPid(), p);
         for (ProcessInfo p : diskList) merged.putIfAbsent(p.getPid(), p);
-        allRows.setAll(toRows(new ArrayList<>(merged.values())));
 
-        cpuRows.setAll(toRows(cpuList));
-        memRows.setAll(toRows(memList));
-        diskRows.setAll(toRows(diskList));
+        // Atomic swap — keep old data visible until new data is ready
+        List<ProcRow> newAllRows = toRows(new ArrayList<>(merged.values()));
+        if (!newAllRows.isEmpty()) allRows.setAll(newAllRows);
+
+        List<ProcRow> newCpuRows = toRows(cpuList);
+        if (!newCpuRows.isEmpty()) cpuRows.setAll(newCpuRows);
+
+        List<ProcRow> newMemRows = toRows(memList);
+        if (!newMemRows.isEmpty()) memRows.setAll(newMemRows);
+
+        List<ProcRow> newDiskRows = toRows(diskList);
+        if (!newDiskRows.isEmpty()) diskRows.setAll(newDiskRows);
     }
 
     private List<ProcRow> toRows(List<ProcessInfo> procs) {

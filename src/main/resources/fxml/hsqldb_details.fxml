@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<ScrollPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.tcs.ion.iCamera.cctv.controller.HsqldbDetailsController"
+            fitToWidth="true" styleClass="page-scroll">
+    <VBox styleClass="page-root" spacing="16">
+        <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+
+        <Pane fx:id="paneHsqldbStatus" styleClass="tile">
+            <VBox spacing="8" style="-fx-padding:16;">
+                <Label text="HSQLDB" styleClass="section-header"/>
+                <GridPane hgap="16" vgap="8">
+                    <Label text="Status:"              GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="detail-label"/>
+                    <Label fx:id="lblHsqldbStatus"     GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="detail-value"/>
+                    <Label text="Service Status:"      GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="detail-label"/>
+                    <Label fx:id="lblHsqldbService"    GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="detail-value"/>
+                    <Label text="JMX Report:"          GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="detail-label"/>
+                    <Label fx:id="lblHsqldbJmx"        GridPane.columnIndex="1" GridPane.rowIndex="2" styleClass="detail-value"/>
+                    <Label text="Direct Connectivity:" GridPane.columnIndex="0" GridPane.rowIndex="3" styleClass="detail-label"/>
+                    <Label fx:id="lblHsqldbDirect"     GridPane.columnIndex="1" GridPane.rowIndex="3" styleClass="detail-value"/>
+                    <Label text="Started:"             GridPane.columnIndex="0" GridPane.rowIndex="4" styleClass="detail-label"/>
+                    <Label fx:id="lblHsqldbStartTime"  GridPane.columnIndex="1" GridPane.rowIndex="4" styleClass="detail-value"/>
+                    <Label text="Uptime:"              GridPane.columnIndex="0" GridPane.rowIndex="5" styleClass="detail-label"/>
+                    <Label fx:id="lblHsqldbUptime"     GridPane.columnIndex="1" GridPane.rowIndex="5" styleClass="detail-value text-green"/>
+                </GridPane>
+            </VBox>
+        </Pane>
+    </VBox>
+</ScrollPane>

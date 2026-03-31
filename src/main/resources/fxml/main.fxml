@@ -26,7 +26,7 @@
             <!-- Level 1: Primary tab navigation -->
             <HBox fx:id="tabBar" styleClass="tab-bar" alignment="CENTER_LEFT" spacing="0">
                 <padding><Insets top="0" left="8" right="8" bottom="0"/></padding>
-                <Button fx:id="tabDashboard"     text="Dashboard"     onAction="#showDashboard"     styleClass="main-tab, main-tab-active"/>
+                <Button fx:id="tabDashboard"     text="Dashboard"     onAction="#showDashboard"     styleClass="main-tab"/>
                 <Button fx:id="tabApplication"   text="Application"   onAction="#showApplication"   styleClass="main-tab"/>
                 <Button fx:id="tabSystem"        text="System"        onAction="#showSystem"        styleClass="main-tab"/>
                 <Button fx:id="tabAlerts"        text="Alerts"        onAction="#showAlerts"        styleClass="main-tab"/>
@@ -79,7 +79,7 @@
             <VBox styleClass="export-section" spacing="8">
                 <padding><Insets top="10" left="12" right="12" bottom="12"/></padding>
                 <Separator/>
-                <Button fx:id="btnExport" text="Export to Excel" onAction="#onExportToExcel"
+                <Button fx:id="btnExport" text="Export Issues" onAction="#onExportToExcel"
                         maxWidth="Infinity" styleClass="btn-export"/>
             </VBox>
         </VBox>

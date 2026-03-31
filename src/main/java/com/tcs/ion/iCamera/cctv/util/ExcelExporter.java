@@ -224,6 +224,30 @@ public class ExcelExporter {
         return style;
     }
 
+    /**
+     * Exports only alerts to the specified file with sheet protection.
+     */
+    public static void exportAlertsToFile(List<AlertData> alerts, File outputFile) throws IOException {
+        outputFile.getParentFile().mkdirs();
+
+        try (XSSFWorkbook wb = new XSSFWorkbook()) {
+            CellStyle headerStyle = createHeaderStyle(wb);
+            CellStyle greenStyle = createStatusStyle(wb, IndexedColors.GREEN);
+            CellStyle redStyle = createStatusStyle(wb, IndexedColors.RED);
+            CellStyle amberStyle = createStatusStyle(wb, IndexedColors.GOLD);
+
+            XSSFSheet sheet = createAlertsSheet(wb, headerStyle, greenStyle, redStyle, amberStyle, alerts);
+
+            sheet.protectSheet("iCamera2026");
+            wb.lockStructure();
+
+            try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+                wb.write(fos);
+            }
+        }
+        log.info("Exported alerts to {}", outputFile.getAbsolutePath());
+    }
+
     private static void autoSizeColumns(Sheet sheet, int count) {
         for (int i = 0; i < count; i++) {
             try { sheet.autoSizeColumn(i); } catch (Exception ignored) {}

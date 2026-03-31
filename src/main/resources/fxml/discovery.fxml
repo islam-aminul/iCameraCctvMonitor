@@ -7,9 +7,6 @@
       styleClass="page-root" spacing="16" alignment="CENTER">
     <padding><Insets top="40" left="40" right="40" bottom="40"/></padding>
 
-    <Label text="Discovery" styleClass="page-title"/>
-    <Separator/>
-
     <VBox styleClass="tile" spacing="16" alignment="CENTER" maxWidth="600">
         <padding><Insets top="40" left="40" right="40" bottom="40"/></padding>
         <Label text="🔍" style="-fx-font-size:64;"/>

@@ -63,9 +63,6 @@ public class DashboardController implements Initializable {
     @FXML private Label lblLastMac;
     @FXML private Label lblMacWarning;
 
-    // --- TC Code Banner ---
-    @FXML private Label lblTcCodeBanner;
-
     private final DataStore store = DataStore.getInstance();
     private Timeline refreshTimeline;
 
@@ -86,7 +83,6 @@ public class DashboardController implements Initializable {
         if (pd != null) {
             lblProxyId.setText("ID: " + pd.getProxyId());
             lblProxyName.setText(pd.getProxyName());
-            lblTcCodeBanner.setText("TC Code: " + pd.getTcCode());
 
             String status = pd.getStatus() != null ? pd.getStatus() : "UNKNOWN";
             lblProxyStatus.setText(status);
@@ -127,7 +123,6 @@ public class DashboardController implements Initializable {
             lblProxyStatus.setText("Awaiting data...");
             lblProxyId.setText("ID: --");
             lblProxyName.setText("--");
-            lblTcCodeBanner.setText("TC Code: --");
             lblServiceStatus.setText("--");
             lblJmxStatus.setText("--");
             lblHsqldbStatus.setText("--");
