@@ -104,7 +104,17 @@ public class AlertService {
                 String.format("Memory used %.1f%% > %.0f%%", sm.getMemoryUsedPercent(), ALERT_THRESHOLD),
                 sm.getMemoryUsedPercent(), ALERT_THRESHOLD);
 
+        // Only alert for the drive where iCamera proxy is installed
+        ProxyData pd = store.getProxyData();
+        String proxyDrive = null;
+        if (pd != null && pd.getInstallPath() != null && pd.getInstallPath().length() >= 2) {
+            proxyDrive = pd.getInstallPath().substring(0, 2).toUpperCase();
+        }
+
         for (SystemMetrics.DriveInfo di : sm.getDrives()) {
+            if (proxyDrive != null && !di.getName().toUpperCase().startsWith(proxyDrive)) continue;
+            if (proxyDrive == null) continue; // Can't determine proxy drive, skip disk alerts
+
             String key = "DISK_HIGH_" + di.getName();
             raiseOrClear(key, di.getUsedPercent() > ALERT_THRESHOLD,
                     AlertData.Severity.WARNING, AlertData.Category.SYSTEM,

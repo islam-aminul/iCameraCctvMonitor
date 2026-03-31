@@ -137,42 +137,11 @@
     -fx-font-family: "Consolas", "Courier New", monospace;
 }
 
-/* Proxy status pill in header */
-.proxy-status-pill {
-    -fx-padding: 2 8 2 8;
-    -fx-background-color: #13131F;
-    -fx-background-radius: 12;
-    -fx-border-color: #2E3060;
-    -fx-border-radius: 12;
-}
-
-/* Overall RAG pill in header */
-.overall-rag-pill {
-    -fx-padding: 2 8 2 8;
-    -fx-background-color: #13131F;
-    -fx-background-radius: 12;
-    -fx-border-color: #2E3060;
-    -fx-border-radius: 12;
-}
-
-/* RAG pill labels */
-.rag-pill {
+/* Header text that must remain readable on colored backgrounds */
+.header-info-label {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 13px;
     -fx-font-weight: bold;
-    -fx-font-size: 12px;
-    -fx-padding: 2 6 2 6;
-    -fx-background-radius: 8;
-}
-
-.rag-green {
-    -fx-text-fill: #00E676;
-}
-
-.rag-amber {
-    -fx-text-fill: #FFD600;
-}
-
-.rag-red {
-    -fx-text-fill: #F44336;
 }
 
 /* ============================================================
