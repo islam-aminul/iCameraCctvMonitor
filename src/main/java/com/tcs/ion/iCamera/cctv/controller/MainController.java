@@ -38,16 +38,16 @@ import java.util.*;
 public class MainController implements Initializable {
 
     private static final Logger log = LoggerFactory.getLogger(MainController.class);
-    private static final DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private static final DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm:ss");
     private static final DateTimeFormatter DT_FMT =
             DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm:ss").withZone(ZoneId.systemDefault());
     private static final DateTimeFormatter EXPORT_FMT = DateTimeFormatter.ofPattern("yyyyMMdd HHmm");
 
     // --- Header ---
+    @FXML private HBox headerBar;
     @FXML private Label lblTitle;
     @FXML private Label lblTcCode;
-    @FXML private Label lblProxyStatusPill;
-    @FXML private Label lblOverallRag;
+    @FXML private Label lblProxyId;
     @FXML private Label lblClock;
     @FXML private Label lblLastRefresh;
     @FXML private Label lblAlertBadge;
@@ -240,33 +240,27 @@ public class MainController implements Initializable {
     }
 
     private void updateHeader() {
-        // TC Code
         ProxyData pd = store.getProxyData();
+
+        // TC Code and Proxy ID
         if (pd != null) {
             String tc = pd.getTcCode();
-            lblTcCode.setText(tc != null && !tc.isEmpty() ? "TC: " + tc : "");
-
-            // Proxy status pill
-            String status = pd.getStatus() != null ? pd.getStatus() : "UNKNOWN";
-            lblProxyStatusPill.setText(status);
-            lblProxyStatusPill.getStyleClass().removeAll("rag-green", "rag-amber", "rag-red");
-            switch (status) {
-                case "UP":       lblProxyStatusPill.getStyleClass().add("rag-green"); break;
-                case "DEGRADED": lblProxyStatusPill.getStyleClass().add("rag-amber"); break;
-                default:         lblProxyStatusPill.getStyleClass().add("rag-red"); break;
-            }
+            lblTcCode.setText(tc != null && !tc.isEmpty() ? "TC: " + tc : "TC: --");
+            lblProxyId.setText("Proxy: " + pd.getProxyId());
         } else {
-            lblTcCode.setText("");
-            lblProxyStatusPill.setText("--");
-            lblProxyStatusPill.getStyleClass().removeAll("rag-green", "rag-amber", "rag-red");
+            lblTcCode.setText("TC: Awaiting data...");
+            lblProxyId.setText("Proxy: --");
         }
 
-        // Last refresh
-        if (store.getLastPollTime() != null) {
-            lblLastRefresh.setText("Updated: " + DT_FMT.format(store.getLastPollTime()));
+        // Last refresh — relative time
+        Instant lastPoll = store.getLastPollTime();
+        if (lastPoll != null) {
+            long secsAgo = ChronoUnit.SECONDS.between(lastPoll, Instant.now());
+            if (secsAgo < 60) lblLastRefresh.setText("Updated: " + secsAgo + "s ago");
+            else lblLastRefresh.setText("Updated: " + (secsAgo / 60) + "m ago");
         }
 
-        // Overall RAG status
+        // Overall RAG status — color entire header background
         List<AlertData> unresolved = store.getUnresolvedAlerts();
         boolean hasCritical = false;
         boolean hasWarning = false;
@@ -275,17 +269,17 @@ public class MainController implements Initializable {
             else if (a.getSeverity() == AlertData.Severity.WARNING) hasWarning = true;
         }
 
-        lblOverallRag.getStyleClass().removeAll("rag-green", "rag-amber", "rag-red");
-        if (hasCritical) {
-            lblOverallRag.setText("CRITICAL");
-            lblOverallRag.getStyleClass().add("rag-red");
+        String bgColor;
+        if (pd == null) {
+            bgColor = "#0D0D1A"; // default dark — no data yet
+        } else if (hasCritical) {
+            bgColor = "#B71C1C"; // dark red
         } else if (hasWarning) {
-            lblOverallRag.setText("WARNING");
-            lblOverallRag.getStyleClass().add("rag-amber");
+            bgColor = "#E65100"; // dark orange/amber
         } else {
-            lblOverallRag.setText("OK");
-            lblOverallRag.getStyleClass().add("rag-green");
+            bgColor = "#1B5E20"; // dark green
         }
+        headerBar.setStyle("-fx-background-color: " + bgColor + ";");
 
         // Alert badge on Alerts tab
         int alertCount = unresolved.size();

@@ -39,10 +39,6 @@ public class DashboardController implements Initializable {
     @FXML private ProgressBar pbCctvActive;
     @FXML private Label lblCctvWarning;
 
-    // --- System Health ---
-    @FXML private Label lblSystemHealth;
-    @FXML private VBox paneSystemTile;
-
     // --- CPU ---
     @FXML private Label lblCpuPercent;
     @FXML private ProgressBar pbCpu;
@@ -56,6 +52,7 @@ public class DashboardController implements Initializable {
     // --- Disk ---
     @FXML private Label lblDiskSummary;
     @FXML private VBox vboxDisks;
+    @FXML private VBox paneDiskTile;
 
     // --- Network ---
     @FXML private Label lblNetworkSpeed;
@@ -127,13 +124,19 @@ public class DashboardController implements Initializable {
             lblLastMac.setText("Last:    " + nvl(pd.getLastMacAddress()));
             lblMacWarning.setVisible(pd.isMacMismatch());
         } else {
-            lblProxyStatus.setText("No Data");
+            lblProxyStatus.setText("Awaiting data...");
+            lblProxyId.setText("ID: --");
+            lblProxyName.setText("--");
+            lblTcCodeBanner.setText("TC Code: --");
             lblServiceStatus.setText("--");
             lblJmxStatus.setText("--");
             lblHsqldbStatus.setText("--");
             lblHsqldbServiceStatus.setText("--");
             lblHsqldbJmxStatus.setText("--");
             lblHsqldbDirect.setText("--");
+            lblCurrentMac.setText("Current: --");
+            lblLastMac.setText("Last: --");
+            lblMacWarning.setVisible(false);
         }
 
         // ---- CCTV tile ----
@@ -165,27 +168,49 @@ public class DashboardController implements Initializable {
             pbMem.setProgress(mem / 100.0);
             applyThreshold(paneMemTile, mem);
 
-            // Disk summary
+            // Disk summary — only show proxy install drive
+            String proxyDrive = null;
+            if (pd != null && pd.getInstallPath() != null && pd.getInstallPath().length() >= 2) {
+                proxyDrive = pd.getInstallPath().substring(0, 2).toUpperCase();
+            }
+
             vboxDisks.getChildren().clear();
+            boolean driveFound = false;
             for (SystemMetrics.DriveInfo di : sm.getDrives()) {
+                if (proxyDrive != null && !di.getName().toUpperCase().startsWith(proxyDrive)) continue;
+
                 HBox row = new HBox(8);
                 Label lName = new Label(di.getName());
                 lName.getStyleClass().add("tile-sublabel");
                 ProgressBar pb = new ProgressBar(di.getUsedPercent() / 100.0);
                 pb.setPrefWidth(120);
                 Label lPct = new Label(String.format("%.1f%%", di.getUsedPercent()));
-                lPct.getStyleClass().add(di.getUsedPercent() > 85 ? "text-red" : "text-green");
+                lPct.getStyleClass().add(di.getUsedPercent() > 85 ? "text-red"
+                        : di.getUsedPercent() > 60 ? "text-yellow" : "text-green");
                 row.getChildren().addAll(lName, pb, lPct);
                 vboxDisks.getChildren().add(row);
+                applyThreshold(paneDiskTile, di.getUsedPercent());
+                driveFound = true;
+            }
+
+            // Fallback: if installPath unknown, show all drives
+            if (!driveFound && proxyDrive == null) {
+                for (SystemMetrics.DriveInfo di : sm.getDrives()) {
+                    HBox row = new HBox(8);
+                    Label lName = new Label(di.getName());
+                    lName.getStyleClass().add("tile-sublabel");
+                    ProgressBar pb = new ProgressBar(di.getUsedPercent() / 100.0);
+                    pb.setPrefWidth(120);
+                    Label lPct = new Label(String.format("%.1f%%", di.getUsedPercent()));
+                    lPct.getStyleClass().add(di.getUsedPercent() > 85 ? "text-red"
+                            : di.getUsedPercent() > 60 ? "text-yellow" : "text-green");
+                    row.getChildren().addAll(lName, pb, lPct);
+                    vboxDisks.getChildren().add(row);
+                }
             }
 
             // Network
             lblNetworkSpeed.setText(String.format("%.2f MB/s", sm.getNetworkSpeedMbps()));
-
-            // System health
-            boolean healthy = sm.isHealthy();
-            lblSystemHealth.setText(healthy ? "STABLE" : "UNSTABLE");
-            applyTriState(paneSystemTile, lblSystemHealth, healthy ? "UP" : "DOWN");
         }
     }
 

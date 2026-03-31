@@ -69,11 +69,13 @@
                 <Label fx:id="lblCctvWarning" styleClass="text-yellow" text="" visible="false" managed="false"/>
             </VBox>
 
-            <!-- System Health tile -->
-            <VBox fx:id="paneSystemTile" styleClass="tile" HBox.hgrow="ALWAYS" spacing="6">
+            <!-- MAC Address tile (moved from Network section) -->
+            <VBox styleClass="tile" HBox.hgrow="ALWAYS" spacing="6">
                 <padding><Insets topRightBottomLeft="12"/></padding>
-                <Label text="SYSTEM HEALTH" styleClass="tile-header"/>
-                <Label fx:id="lblSystemHealth" styleClass="tile-value-large text-green" text="--"/>
+                <Label text="MAC ADDRESS" styleClass="tile-header"/>
+                <Label fx:id="lblCurrentMac" styleClass="tile-sublabel"/>
+                <Label fx:id="lblLastMac" styleClass="tile-sublabel"/>
+                <Label fx:id="lblMacWarning" styleClass="text-yellow" text="MAC Mismatch Detected!" visible="false"/>
             </VBox>
         </HBox>
 
@@ -98,7 +100,7 @@
             </VBox>
 
             <!-- Disk tile -->
-            <VBox styleClass="tile" HBox.hgrow="ALWAYS" spacing="6">
+            <VBox fx:id="paneDiskTile" styleClass="tile" HBox.hgrow="ALWAYS" spacing="6">
                 <padding><Insets topRightBottomLeft="12"/></padding>
                 <Label text="DISK USAGE" styleClass="tile-header"/>
                 <Label fx:id="lblDiskSummary" styleClass="tile-sublabel"/>
@@ -118,16 +120,8 @@
                 <Label text="to AWS" styleClass="tile-sublabel"/>
             </VBox>
 
-            <!-- MAC tile -->
-            <VBox styleClass="tile" HBox.hgrow="ALWAYS" spacing="6">
-                <padding><Insets topRightBottomLeft="12"/></padding>
-                <Label text="MAC ADDRESS" styleClass="tile-header"/>
-                <Label fx:id="lblCurrentMac" styleClass="tile-sublabel"/>
-                <Label fx:id="lblLastMac" styleClass="tile-sublabel"/>
-                <Label fx:id="lblMacWarning" styleClass="text-yellow" text="MAC Mismatch Detected!" visible="false"/>
-            </VBox>
-
-            <!-- Spacer -->
+            <!-- Spacers to balance layout -->
+            <VBox HBox.hgrow="ALWAYS"/>
             <VBox HBox.hgrow="ALWAYS"/>
         </HBox>
     </VBox>

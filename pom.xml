@@ -64,7 +64,7 @@
 
         <!-- Logging -->
         <slf4j.version>1.7.36</slf4j.version>
-        <logback.version>1.2.13</logback.version>
+        <logback.version>1.1.7</logback.version>
 
         <!-- HTTP / Codec / JSON -->
         <httpclient.version>4.5.14</httpclient.version>
@@ -261,7 +261,7 @@
         <dependency>
             <groupId>javax.xml.soap</groupId>
             <artifactId>javax.xml.soap-api</artifactId>
-            <version>1.4.0</version>
+            <version>1.3.7</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.messaging.saaj</groupId>
@@ -531,53 +531,42 @@
                 </executions>
             </plugin>
 
-            <!-- Keystore generation + JAR/EXE signing via exec-maven-plugin.
-                 Uses exec-maven-plugin for keytool (instead of keytool-maven-plugin)
-                 so that keytool output is logged at INFO level.
+            <!-- Keystore generation via keytool-maven-plugin -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>keytool-maven-plugin</artifactId>
+                <version>2.0.2</version>
+                <executions>
+                    <execution>
+                        <id>generate-keystore</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>generateKeyPair</goal>
+                        </goals>
+                        <configuration>
+                            <keystore>${project.build.directory}/${keystore.filename}</keystore>
+                            <storetype>PKCS12</storetype>
+                            <storepass>${keystore.password}</storepass>
+                            <keypass>${keystore.password}</keypass>
+                            <alias>${keystore.alias}</alias>
+                            <dname>CN=${cert.cn}, OU=${cert.ou}, O=${cert.o}, L=${cert.l}, S=${cert.st}, C=${cert.c}</dname>
+                            <sigalg>SHA256withRSA</sigalg>
+                            <keyalg>RSA</keyalg>
+                            <keysize>2048</keysize>
+                            <validity>3650</validity>
+                            <skipIfExist>true</skipIfExist>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- JAR/EXE signing via exec-maven-plugin.
                  Skip signing with -Dsigning.skip=true. -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.5.0</version>
                 <executions>
-                    <execution>
-                        <id>generate-keystore</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>keytool</executable>
-                            <arguments>
-                                <argument>-genkeypair</argument>
-                                <argument>-keystore</argument>
-                                <argument>${project.build.directory}/${keystore.filename}</argument>
-                                <argument>-storetype</argument>
-                                <argument>PKCS12</argument>
-                                <argument>-storepass</argument>
-                                <argument>${keystore.password}</argument>
-                                <argument>-keypass</argument>
-                                <argument>${keystore.password}</argument>
-                                <argument>-alias</argument>
-                                <argument>${keystore.alias}</argument>
-                                <argument>-dname</argument>
-                                <argument>CN=${cert.cn}, OU=${cert.ou}, O=${cert.o}, L=${cert.l}, S=${cert.st}, C=${cert.c}</argument>
-                                <argument>-sigalg</argument>
-                                <argument>SHA256withRSA</argument>
-                                <argument>-keyalg</argument>
-                                <argument>RSA</argument>
-                                <argument>-keysize</argument>
-                                <argument>2048</argument>
-                                <argument>-validity</argument>
-                                <argument>3650</argument>
-                            </arguments>
-                            <successCodes>
-                                <!-- 0 = generated, 1 = keystore already exists (keytool error) -->
-                                <successCode>0</successCode>
-                                <successCode>1</successCode>
-                            </successCodes>
-                        </configuration>
-                    </execution>
                     <execution>
                         <id>sign-jar</id>
                         <phase>package</phase>

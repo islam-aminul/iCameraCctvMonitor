@@ -10,31 +10,17 @@
     <!-- ===== Top area: header + tab navigation ===== -->
     <top>
         <VBox>
-            <!-- Header bar: TC info, proxy status, RAG indicator, clock, last updated -->
-            <HBox styleClass="header-bar" alignment="CENTER_LEFT" spacing="12">
+            <!-- Header bar: TC info, proxy ID, clock, last updated — entire background colored by RAG -->
+            <HBox fx:id="headerBar" styleClass="header-bar" alignment="CENTER_LEFT" spacing="12">
                 <Label fx:id="lblTitle" styleClass="app-title" text="iCamera CCTV Monitor"/>
                 <Separator orientation="VERTICAL" styleClass="header-sep"/>
-                <Label fx:id="lblTcCode" styleClass="tc-code-label"/>
+                <Label fx:id="lblTcCode" styleClass="header-info-label" text="TC: --"/>
+                <Separator orientation="VERTICAL" styleClass="header-sep"/>
+                <Label fx:id="lblProxyId" styleClass="header-info-label" text="Proxy: --"/>
                 <Region HBox.hgrow="ALWAYS"/>
-
-                <!-- Proxy status pill -->
-                <HBox alignment="CENTER" spacing="6" styleClass="proxy-status-pill">
-                    <Label text="Proxy:" styleClass="header-meta"/>
-                    <Label fx:id="lblProxyStatusPill" styleClass="rag-pill" text="--"/>
-                </HBox>
-
+                <Label fx:id="lblClock" styleClass="header-clock" text="--"/>
                 <Separator orientation="VERTICAL" styleClass="header-sep"/>
-
-                <!-- Overall RAG status -->
-                <HBox alignment="CENTER" spacing="6" styleClass="overall-rag-pill">
-                    <Label text="Status:" styleClass="header-meta"/>
-                    <Label fx:id="lblOverallRag" styleClass="rag-pill rag-green" text="OK"/>
-                </HBox>
-
-                <Separator orientation="VERTICAL" styleClass="header-sep"/>
-                <Label fx:id="lblClock" styleClass="header-clock" text="--:--:--"/>
-                <Separator orientation="VERTICAL" styleClass="header-sep"/>
-                <Label fx:id="lblLastRefresh" styleClass="header-meta" text="Updated: --"/>
+                <Label fx:id="lblLastRefresh" styleClass="header-info-label" text="Updated: --"/>
             </HBox>
 
             <!-- Level 1: Primary tab navigation -->
