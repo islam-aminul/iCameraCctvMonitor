@@ -6,109 +6,129 @@
             fx:controller="com.tcs.ion.iCamera.cctv.controller.DashboardController"
             fitToWidth="true" styleClass="page-scroll">
 
-    <VBox styleClass="page-root" spacing="16">
+    <VBox styleClass="page-root" spacing="20">
         <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
 
         <!-- Page title -->
         <HBox alignment="CENTER_LEFT" spacing="12">
-            <Label text="iCamera CCTV Monitoring – Dashboard" styleClass="page-title"/>
+            <Label text="Dashboard" styleClass="page-title"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Label fx:id="lblTcCodeBanner" styleClass="tc-code-banner"/>
         </HBox>
         <Separator/>
 
-        <!-- Row 1: Proxy, HSQLDB, CCTV, System Health -->
-        <HBox spacing="16" fillHeight="true">
-            <!-- Proxy tile -->
-            <Pane fx:id="paneProxyTile" styleClass="tile" HBox.hgrow="ALWAYS">
-                <VBox spacing="6" style="-fx-padding:12;">
-                    <Label text="PROXY STATUS" styleClass="tile-header"/>
-                    <Label fx:id="lblProxyStatus" styleClass="tile-value-large text-green" text="UP"/>
-                    <Label fx:id="lblProxyId"   styleClass="tile-sublabel"/>
-                    <Label fx:id="lblProxyName" styleClass="tile-sublabel"/>
-                </VBox>
-            </Pane>
+        <!-- ===== Section 1: Application Health ===== -->
+        <Label text="APPLICATION HEALTH" styleClass="tile-section-header"/>
 
-            <!-- HSQLDB tile -->
-            <Pane fx:id="paneHsqldbTile" styleClass="tile" HBox.hgrow="ALWAYS">
-                <VBox spacing="6" style="-fx-padding:12;">
-                    <Label text="HSQLDB" styleClass="tile-header"/>
-                    <Label fx:id="lblHsqldbStatus" styleClass="tile-value-large text-green" text="—"/>
-                </VBox>
-            </Pane>
+        <HBox spacing="16" fillHeight="true">
+            <!-- Proxy tile (tri-state: UP/DEGRADED/DOWN) -->
+            <VBox fx:id="paneProxyTile" styleClass="tile" HBox.hgrow="ALWAYS" spacing="6">
+                <padding><Insets topRightBottomLeft="12"/></padding>
+                <Label text="PROXY STATUS" styleClass="tile-header"/>
+                <Label fx:id="lblProxyStatus" styleClass="tile-value-large text-green" text="--"/>
+                <Label fx:id="lblProxyId" styleClass="tile-sublabel"/>
+                <Label fx:id="lblProxyName" styleClass="tile-sublabel"/>
+                <!-- Sub-items: service & JMX status -->
+                <HBox spacing="8" styleClass="hierarchy-indent">
+                    <Label text="Service:" styleClass="detail-label"/>
+                    <Label fx:id="lblServiceStatus" styleClass="detail-value" text="--"/>
+                </HBox>
+                <HBox spacing="8" styleClass="hierarchy-indent">
+                    <Label text="JMX:" styleClass="detail-label"/>
+                    <Label fx:id="lblJmxStatus" styleClass="detail-value" text="--"/>
+                </HBox>
+            </VBox>
+
+            <!-- HSQLDB tile (tri-state: UP/DEGRADED/DOWN) -->
+            <VBox fx:id="paneHsqldbTile" styleClass="tile" HBox.hgrow="ALWAYS" spacing="6">
+                <padding><Insets topRightBottomLeft="12"/></padding>
+                <Label text="HSQLDB DATABASE" styleClass="tile-header"/>
+                <Label fx:id="lblHsqldbStatus" styleClass="tile-value-large text-green" text="--"/>
+                <!-- Sub-items: service, JMX report, direct connectivity -->
+                <HBox spacing="8" styleClass="hierarchy-indent">
+                    <Label text="Service:" styleClass="detail-label"/>
+                    <Label fx:id="lblHsqldbServiceStatus" styleClass="detail-value" text="--"/>
+                </HBox>
+                <HBox spacing="8" styleClass="hierarchy-indent">
+                    <Label text="JMX Report:" styleClass="detail-label"/>
+                    <Label fx:id="lblHsqldbJmxStatus" styleClass="detail-value" text="--"/>
+                </HBox>
+                <HBox spacing="8" styleClass="hierarchy-indent">
+                    <Label text="Direct:" styleClass="detail-label"/>
+                    <Label fx:id="lblHsqldbDirect" styleClass="detail-value" text="--"/>
+                </HBox>
+            </VBox>
 
             <!-- CCTV tile -->
-            <Pane styleClass="tile" HBox.hgrow="ALWAYS">
-                <VBox spacing="6" style="-fx-padding:12;">
-                    <Label text="CCTV CAMERAS" styleClass="tile-header"/>
-                    <Label fx:id="lblCctvActive" styleClass="tile-value-large text-green"/>
-                    <Label fx:id="lblCctvTotal"  styleClass="tile-sublabel"/>
-                    <ProgressBar fx:id="pbCctvActive" progress="0" maxWidth="Infinity"/>
-                </VBox>
-            </Pane>
+            <VBox styleClass="tile" HBox.hgrow="ALWAYS" spacing="6">
+                <padding><Insets topRightBottomLeft="12"/></padding>
+                <Label text="CCTV CAMERAS" styleClass="tile-header"/>
+                <Label fx:id="lblCctvActive" styleClass="tile-value-large text-green"/>
+                <Label fx:id="lblCctvTotal" styleClass="tile-sublabel"/>
+                <ProgressBar fx:id="pbCctvActive" progress="0" maxWidth="Infinity"/>
+                <Label fx:id="lblCctvWarning" styleClass="text-yellow" text="" visible="false" managed="false"/>
+            </VBox>
 
             <!-- System Health tile -->
-            <Pane fx:id="paneSystemTile" styleClass="tile" HBox.hgrow="ALWAYS">
-                <VBox spacing="6" style="-fx-padding:12;">
-                    <Label text="SYSTEM HEALTH" styleClass="tile-header"/>
-                    <Label fx:id="lblSystemHealth" styleClass="tile-value-large text-green" text="—"/>
-                </VBox>
-            </Pane>
+            <VBox fx:id="paneSystemTile" styleClass="tile" HBox.hgrow="ALWAYS" spacing="6">
+                <padding><Insets topRightBottomLeft="12"/></padding>
+                <Label text="SYSTEM HEALTH" styleClass="tile-header"/>
+                <Label fx:id="lblSystemHealth" styleClass="tile-value-large text-green" text="--"/>
+            </VBox>
         </HBox>
 
-        <!-- Row 2: CPU, Memory, Disk, Network -->
+        <!-- ===== Section 2: System Resources ===== -->
+        <Label text="SYSTEM RESOURCES" styleClass="tile-section-header"/>
+
         <HBox spacing="16" fillHeight="true">
             <!-- CPU tile -->
-            <Pane fx:id="paneCpuTile" styleClass="tile" HBox.hgrow="ALWAYS">
-                <VBox spacing="6" style="-fx-padding:12;">
-                    <Label text="CPU USAGE" styleClass="tile-header"/>
-                    <Label fx:id="lblCpuPercent" styleClass="tile-value-large" text="—"/>
-                    <ProgressBar fx:id="pbCpu" progress="0" maxWidth="Infinity"/>
-                </VBox>
-            </Pane>
+            <VBox fx:id="paneCpuTile" styleClass="tile" HBox.hgrow="ALWAYS" spacing="6">
+                <padding><Insets topRightBottomLeft="12"/></padding>
+                <Label text="CPU USAGE" styleClass="tile-header"/>
+                <Label fx:id="lblCpuPercent" styleClass="tile-value-large" text="--"/>
+                <ProgressBar fx:id="pbCpu" progress="0" maxWidth="Infinity"/>
+            </VBox>
 
             <!-- Memory tile -->
-            <Pane fx:id="paneMemTile" styleClass="tile" HBox.hgrow="ALWAYS">
-                <VBox spacing="6" style="-fx-padding:12;">
-                    <Label text="MEMORY USAGE" styleClass="tile-header"/>
-                    <Label fx:id="lblMemPercent" styleClass="tile-value-large" text="—"/>
-                    <ProgressBar fx:id="pbMem" progress="0" maxWidth="Infinity"/>
-                </VBox>
-            </Pane>
+            <VBox fx:id="paneMemTile" styleClass="tile" HBox.hgrow="ALWAYS" spacing="6">
+                <padding><Insets topRightBottomLeft="12"/></padding>
+                <Label text="MEMORY USAGE" styleClass="tile-header"/>
+                <Label fx:id="lblMemPercent" styleClass="tile-value-large" text="--"/>
+                <ProgressBar fx:id="pbMem" progress="0" maxWidth="Infinity"/>
+            </VBox>
 
             <!-- Disk tile -->
-            <Pane styleClass="tile" HBox.hgrow="ALWAYS">
-                <VBox spacing="6" style="-fx-padding:12;">
-                    <Label text="DISK USAGE" styleClass="tile-header"/>
-                    <Label fx:id="lblDiskSummary" styleClass="tile-sublabel"/>
-                    <VBox fx:id="vboxDisks" spacing="4"/>
-                </VBox>
-            </Pane>
-
-            <!-- Network tile -->
-            <Pane fx:id="paneNetworkTile" styleClass="tile" HBox.hgrow="ALWAYS">
-                <VBox spacing="6" style="-fx-padding:12;">
-                    <Label text="NETWORK UPLOAD" styleClass="tile-header"/>
-                    <Label fx:id="lblNetworkSpeed" styleClass="tile-value-large text-blue" text="—"/>
-                    <Label text="to AWS" styleClass="tile-sublabel"/>
-                </VBox>
-            </Pane>
+            <VBox styleClass="tile" HBox.hgrow="ALWAYS" spacing="6">
+                <padding><Insets topRightBottomLeft="12"/></padding>
+                <Label text="DISK USAGE" styleClass="tile-header"/>
+                <Label fx:id="lblDiskSummary" styleClass="tile-sublabel"/>
+                <VBox fx:id="vboxDisks" spacing="4"/>
+            </VBox>
         </HBox>
 
-        <!-- Row 3: MAC Details -->
-        <HBox spacing="16">
-            <Pane styleClass="tile" HBox.hgrow="ALWAYS">
-                <VBox spacing="6" style="-fx-padding:12;">
-                    <Label text="MAC ADDRESS" styleClass="tile-header"/>
-                    <Label fx:id="lblCurrentMac" styleClass="tile-sublabel"/>
-                    <Label fx:id="lblLastMac"    styleClass="tile-sublabel"/>
-                    <Label fx:id="lblMacWarning" styleClass="text-yellow" text="⚠ MAC Mismatch Detected!" visible="false"/>
-                </VBox>
-            </Pane>
-            <!-- Spacer tiles -->
-            <Pane styleClass="tile" HBox.hgrow="ALWAYS" visible="false"/>
-            <Pane styleClass="tile" HBox.hgrow="ALWAYS" visible="false"/>
-            <Pane styleClass="tile" HBox.hgrow="ALWAYS" visible="false"/>
+        <!-- ===== Section 3: Network & Connectivity ===== -->
+        <Label text="NETWORK &amp; CONNECTIVITY" styleClass="tile-section-header"/>
+
+        <HBox spacing="16" fillHeight="true">
+            <!-- Network tile -->
+            <VBox fx:id="paneNetworkTile" styleClass="tile" HBox.hgrow="ALWAYS" spacing="6">
+                <padding><Insets topRightBottomLeft="12"/></padding>
+                <Label text="NETWORK UPLOAD" styleClass="tile-header"/>
+                <Label fx:id="lblNetworkSpeed" styleClass="tile-value-large text-blue" text="--"/>
+                <Label text="to AWS" styleClass="tile-sublabel"/>
+            </VBox>
+
+            <!-- MAC tile -->
+            <VBox styleClass="tile" HBox.hgrow="ALWAYS" spacing="6">
+                <padding><Insets topRightBottomLeft="12"/></padding>
+                <Label text="MAC ADDRESS" styleClass="tile-header"/>
+                <Label fx:id="lblCurrentMac" styleClass="tile-sublabel"/>
+                <Label fx:id="lblLastMac" styleClass="tile-sublabel"/>
+                <Label fx:id="lblMacWarning" styleClass="text-yellow" text="MAC Mismatch Detected!" visible="false"/>
+            </VBox>
+
+            <!-- Spacer -->
+            <VBox HBox.hgrow="ALWAYS"/>
         </HBox>
     </VBox>
 </ScrollPane>

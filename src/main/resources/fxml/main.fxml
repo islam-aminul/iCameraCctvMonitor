@@ -1,74 +1,101 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.image.*?>
 <?import javafx.geometry.*?>
 <BorderPane xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.tcs.ion.iCamera.cctv.controller.MainController"
             styleClass="root-pane">
 
-    <!-- ===== Top header bar ===== -->
+    <!-- ===== Top area: header + tab navigation ===== -->
     <top>
-        <HBox styleClass="header-bar" alignment="CENTER_LEFT" spacing="12">
-            <Label fx:id="lblTitle" styleClass="app-title" text="iCamera CCTV Monitor"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Label fx:id="lblTcCode" styleClass="tc-code-label"/>
-            <Label fx:id="lblJmxStatus" styleClass="status-ok" text="JMX: Connecting..."/>
-            <Separator orientation="VERTICAL" styleClass="header-sep"/>
-            <Label fx:id="lblLastRefresh" styleClass="header-meta" text="Last refresh: —"/>
-        </HBox>
-    </top>
+        <VBox>
+            <!-- Header bar: TC info, proxy status, RAG indicator, clock, last updated -->
+            <HBox styleClass="header-bar" alignment="CENTER_LEFT" spacing="12">
+                <Label fx:id="lblTitle" styleClass="app-title" text="iCamera CCTV Monitor"/>
+                <Separator orientation="VERTICAL" styleClass="header-sep"/>
+                <Label fx:id="lblTcCode" styleClass="tc-code-label"/>
+                <Region HBox.hgrow="ALWAYS"/>
 
-    <!-- ===== Left navigation sidebar ===== -->
-    <left>
-        <VBox styleClass="sidebar" spacing="4" prefWidth="200">
-            <padding><Insets top="16" left="8" right="8" bottom="16"/></padding>
+                <!-- Proxy status pill -->
+                <HBox alignment="CENTER" spacing="6" styleClass="proxy-status-pill">
+                    <Label text="Proxy:" styleClass="header-meta"/>
+                    <Label fx:id="lblProxyStatusPill" styleClass="rag-pill" text="--"/>
+                </HBox>
 
-            <!-- Sidebar header -->
-            <Label text="NAVIGATION" styleClass="sidebar-section-header"/>
-            <Separator styleClass="sidebar-sep"/>
+                <Separator orientation="VERTICAL" styleClass="header-sep"/>
 
-            <Button fx:id="btnDashboard"       text="⊞  Dashboard"          onAction="#showDashboard"
-                    maxWidth="Infinity" styleClass="nav-btn, nav-btn-active"/>
-            <Button fx:id="btnAppDetails"      text="⊙  Application Details" onAction="#showAppDetails"
-                    maxWidth="Infinity" styleClass="nav-btn"/>
-            <Button fx:id="btnCctvDetails"     text="◈  CCTV Details"        onAction="#showCctvDetails"
-                    maxWidth="Infinity" styleClass="nav-btn"/>
-            <Button fx:id="btnSystemHardware"  text="⬡  System Hardware"     onAction="#showSystemHardware"
-                    maxWidth="Infinity" styleClass="nav-btn"/>
-            <Button fx:id="btnNetworkMonitor"  text="⇆  Network Monitor"     onAction="#showNetworkMonitor"
-                    maxWidth="Infinity" styleClass="nav-btn"/>
+                <!-- Overall RAG status -->
+                <HBox alignment="CENTER" spacing="6" styleClass="overall-rag-pill">
+                    <Label text="Status:" styleClass="header-meta"/>
+                    <Label fx:id="lblOverallRag" styleClass="rag-pill rag-green" text="OK"/>
+                </HBox>
 
-            <!-- Alerts with badge -->
-            <StackPane>
-                <Button fx:id="btnAlerts" text="⚠  Alerts" onAction="#showAlerts"
-                        maxWidth="Infinity" styleClass="nav-btn"/>
-                <Label fx:id="lblAlertBadge" styleClass="alert-badge" visible="false"
-                       StackPane.alignment="TOP_RIGHT"/>
-            </StackPane>
+                <Separator orientation="VERTICAL" styleClass="header-sep"/>
+                <Label fx:id="lblClock" styleClass="header-clock" text="--:--:--"/>
+                <Separator orientation="VERTICAL" styleClass="header-sep"/>
+                <Label fx:id="lblLastRefresh" styleClass="header-meta" text="Updated: --"/>
+            </HBox>
 
-            <Button fx:id="btnStreamAnalytics" text="▶  Stream Analytics"    onAction="#showStreamAnalytics"
-                    maxWidth="Infinity" styleClass="nav-btn"/>
-            <Button fx:id="btnVmsDetection"    text="⬡  VMS Detection"       onAction="#showVmsDetection"
-                    maxWidth="Infinity" styleClass="nav-btn"/>
+            <!-- Level 1: Primary tab navigation -->
+            <HBox fx:id="tabBar" styleClass="tab-bar" alignment="CENTER_LEFT" spacing="0">
+                <padding><Insets top="0" left="8" right="8" bottom="0"/></padding>
+                <Button fx:id="tabDashboard"     text="Dashboard"     onAction="#showDashboard"     styleClass="main-tab, main-tab-active"/>
+                <Button fx:id="tabApplication"   text="Application"   onAction="#showApplication"   styleClass="main-tab"/>
+                <Button fx:id="tabSystem"        text="System"        onAction="#showSystem"        styleClass="main-tab"/>
+                <Button fx:id="tabAlerts"        text="Alerts"        onAction="#showAlerts"        styleClass="main-tab"/>
+                <StackPane>
+                    <Button fx:id="tabAlertsHidden" visible="false" managed="false"/>
+                    <Label fx:id="lblAlertBadge" styleClass="alert-badge" visible="false"
+                           StackPane.alignment="CENTER_RIGHT" translateX="-4"/>
+                </StackPane>
+                <Button fx:id="tabDiscovery"     text="Discovery"     onAction="#showDiscovery"     styleClass="main-tab"/>
+                <Button fx:id="tabSettings"      text="Settings"      onAction="#showSettings"      styleClass="main-tab"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="v1.0.0 | TCS iON" styleClass="tab-bar-version"/>
+            </HBox>
 
-            <Separator styleClass="sidebar-sep"/>
-            <Label text="TOOLS" styleClass="sidebar-section-header"/>
-            <Separator styleClass="sidebar-sep"/>
-
-            <Button fx:id="btnDiscovery"       text="⊕  Discovery"           onAction="#showDiscovery"
-                    maxWidth="Infinity" styleClass="nav-btn"/>
-            <Button fx:id="btnSettings"        text="⚙  Settings"            onAction="#showSettings"
-                    maxWidth="Infinity" styleClass="nav-btn"/>
-
-            <Region VBox.vgrow="ALWAYS"/>
-            <Label text="v1.0.0 | TCS iON" styleClass="sidebar-footer"/>
+            <!-- Level 2: Sub-tab navigation (shown when Application or System is selected) -->
+            <HBox fx:id="subTabBar" styleClass="sub-tab-bar" alignment="CENTER_LEFT" spacing="0"
+                  visible="false" managed="false">
+                <padding><Insets top="0" left="8" right="8" bottom="0"/></padding>
+                <!-- Sub-tabs are populated dynamically by MainController -->
+            </HBox>
         </VBox>
-    </left>
+    </top>
 
     <!-- ===== Main content area ===== -->
     <center>
         <StackPane fx:id="contentArea" styleClass="content-area"/>
     </center>
+
+    <!-- ===== Right: Active Issues Panel (permanently visible) ===== -->
+    <right>
+        <VBox fx:id="issuesPanel" styleClass="issues-panel" prefWidth="300" minWidth="280" maxWidth="320">
+            <!-- Panel header -->
+            <HBox styleClass="issues-panel-header" alignment="CENTER_LEFT" spacing="8">
+                <padding><Insets top="10" left="12" right="12" bottom="10"/></padding>
+                <Label text="Active Issues" styleClass="issues-panel-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblIssueCount" styleClass="issue-count-badge" text="0"/>
+            </HBox>
+            <Separator styleClass="issues-panel-sep"/>
+
+            <!-- Scrollable issues list -->
+            <ScrollPane fx:id="issuesScrollPane" fitToWidth="true" styleClass="issues-scroll"
+                        VBox.vgrow="ALWAYS">
+                <VBox fx:id="issuesList" styleClass="issues-list" spacing="8">
+                    <padding><Insets top="8" left="8" right="8" bottom="8"/></padding>
+                </VBox>
+            </ScrollPane>
+
+            <!-- Export button at bottom -->
+            <VBox styleClass="export-section" spacing="8">
+                <padding><Insets top="10" left="12" right="12" bottom="12"/></padding>
+                <Separator/>
+                <Button fx:id="btnExport" text="Export to Excel" onAction="#onExportToExcel"
+                        maxWidth="Infinity" styleClass="btn-export"/>
+            </VBox>
+        </VBox>
+    </right>
 </BorderPane>
