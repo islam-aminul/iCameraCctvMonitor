@@ -51,7 +51,6 @@ public class MacDetailsController implements Initializable {
     @FXML private Button   btnValidateMac;
     @FXML private Label    lblValidatingSpinner;
 
-    @FXML private Label    lblDestHost;
     @FXML private Label    lblOutboundIface;
     @FXML private Label    lblLocalMac;
     @FXML private Label    lblCloudMac;
@@ -155,20 +154,14 @@ public class MacDetailsController implements Initializable {
 
     /** Populates all validation output labels from a completed {@link MacValidationResult}. */
     private void displayValidationResult(MacValidationResult r) {
-        // Network / API context
-        lblDestHost.setText(nvl(r.getDestinationHost()));
+        // Network / API context (destination host and URL are logged, not displayed)
         lblOutboundIface.setText(nvl(r.getOutboundInterface()));
         lblLocalMac.setText(nvl(r.getLocalMac()));
         lblCloudMac.setText(nvl(r.getCloudMac()));
 
         // Alert outcome label
         String alertText;
-        if (r.getScenario() == MacValidationResult.Scenario.VALIDATION_FAILED) {
-            alertText = r.getAlertMessage()
-                    + (r.getErrorDetail() != null ? "\nDetail: " + r.getErrorDetail() : "");
-        } else {
-            alertText = r.getAlertMessage();
-        }
+        alertText = r.getAlertMessage();
         lblValidationAlert.setText(alertText);
         lblValidationAlert.getStyleClass().removeAll(
                 "text-green", "text-yellow", "text-red", "detail-value");
@@ -187,7 +180,6 @@ public class MacDetailsController implements Initializable {
 
     /** Clears all validation output fields (called before a new run). */
     private void clearValidationDisplay() {
-        lblDestHost.setText("");
         lblOutboundIface.setText("");
         lblLocalMac.setText("");
         lblCloudMac.setText("");

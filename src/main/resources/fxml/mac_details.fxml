@@ -43,17 +43,14 @@
                         <ColumnConstraints hgrow="ALWAYS"/>
                     </columnConstraints>
 
-                    <Label text="Destination Host:"   GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="detail-label"/>
-                    <Label fx:id="lblDestHost"         GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="detail-value"/>
+                    <Label text="Outbound Interface:" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="detail-label"/>
+                    <Label fx:id="lblOutboundIface"    GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="detail-value"/>
 
-                    <Label text="Outbound Interface:" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="detail-label"/>
-                    <Label fx:id="lblOutboundIface"    GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="detail-value"/>
+                    <Label text="Local MAC:"          GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="detail-label"/>
+                    <Label fx:id="lblLocalMac"         GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="detail-value"/>
 
-                    <Label text="Local MAC:"          GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="detail-label"/>
-                    <Label fx:id="lblLocalMac"         GridPane.columnIndex="1" GridPane.rowIndex="2" styleClass="detail-value"/>
-
-                    <Label text="Cloud MAC:"          GridPane.columnIndex="0" GridPane.rowIndex="3" styleClass="detail-label"/>
-                    <Label fx:id="lblCloudMac"         GridPane.columnIndex="1" GridPane.rowIndex="3" styleClass="detail-value"/>
+                    <Label text="Cloud MAC:"          GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="detail-label"/>
+                    <Label fx:id="lblCloudMac"         GridPane.columnIndex="1" GridPane.rowIndex="2" styleClass="detail-value"/>
                 </GridPane>
 
                 <!-- Alert outcome -->
