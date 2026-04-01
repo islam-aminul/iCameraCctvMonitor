@@ -13,13 +13,15 @@ import java.util.Properties;
 
 /**
  * Loads MAC validation endpoint configuration from
- * {@code <app-dir>/mac-validation.properties}.
+ * {@code <app-dir>/application.properties}.
  *
- * <p>If the file does not exist at startup, built-in defaults are used and a
- * template file is written to disk so operators can discover and customise the
- * configuration without repackaging the application.
+ * <p>The same {@code application.properties} file at the executable location
+ * serves as the single external configuration file for all configurable
+ * parameters.  If the file does not exist, built-in defaults are used and a
+ * fully commented template is written to disk so operators can discover and
+ * customise settings without repackaging the application.
  *
- * <p>Recognised properties:
+ * <p>Recognised properties (MAC validation section):
  * <ul>
  *   <li>{@code mac.validation.host} – hostname used both for outbound-interface
  *       detection and for building the HTTPS API URL
@@ -37,7 +39,8 @@ public final class MacValidationConfig {
     public static final String DEFAULT_SERVLET_PATH =
             "/iCAMERAStreamingFW/GetProxyMacValidationDataServlet";
 
-    private static final String FILE_NAME   = "mac-validation.properties";
+    /** External config file – same name used by all configurable parameters. */
+    private static final String FILE_NAME   = "application.properties";
     private static final Path   CONFIG_FILE = AppDirs.getAppDir().resolve(FILE_NAME);
 
     private final String host;
@@ -51,7 +54,7 @@ public final class MacValidationConfig {
     // ---- Factory -----------------------------------------------------------
 
     /**
-     * Loads configuration from {@code <app-dir>/mac-validation.properties},
+     * Loads configuration from {@code <app-dir>/application.properties},
      * falling back to built-in defaults when the file is absent or unreadable.
      * A template file is written to disk on first use.
      */
@@ -88,24 +91,52 @@ public final class MacValidationConfig {
 
     // ---- Template writer ---------------------------------------------------
 
+    /**
+     * Writes a fully commented {@code application.properties} template to
+     * {@code <app-dir>} covering all known configurable parameters.
+     */
     private static void writeTemplate() {
         String nl = System.lineSeparator();
         String template =
-                "# =================================================================" + nl +
-                "# iCamera CCTV Monitor – MAC Validation Configuration" + nl +
-                "# Edit this file to customise the remote MAC validation endpoint." + nl +
-                "# =================================================================" + nl +
-                "#" + nl +
-                "# mac.validation.host" + nl +
-                "#   Hostname used for:" + nl +
-                "#     1. Detecting the local outbound network interface" + nl +
-                "#        (a UDP probe is made to this host – no data is actually sent)" + nl +
-                "#     2. Building the HTTPS API URL:" + nl +
-                "#        https://<host><mac.validation.servlet.path>" + nl +
-                "mac.validation.host=" + DEFAULT_HOST + nl +
+                "# ============================================================" + nl +
+                "# iCamera CCTV Monitor – Application Properties" + nl +
+                "# Place this file next to the application JAR / EXE to" + nl +
+                "# override built-in defaults without repackaging." + nl +
+                "# ============================================================" + nl +
                 nl +
-                "# mac.validation.servlet.path" + nl +
-                "#   Servlet path appended to https://<mac.validation.host>." + nl +
+                "# --- JMX Connection ---" + nl +
+                "jmx.host=localhost" + nl +
+                "jmx.port=1099" + nl +
+                "jmx.port.retries=5" + nl +
+                nl +
+                "# --- Polling ---" + nl +
+                "poll.interval.seconds=30" + nl +
+                nl +
+                "# --- ffprobe ---" + nl +
+                "ffprobe.path=.\\ffprobe.exe" + nl +
+                nl +
+                "# --- Embedded Jetty REST Server ---" + nl +
+                "jetty.port=8080" + nl +
+                nl +
+                "# --- Export ---" + nl +
+                "export.path=exports" + nl +
+                "export.format=XLSX" + nl +
+                nl +
+                "# --- Theme ---" + nl +
+                "theme=DARK" + nl +
+                "accent.color=#2196F3" + nl +
+                "font.family=Segoe UI" + nl +
+                "font.size=13" + nl +
+                nl +
+                "# --- MAC Validation ---" + nl +
+                "# Hostname used for:" + nl +
+                "#   1. Detecting the local outbound network interface" + nl +
+                "#      (a no-op UDP probe is made – no data is transmitted)" + nl +
+                "#   2. Building the HTTPS API URL:" + nl +
+                "#      https://<mac.validation.host><mac.validation.servlet.path>" + nl +
+                "mac.validation.host=" + DEFAULT_HOST + nl +
+                "#" + nl +
+                "# Servlet path appended to https://<mac.validation.host>." + nl +
                 "mac.validation.servlet.path=" + DEFAULT_SERVLET_PATH + nl;
 
         try {
@@ -113,10 +144,10 @@ public final class MacValidationConfig {
                     template.getBytes(StandardCharsets.UTF_8),
                     StandardOpenOption.CREATE,
                     StandardOpenOption.TRUNCATE_EXISTING);
-            log.info("MAC validation config template written to {} – edit to customise",
+            log.info("application.properties template written to {} – edit to customise",
                     CONFIG_FILE);
         } catch (IOException e) {
-            log.warn("Could not write MAC validation config template to {}: {}",
+            log.warn("Could not write application.properties template to {}: {}",
                     CONFIG_FILE, e.getMessage());
         }
     }
