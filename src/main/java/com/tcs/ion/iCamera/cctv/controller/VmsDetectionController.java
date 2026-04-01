@@ -21,8 +21,7 @@ import java.util.*;
  * VMS Detection page.
  *
  * Shows all Video Management Software detected on this machine – both running
- * processes and installed Windows services – in a compact scrollable table.
- * No details card; the table shows 2-3 rows visible at a time and is scrollable.
+ * processes and installed Windows services – in a full-height scrollable table.
  */
 public class VmsDetectionController implements Initializable {
 
@@ -31,7 +30,6 @@ public class VmsDetectionController implements Initializable {
     @FXML private Label  lblRunning;
     @FXML private Label  lblStopped;
     @FXML private Label  lblLastScan;
-    @FXML private Button btnRescan;
 
     @FXML private TableView<VmsRow>              tableVms;
     @FXML private TableColumn<VmsRow, String>    colVendor;
@@ -41,8 +39,6 @@ public class VmsDetectionController implements Initializable {
     @FXML private TableColumn<VmsRow, String>    colCpu;
     @FXML private TableColumn<VmsRow, String>    colMemory;
     @FXML private TableColumn<VmsRow, String>    colPath;
-
-    @FXML private VBox   paneNoVms;
 
     private final DataStore store = DataStore.getInstance();
     private final ObservableList<VmsRow> rows = FXCollections.observableArrayList();
@@ -114,8 +110,6 @@ public class VmsDetectionController implements Initializable {
         lblTotalDetected.setText("Detected: " + total);
         lblRunning.setText("Running: " + running);
         lblStopped.setText("Stopped/Installed: " + stopped);
-        paneNoVms.setVisible(total == 0);
-        tableVms.setVisible(total > 0);
 
         if (total == 0) {
             lblScanStatus.setText("No VMS software detected on this machine");
@@ -138,20 +132,6 @@ public class VmsDetectionController implements Initializable {
         }
     }
 
-    @FXML
-    private void onRescan() {
-        btnRescan.setDisable(true);
-        btnRescan.setText("Scanning…");
-        new Thread(() -> {
-            store.triggerVmsRescan();
-            refresh();
-            javafx.application.Platform.runLater(() -> {
-                btnRescan.setDisable(false);
-                btnRescan.setText("Re-scan Now");
-            });
-        }).start();
-    }
-
     // ---- Row model ----
 
     public static class VmsRow {
@@ -167,9 +147,9 @@ public class VmsDetectionController implements Initializable {
             vendor.set(v.getVendorDisplayName());
             process.set(nvl(v.getProcessName()));
             status.set(nvl(v.getStatus(), "UNKNOWN"));
-            pid.set(v.getPid() > 0 ? String.valueOf(v.getPid()) : "—");
-            cpu.set(v.getCpuPercent() > 0 ? String.format("%.1f%%", v.getCpuPercent()) : "—");
-            memory.set(v.getMemoryMb() > 0 ? v.getMemoryMb() + " MB" : "—");
+            pid.set(v.getPid() > 0 ? String.valueOf(v.getPid()) : "\u2014");
+            cpu.set(v.getCpuPercent() > 0 ? String.format("%.1f%%", v.getCpuPercent()) : "\u2014");
+            memory.set(v.getMemoryMb() > 0 ? v.getMemoryMb() + " MB" : "\u2014");
             path.set(nvl(v.getInstallPath(), "Unknown"));
         }
 

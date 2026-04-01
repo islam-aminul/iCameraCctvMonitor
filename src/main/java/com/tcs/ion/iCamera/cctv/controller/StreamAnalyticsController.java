@@ -21,7 +21,6 @@ public class StreamAnalyticsController implements Initializable {
 
     @FXML private TextField txtSearch;
     @FXML private TableView<StreamRow> tableStreams;
-    @FXML private TableColumn<StreamRow, Integer>  colId;
     @FXML private TableColumn<StreamRow, String>   colName;
     @FXML private TableColumn<StreamRow, String>   colIp;
     @FXML private TableColumn<StreamRow, String>   colRtsp;
@@ -32,6 +31,7 @@ public class StreamAnalyticsController implements Initializable {
     @FXML private TableColumn<StreamRow, String>   colBitrate;
     @FXML private TableColumn<StreamRow, String>   colKeyframe;
     @FXML private TableColumn<StreamRow, String>   colProbeStatus;
+    @FXML private TableColumn<StreamRow, String>   colError;
     @FXML private Label lblLastProbeTime;
     @FXML private Label lblTotalStreams;
 
@@ -42,7 +42,6 @@ public class StreamAnalyticsController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        colId.setCellValueFactory(d -> d.getValue().id.asObject());
         colName.setCellValueFactory(d -> d.getValue().name);
         colIp.setCellValueFactory(d -> d.getValue().ip);
         colRtsp.setCellValueFactory(d -> d.getValue().rtsp);
@@ -53,6 +52,7 @@ public class StreamAnalyticsController implements Initializable {
         colBitrate.setCellValueFactory(d -> d.getValue().bitrate);
         colKeyframe.setCellValueFactory(d -> d.getValue().keyframe);
         colProbeStatus.setCellValueFactory(d -> d.getValue().probeStatus);
+        colError.setCellValueFactory(d -> d.getValue().error);
 
         // Colour probe status
         colProbeStatus.setCellFactory(col -> new TableCell<StreamRow, String>() {
@@ -62,6 +62,17 @@ public class StreamAnalyticsController implements Initializable {
                 setText(item);
                 getStyleClass().removeAll("text-green", "text-red");
                 getStyleClass().add("OK".equals(item) ? "text-green" : "text-red");
+            }
+        });
+
+        // Colour error column red when non-empty
+        colError.setCellFactory(col -> new TableCell<StreamRow, String>() {
+            @Override protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null || item.isEmpty()) { setText(null); return; }
+                setText(item);
+                getStyleClass().removeAll("text-red");
+                getStyleClass().add("text-red");
             }
         });
 
@@ -100,7 +111,6 @@ public class StreamAnalyticsController implements Initializable {
     }
 
     public static class StreamRow {
-        final IntegerProperty id   = new SimpleIntegerProperty();
         final StringProperty  name = new SimpleStringProperty();
         final StringProperty  ip   = new SimpleStringProperty();
         final StringProperty  rtsp = new SimpleStringProperty();
@@ -111,9 +121,9 @@ public class StreamAnalyticsController implements Initializable {
         final StringProperty  bitrate     = new SimpleStringProperty();
         final StringProperty  keyframe    = new SimpleStringProperty();
         final StringProperty  probeStatus = new SimpleStringProperty();
+        final StringProperty  error       = new SimpleStringProperty();
 
         StreamRow(CctvData c) {
-            id.set(c.getCctvId());
             name.set(c.getCctvName());
             ip.set(nvl(c.getIpAddress()));
             rtsp.set(nvl(c.getRtspUrl()));
@@ -124,6 +134,7 @@ public class StreamAnalyticsController implements Initializable {
             bitrate.set(c.getBitrateKbps() > 0 ? c.getBitrateKbps() + " Kbps" : "N/A");
             keyframe.set(c.getKeyFrameInterval() > 0 ? String.valueOf(c.getKeyFrameInterval()) : "N/A");
             probeStatus.set(c.isFfprobeSuccess() ? "OK" : "FAILED");
+            error.set(c.getInactiveReason() != null ? c.getInactiveReason() : "");
         }
 
         private static String nvl(String s) { return s != null ? s : "N/A"; }

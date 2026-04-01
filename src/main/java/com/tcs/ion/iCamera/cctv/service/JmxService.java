@@ -249,19 +249,13 @@ public class JmxService {
                 if (rfv != null) {
                     // ResourceFieldValues typed getters: getName() → CCTV display name,
                     // getKey3() → RTSP URL stored in the resource key-3 field.
-                    // getIpAddress() → direct camera IP (preferred over RTSP-based extraction).
                     String name = rfv.getName();
                     String rtsp = rfv.getKey3();
                     if (name != null) cctv.setCctvName(name);
                     if (rtsp != null) {
                         cctv.setRtspUrl(rtsp);   // also auto-extracts IP from RTSP as fallback
                     }
-                    // Override with direct IP metadata when available; it is more reliable
-                    // than parsing the RTSP URL (which may contain hostnames or auth prefixes).
-                    String directIp = rfv.getIpAddress();
-                    if (directIp != null && !directIp.isEmpty()) {
-                        cctv.setIpAddress(directIp);
-                    }
+                    // IP address is auto-extracted from the RTSP URL by setRtspUrl().
                 }
 
                 // Reachability from cctvStatusMap

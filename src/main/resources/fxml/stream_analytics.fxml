@@ -16,17 +16,17 @@
 
     <TableView fx:id="tableStreams" VBox.vgrow="ALWAYS" styleClass="data-table">
         <columns>
-            <TableColumn fx:id="colId"          text="ID"         prefWidth="55"/>
-            <TableColumn fx:id="colName"         text="Name"       prefWidth="150"/>
-            <TableColumn fx:id="colIp"           text="IP"         prefWidth="120"/>
-            <TableColumn fx:id="colRtsp"         text="RTSP URL"   prefWidth="200"/>
-            <TableColumn fx:id="colEncoding"     text="Codec"      prefWidth="80"/>
-            <TableColumn fx:id="colProfile"      text="Profile"    prefWidth="80"/>
-            <TableColumn fx:id="colFps"          text="FPS"        prefWidth="80"/>
-            <TableColumn fx:id="colResolution"   text="Resolution" prefWidth="100"/>
-            <TableColumn fx:id="colBitrate"      text="Bitrate"    prefWidth="90"/>
-            <TableColumn fx:id="colKeyframe"     text="Keyframe"   prefWidth="80"/>
-            <TableColumn fx:id="colProbeStatus"  text="Probe"      prefWidth="70"/>
+            <TableColumn fx:id="colName"         text="Name"       prefWidth="140"/>
+            <TableColumn fx:id="colIp"           text="IP"         prefWidth="110"/>
+            <TableColumn fx:id="colRtsp"         text="RTSP URL"   prefWidth="190"/>
+            <TableColumn fx:id="colEncoding"     text="Codec"      prefWidth="70"/>
+            <TableColumn fx:id="colProfile"      text="Profile"    prefWidth="70"/>
+            <TableColumn fx:id="colFps"          text="FPS"        prefWidth="70"/>
+            <TableColumn fx:id="colResolution"   text="Resolution" prefWidth="90"/>
+            <TableColumn fx:id="colBitrate"      text="Bitrate"    prefWidth="80"/>
+            <TableColumn fx:id="colKeyframe"     text="Keyframe"   prefWidth="70"/>
+            <TableColumn fx:id="colProbeStatus"  text="Probe"      prefWidth="60"/>
+            <TableColumn fx:id="colError"        text="Error"      prefWidth="160"/>
         </columns>
     </TableView>
 </VBox>

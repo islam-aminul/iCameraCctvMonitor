@@ -22,18 +22,13 @@
     <!-- Table (fills remaining space) -->
     <TableView fx:id="tableCctv" VBox.vgrow="ALWAYS" styleClass="data-table">
         <columns>
-            <TableColumn fx:id="colId"         text="ID"          prefWidth="55"/>
-            <TableColumn fx:id="colName"       text="Name"        prefWidth="160"/>
-            <TableColumn fx:id="colIp"         text="IP"          prefWidth="120"/>
-            <TableColumn fx:id="colRtsp"       text="RTSP URL"    prefWidth="200"/>
-            <TableColumn fx:id="colReachable"  text="Reachable"   prefWidth="80"/>
-            <TableColumn fx:id="colFileGen"    text="File Gen"    prefWidth="80"/>
-            <TableColumn fx:id="colFileUpload" text="Upload"      prefWidth="80"/>
-            <TableColumn fx:id="colEncoding"   text="Encoding"    prefWidth="80"/>
-            <TableColumn fx:id="colProfile"    text="Profile"     prefWidth="80"/>
-            <TableColumn fx:id="colFps"        text="FPS"         prefWidth="60"/>
-            <TableColumn fx:id="colResolution" text="Resolution"  prefWidth="100"/>
-            <TableColumn fx:id="colStatus"     text="Status"      prefWidth="90"/>
+            <TableColumn fx:id="colName"       text="Name"        prefWidth="180"/>
+            <TableColumn fx:id="colIp"         text="IP"          prefWidth="130"/>
+            <TableColumn fx:id="colRtsp"       text="RTSP URL"    prefWidth="260"/>
+            <TableColumn fx:id="colReachable"  text="Reachable"   prefWidth="90"/>
+            <TableColumn fx:id="colFileGen"    text="File Gen"    prefWidth="90"/>
+            <TableColumn fx:id="colFileUpload" text="Upload"      prefWidth="90"/>
+            <TableColumn fx:id="colStatus"     text="Status"      prefWidth="100"/>
         </columns>
     </TableView>
 </VBox>

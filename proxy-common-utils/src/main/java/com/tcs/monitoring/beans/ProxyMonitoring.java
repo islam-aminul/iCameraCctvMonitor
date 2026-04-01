@@ -54,11 +54,18 @@ public class ProxyMonitoring implements ProxyMonitoringMBean {
         cm.cctvFileLastUploadedMap.put(102L, now - 75_000L);
 
         // Camera 3 – intentionally unreachable / stale
-        cm.startHitMap.put(103L, new ResourceFieldValues("Camera-Lobby",
+        cm.startHitMap.put(103L, new ResourceFieldValues("Camera-Lobby1",
                 "rtsp://192.168.1.103:554/stream1"));
         cm.cctvStatusMap.put(103L, false);
         cm.cctvFileLastModifiedMap.put(103L, now - 600_000L);  // 10 min ago
         cm.cctvFileLastUploadedMap.put(103L, now - 610_000L);
+
+        // Camera 3 – intentionally unreachable / stale
+        cm.startHitMap.put(104L, new ResourceFieldValues("Camera-Lobby2",
+                "rtsp://192.168.1.104:554/stream1"));
+        cm.cctvStatusMap.put(104L, false);
+        cm.cctvFileLastModifiedMap.put(104L, now - 600_000L);  // 10 min ago
+        cm.cctvFileLastUploadedMap.put(104L, now - 610_000L);
 
         return cm;
     }

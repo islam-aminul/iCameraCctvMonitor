@@ -184,9 +184,15 @@ public class DashboardController implements Initializable {
         }
 
         // CCTV tile coloring based on active ratio
+        paneCctvTile.getStyleClass().removeAll("tile-up", "tile-down", "tile-warn");
         if (total > 0) {
             double activePct = (double) active / total * 100.0;
-            applyThreshold(paneCctvTile, 100.0 - activePct); // invert: 0% inactive = green
+            paneCctvTile.getStyleClass().add(
+                    (100.0 - activePct) > 85 ? "tile-down"
+                  : (100.0 - activePct) > 60 ? "tile-warn"
+                  : "tile-up");
+        } else {
+            paneCctvTile.getStyleClass().add("tile-down"); // red when no cameras
         }
 
         // ---- System / CPU / Memory ----

@@ -2,74 +2,41 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.*?>
-<ScrollPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.tcs.ion.iCamera.cctv.controller.VmsDetectionController"
-            fitToWidth="true" styleClass="page-scroll">
-    <VBox styleClass="page-root" spacing="12">
-        <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.tcs.ion.iCamera.cctv.controller.VmsDetectionController"
+      styleClass="page-root" spacing="12">
+    <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
 
-        <HBox alignment="CENTER_RIGHT" spacing="12">
-            <Region HBox.hgrow="ALWAYS"/>
-            <Button fx:id="btnRescan" text="Re-scan Now" onAction="#onRescan" styleClass="btn-primary"/>
-        </HBox>
-
-        <!-- Summary bar -->
-        <HBox spacing="20" styleClass="summary-bar" alignment="CENTER_LEFT">
-            <VBox spacing="2">
-                <Label text="STATUS" styleClass="tile-header"/>
-                <Label fx:id="lblScanStatus" styleClass="detail-value text-green" wrapText="true"/>
-            </VBox>
-            <Separator orientation="VERTICAL"/>
-            <Label fx:id="lblTotalDetected" styleClass="summary-chip"/>
-            <Label fx:id="lblRunning"       styleClass="summary-chip text-yellow"/>
-            <Label fx:id="lblStopped"       styleClass="summary-chip text-white"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Label fx:id="lblLastScan" styleClass="header-meta"/>
-        </HBox>
-
-        <!-- "No VMS" panel -->
-        <VBox fx:id="paneNoVms" styleClass="tile" alignment="CENTER" spacing="16"
-              prefHeight="160" visible="true">
-            <Label text="✓" style="-fx-font-size:42; -fx-text-fill:#00E676;"/>
-            <Label text="No Video Management Software detected on this machine."
-                   styleClass="detail-value text-green" wrapText="true" textAlignment="CENTER"/>
-            <Label text="Scanned: Milestone, Hikvision, Dahua, Avigilon, Genetec, Axis, Bosch,&#10;Hanwha, Pelco, Exacq, NUUO, Digifort"
-                   styleClass="header-meta" textAlignment="CENTER" wrapText="true"/>
+    <!-- Summary bar -->
+    <HBox spacing="20" styleClass="summary-bar" alignment="CENTER_LEFT">
+        <VBox spacing="2">
+            <Label text="STATUS" styleClass="tile-header"/>
+            <Label fx:id="lblScanStatus" styleClass="detail-value text-green" wrapText="true"/>
         </VBox>
+        <Label fx:id="lblTotalDetected" styleClass="summary-chip"/>
+        <Label fx:id="lblRunning"       styleClass="summary-chip text-yellow"/>
+        <Label fx:id="lblStopped"       styleClass="summary-chip text-white"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="lblLastScan" styleClass="header-meta"/>
+    </HBox>
 
-        <!-- VMS Table (compact – 3 rows visible, scrollable) -->
-        <TableView fx:id="tableVms" prefHeight="120" maxHeight="120"
-                   styleClass="data-table" visible="false" VBox.vgrow="NEVER">
-            <columns>
-                <TableColumn fx:id="colVendor"  text="Vendor / Software"  prefWidth="200"/>
-                <TableColumn fx:id="colProcess" text="Process / Service"  prefWidth="180"/>
-                <TableColumn fx:id="colStatus"  text="Status"             prefWidth="110"/>
-                <TableColumn fx:id="colPid"     text="PID"               prefWidth="70"/>
-                <TableColumn fx:id="colCpu"     text="CPU"               prefWidth="75"/>
-                <TableColumn fx:id="colMemory"  text="Memory"            prefWidth="90"/>
-                <TableColumn fx:id="colPath"    text="Path / Service"    prefWidth="260"/>
-            </columns>
-            <placeholder>
-                <Label text="No VMS software detected" styleClass="tile-sublabel"/>
-            </placeholder>
-        </TableView>
+    <!-- VMS Table (full height, scrollable) -->
+    <TableView fx:id="tableVms" styleClass="data-table" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colVendor"  text="Vendor / Software"  prefWidth="200"/>
+            <TableColumn fx:id="colProcess" text="Process / Service"  prefWidth="180"/>
+            <TableColumn fx:id="colStatus"  text="Status"             prefWidth="110"/>
+            <TableColumn fx:id="colPid"     text="PID"               prefWidth="70"/>
+            <TableColumn fx:id="colCpu"     text="CPU"               prefWidth="75"/>
+            <TableColumn fx:id="colMemory"  text="Memory"            prefWidth="90"/>
+            <TableColumn fx:id="colPath"    text="Path / Service"    prefWidth="260"/>
+        </columns>
+        <placeholder>
+            <Label text="No VMS software detected on this machine" styleClass="tile-sublabel"/>
+        </placeholder>
+    </TableView>
 
-        <!-- Vendor legend -->
-        <TitledPane text="Monitored VMS Software" expanded="false" styleClass="settings-pane">
-            <FlowPane hgap="12" vgap="8" style="-fx-padding:10;">
-                <Label text="Milestone XProtect"          styleClass="summary-chip"/>
-                <Label text="Hikvision iVMS / HikCentral" styleClass="summary-chip"/>
-                <Label text="Dahua DSS / SmartPSS"        styleClass="summary-chip"/>
-                <Label text="Avigilon ACC"                 styleClass="summary-chip"/>
-                <Label text="Genetec Security Center"      styleClass="summary-chip"/>
-                <Label text="Axis Camera Station"          styleClass="summary-chip"/>
-                <Label text="Bosch BVMS"                   styleClass="summary-chip"/>
-                <Label text="Hanwha Wisenet SSM"           styleClass="summary-chip"/>
-                <Label text="Pelco VideoXpert"             styleClass="summary-chip"/>
-                <Label text="Exacq Vision"                 styleClass="summary-chip"/>
-                <Label text="NUUO Crystal"                 styleClass="summary-chip"/>
-                <Label text="Digifort"                     styleClass="summary-chip"/>
-            </FlowPane>
-        </TitledPane>
-    </VBox>
-</ScrollPane>
+    <!-- Monitored vendors note -->
+    <Label text="Monitored: Milestone, Hikvision, Dahua, Avigilon, Genetec, Axis, Bosch, Hanwha, Pelco, Exacq, NUUO, Digifort"
+           styleClass="header-meta" wrapText="true"/>
+</VBox>

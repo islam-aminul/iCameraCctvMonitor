@@ -240,6 +240,31 @@
     -fx-alignment: CENTER;
 }
 
+/* --- CCTV Badge --- */
+.cctv-badge {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 1 6 1 6;
+    -fx-background-radius: 10;
+    -fx-min-width: 18;
+    -fx-alignment: CENTER;
+}
+
+.cctv-badge-green {
+    -fx-background-color: #2E7D32;
+    -fx-text-fill: #FFFFFF;
+}
+
+.cctv-badge-red {
+    -fx-background-color: #C62828;
+    -fx-text-fill: #FFFFFF;
+}
+
+.cctv-badge-amber {
+    -fx-background-color: #F57F17;
+    -fx-text-fill: #FFFFFF;
+}
+
 /* ============================================================
    CONTENT AREA
    ============================================================ */

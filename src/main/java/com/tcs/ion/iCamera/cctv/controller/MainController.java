@@ -1,6 +1,7 @@
 package com.tcs.ion.iCamera.cctv.controller;
 
 import com.tcs.ion.iCamera.cctv.model.AlertData;
+import com.tcs.ion.iCamera.cctv.model.CctvData;
 import com.tcs.ion.iCamera.cctv.model.ProxyData;
 import com.tcs.ion.iCamera.cctv.service.DataStore;
 import com.tcs.ion.iCamera.cctv.util.EmailHelper;
@@ -72,14 +73,21 @@ public class MainController implements Initializable {
     @FXML private Label lblIssueCount;
     @FXML private Button btnExport;
 
+    // --- New top-level tab buttons ---
+    @FXML private Button tabCctv;
+    @FXML private Label  lblCctvBadge;
+    @FXML private Button tabMacAddress;
+
     // --- Sub-tab definitions ---
     private static final String[][] APPLICATION_SUBTABS = {
             {"Proxy",            "proxy_details"},
             {"HSQLDB",           "hsqldb_details"},
-            {"MAC Address",      "mac_details"},
-            {"CCTV Details",     "cctv_details"},
-            {"Stream Analytics", "stream_analytics"},
             {"VMS Detection",    "vms_detection"}
+    };
+
+    private static final String[][] CCTV_SUBTABS = {
+            {"CCTV Details",     "cctv_details"},
+            {"Stream Analytics", "stream_analytics"}
     };
 
     private static final String[][] SYSTEM_SUBTABS = {
@@ -118,6 +126,20 @@ public class MainController implements Initializable {
         setActiveMainTab(tabApplication, "application");
         showSubTabs(APPLICATION_SUBTABS);
         navigateTo(APPLICATION_SUBTABS[0][1]); // Default to first sub-tab
+    }
+
+    @FXML
+    private void showCctv() {
+        setActiveMainTab(tabCctv, "cctv");
+        showSubTabs(CCTV_SUBTABS);
+        navigateTo(CCTV_SUBTABS[0][1]); // Default to CCTV Details
+    }
+
+    @FXML
+    private void showMacAddress() {
+        setActiveMainTab(tabMacAddress, "mac_address");
+        hideSubTabs();
+        navigateTo("mac_details");
     }
 
     @FXML
@@ -291,6 +313,23 @@ public class MainController implements Initializable {
         } else {
             lblAlertBadge.setVisible(false);
         }
+
+        // CCTV badge — green count when all OK, red/amber x/y when issues
+        int cctvTotal = store.getTotalCctvCount();
+        long cctvActive = store.getActiveCctvCount();
+        lblCctvBadge.getStyleClass().removeAll("cctv-badge-green", "cctv-badge-red", "cctv-badge-amber");
+        if (cctvTotal > 0 && cctvActive == cctvTotal) {
+            lblCctvBadge.setText(String.valueOf(cctvTotal));
+            lblCctvBadge.getStyleClass().add("cctv-badge-green");
+        } else if (cctvTotal > 0) {
+            long issues = cctvTotal - cctvActive;
+            lblCctvBadge.setText(issues + "/" + cctvTotal);
+            // Red if any cameras unreachable, amber otherwise
+            boolean anyUnreachable = store.getAllCctv().stream().anyMatch(c -> !c.isReachable());
+            lblCctvBadge.getStyleClass().add(anyUnreachable ? "cctv-badge-red" : "cctv-badge-amber");
+        } else {
+            lblCctvBadge.setText("");
+        }
     }
 
     // ===== Active Issues Panel =====
@@ -399,12 +438,23 @@ public class MainController implements Initializable {
     private void showResolutionDialog(AlertData alert, IssueResolutionProvider.Resolution resolution) {
         Dialog<Void> dialog = new Dialog<>();
         dialog.setTitle("Resolution Steps");
-        dialog.setHeaderText(resolution.getTitle());
         dialog.initOwner(contentArea.getScene().getWindow());
+
+        // Apply the app's current theme stylesheet to the dialog
+        javafx.scene.Scene ownerScene = contentArea.getScene();
+        if (ownerScene != null && !ownerScene.getStylesheets().isEmpty()) {
+            dialog.getDialogPane().getStylesheets().addAll(ownerScene.getStylesheets());
+        }
+        dialog.getDialogPane().getStyleClass().add("root-pane");
 
         VBox content = new VBox(12);
         content.setPadding(new Insets(16));
         content.setPrefWidth(450);
+
+        // Alert title — rendered inside content for reliable readability
+        Label titleLabel = new Label(resolution.getTitle());
+        titleLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        titleLabel.setWrapText(true);
 
         // Severity
         Label sevHeader = new Label("Severity:");
@@ -440,6 +490,7 @@ public class MainController implements Initializable {
         }
 
         content.getChildren().addAll(
+                titleLabel, new Separator(),
                 sevHeader, sevText, new Separator(),
                 catHeader, catText, new Separator(),
                 msgHeader, msgText, new Separator(),

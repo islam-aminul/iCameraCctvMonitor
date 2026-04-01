@@ -11,15 +11,12 @@
     <top>
         <VBox>
             <!-- Header bar: TC info, proxy ID, clock, last updated — entire background colored by RAG -->
-            <HBox fx:id="headerBar" styleClass="header-bar" alignment="CENTER_LEFT" spacing="12">
+            <HBox fx:id="headerBar" styleClass="header-bar" alignment="CENTER_LEFT" spacing="24">
                 <Label fx:id="lblTitle" styleClass="app-title" text="iCamera CCTV Monitor"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <Label fx:id="lblTcCode" styleClass="header-info-label" text="TC: --"/>
-                <Separator orientation="VERTICAL" styleClass="header-sep"/>
                 <Label fx:id="lblProxyId" styleClass="header-info-label" text="Proxy: --"/>
-                <Separator orientation="VERTICAL" styleClass="header-sep"/>
                 <Label fx:id="lblClock" styleClass="header-clock" text="--"/>
-                <Separator orientation="VERTICAL" styleClass="header-sep"/>
                 <Label fx:id="lblLastRefresh" styleClass="header-info-label" text="Updated: --"/>
             </HBox>
 
@@ -28,6 +25,11 @@
                 <padding><Insets top="0" left="8" right="8" bottom="0"/></padding>
                 <Button fx:id="tabDashboard"     text="Dashboard"     onAction="#showDashboard"     styleClass="main-tab"/>
                 <Button fx:id="tabApplication"   text="Application"   onAction="#showApplication"   styleClass="main-tab"/>
+                <HBox alignment="CENTER_LEFT" spacing="4">
+                    <Button fx:id="tabCctv"      text="CCTV"          onAction="#showCctv"          styleClass="main-tab"/>
+                    <Label fx:id="lblCctvBadge" styleClass="cctv-badge" text=""/>
+                </HBox>
+                <Button fx:id="tabMacAddress"    text="MAC Address"   onAction="#showMacAddress"    styleClass="main-tab"/>
                 <Button fx:id="tabSystem"        text="System"        onAction="#showSystem"        styleClass="main-tab"/>
                 <Button fx:id="tabAlerts"        text="Alerts"        onAction="#showAlerts"        styleClass="main-tab"/>
                 <StackPane>
