@@ -25,7 +25,6 @@ public class HsqldbDetailsController implements Initializable {
 
     @FXML private Label lblHsqldbStatus;
     @FXML private Label lblHsqldbService;
-    @FXML private Label lblHsqldbJmx;
     @FXML private Label lblHsqldbDirect;
     @FXML private Label lblHsqldbStartTime;
     @FXML private Label lblHsqldbUptime;
@@ -58,14 +57,6 @@ public class HsqldbDetailsController implements Initializable {
         lblHsqldbService.setText(nvl(pd.getHsqldbStatus(), "UNKNOWN"));
         lblHsqldbService.getStyleClass().removeAll("text-green", "text-red");
         lblHsqldbService.getStyleClass().add(hsqlUp ? "text-green" : "text-red");
-
-        // JMX report
-        String jmxStatus = pd.getHsqldbJmxStatus();
-        lblHsqldbJmx.setText(nvl(jmxStatus, "N/A"));
-        lblHsqldbJmx.getStyleClass().removeAll("text-green", "text-red", "text-yellow");
-        if ("UP".equals(jmxStatus)) lblHsqldbJmx.getStyleClass().add("text-green");
-        else if ("DOWN".equals(jmxStatus)) lblHsqldbJmx.getStyleClass().add("text-red");
-        else lblHsqldbJmx.getStyleClass().add("text-yellow");
 
         // Direct connectivity
         boolean direct = pd.isHsqldbDirectlyReachable();

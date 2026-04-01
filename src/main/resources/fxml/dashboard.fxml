@@ -42,10 +42,6 @@
                     <Label fx:id="lblHsqldbServiceStatus" styleClass="detail-value" text="--"/>
                 </HBox>
                 <HBox spacing="8" styleClass="hierarchy-indent">
-                    <Label text="JMX Report:" styleClass="detail-label"/>
-                    <Label fx:id="lblHsqldbJmxStatus" styleClass="detail-value" text="--"/>
-                </HBox>
-                <HBox spacing="8" styleClass="hierarchy-indent">
                     <Label text="Direct:" styleClass="detail-label"/>
                     <Label fx:id="lblHsqldbDirect" styleClass="detail-value" text="--"/>
                 </HBox>
@@ -91,12 +87,13 @@
                 <ProgressBar fx:id="pbMem" progress="0" maxWidth="Infinity"/>
             </VBox>
 
-            <!-- Disk tile -->
+            <!-- Disk tile (similar to CPU/Memory) -->
             <VBox fx:id="paneDiskTile" styleClass="tile" HBox.hgrow="ALWAYS" spacing="6">
                 <padding><Insets topRightBottomLeft="12"/></padding>
                 <Label text="DISK USAGE" styleClass="tile-header"/>
+                <Label fx:id="lblDiskPercent" styleClass="tile-value-large" text="--"/>
                 <Label fx:id="lblDiskSummary" styleClass="tile-sublabel"/>
-                <VBox fx:id="vboxDisks" spacing="4"/>
+                <ProgressBar fx:id="pbDisk" progress="0" maxWidth="Infinity"/>
             </VBox>
         </HBox>
 

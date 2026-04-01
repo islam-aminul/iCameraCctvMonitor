@@ -16,14 +16,12 @@
                     <Label fx:id="lblHsqldbStatus"     GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="detail-value"/>
                     <Label text="Service Status:"      GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="detail-label"/>
                     <Label fx:id="lblHsqldbService"    GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="detail-value"/>
-                    <Label text="JMX Report:"          GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="detail-label"/>
-                    <Label fx:id="lblHsqldbJmx"        GridPane.columnIndex="1" GridPane.rowIndex="2" styleClass="detail-value"/>
-                    <Label text="Direct Connectivity:" GridPane.columnIndex="0" GridPane.rowIndex="3" styleClass="detail-label"/>
-                    <Label fx:id="lblHsqldbDirect"     GridPane.columnIndex="1" GridPane.rowIndex="3" styleClass="detail-value"/>
-                    <Label text="Started:"             GridPane.columnIndex="0" GridPane.rowIndex="4" styleClass="detail-label"/>
-                    <Label fx:id="lblHsqldbStartTime"  GridPane.columnIndex="1" GridPane.rowIndex="4" styleClass="detail-value"/>
-                    <Label text="Uptime:"              GridPane.columnIndex="0" GridPane.rowIndex="5" styleClass="detail-label"/>
-                    <Label fx:id="lblHsqldbUptime"     GridPane.columnIndex="1" GridPane.rowIndex="5" styleClass="detail-value text-green"/>
+                    <Label text="Direct Connectivity:" GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="detail-label"/>
+                    <Label fx:id="lblHsqldbDirect"     GridPane.columnIndex="1" GridPane.rowIndex="2" styleClass="detail-value"/>
+                    <Label text="Started:"             GridPane.columnIndex="0" GridPane.rowIndex="3" styleClass="detail-label"/>
+                    <Label fx:id="lblHsqldbStartTime"  GridPane.columnIndex="1" GridPane.rowIndex="3" styleClass="detail-value"/>
+                    <Label text="Uptime:"              GridPane.columnIndex="0" GridPane.rowIndex="4" styleClass="detail-label"/>
+                    <Label fx:id="lblHsqldbUptime"     GridPane.columnIndex="1" GridPane.rowIndex="4" styleClass="detail-value text-green"/>
                 </GridPane>
             </VBox>
         </Pane>
