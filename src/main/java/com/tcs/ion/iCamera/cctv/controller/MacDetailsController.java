@@ -161,12 +161,7 @@ public class MacDetailsController implements Initializable {
 
         // Alert outcome label
         String alertText;
-        if (r.getScenario() == MacValidationResult.Scenario.VALIDATION_FAILED) {
-            alertText = r.getAlertMessage()
-                    + (r.getErrorDetail() != null ? "\nDetail: " + r.getErrorDetail() : "");
-        } else {
-            alertText = r.getAlertMessage();
-        }
+        alertText = r.getAlertMessage();
         lblValidationAlert.setText(alertText);
         lblValidationAlert.getStyleClass().removeAll(
                 "text-green", "text-yellow", "text-red", "detail-value");
