@@ -76,6 +76,32 @@ public class HttpService {
     }
 
     /**
+     * HTTP POST with JSON body and custom headers.
+     * Returns response body as String, or null on error.
+     */
+    public String postJson(String url, Object body, Map<String, String> headers) {
+        try {
+            HttpPost request = new HttpPost(url);
+            request.setHeader("Content-Type", "application/json; charset=UTF-8");
+            if (headers != null) {
+                for (Map.Entry<String, String> h : headers.entrySet()) {
+                    request.setHeader(h.getKey(), h.getValue());
+                }
+            }
+            request.setEntity(new StringEntity(GSON.toJson(body), "UTF-8"));
+            try (CloseableHttpResponse resp = httpClient.execute(request)) {
+                int code = resp.getStatusLine().getStatusCode();
+                String respBody = EntityUtils.toString(resp.getEntity());
+                log.debug("POST {} -> {} {}", url, code, respBody);
+                return respBody;
+            }
+        } catch (IOException e) {
+            log.error("POST {} failed: {}", url, e.getMessage());
+            return null;
+        }
+    }
+
+    /**
      * HTTP POST with {@code application/x-www-form-urlencoded} body and optional
      * custom headers.  Returns the response body as a String, or null on error.
      *

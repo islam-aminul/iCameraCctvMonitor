@@ -65,6 +65,12 @@ public class SettingsManager {
                 settings.setPollIntervalSeconds(Integer.parseInt(props.getProperty("poll.interval.seconds", String.valueOf(settings.getPollIntervalSeconds()))));
                 settings.setFfprobePath(props.getProperty("ffprobe.path", settings.getFfprobePath()));
                 settings.setJettyPort(Integer.parseInt(props.getProperty("jetty.port", String.valueOf(settings.getJettyPort()))));
+
+                // Cloud Data Centre push settings
+                settings.setCloudDcHost(props.getProperty("cloud.dc.host", settings.getCloudDcHost()));
+                settings.setCloudPushEnabled(Boolean.parseBoolean(props.getProperty("cloud.push.enabled", String.valueOf(settings.isCloudPushEnabled()))));
+                settings.setCloudPushIntervalSeconds(Integer.parseInt(props.getProperty("cloud.push.interval.seconds", String.valueOf(settings.getCloudPushIntervalSeconds()))));
+                settings.setCloudAuthToken(props.getProperty("cloud.auth.token", settings.getCloudAuthToken()));
             }
         } catch (Exception e) {
             log.warn("Could not read application.properties: {}", e.getMessage());

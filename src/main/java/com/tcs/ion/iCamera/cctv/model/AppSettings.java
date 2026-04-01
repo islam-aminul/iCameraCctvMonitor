@@ -38,6 +38,12 @@ public class AppSettings {
     private String fontFamily = "Segoe UI";
     private double fontSize = 13.0;
 
+    // Cloud Data Centre push
+    private String cloudDcHost = "g01.tcsion.com";
+    private boolean cloudPushEnabled = false;
+    private int cloudPushIntervalSeconds = 300;
+    private String cloudAuthToken = "iCam-Monitor-Static-Auth-Token-2026";
+
     public AppSettings() {
         // Default visible dashboard tiles
         dashboardTiles.add("PROXY_STATUS");
@@ -91,4 +97,16 @@ public class AppSettings {
 
     public double getFontSize() { return fontSize; }
     public void setFontSize(double fontSize) { this.fontSize = fontSize; }
+
+    public String getCloudDcHost() { return cloudDcHost; }
+    public void setCloudDcHost(String cloudDcHost) { this.cloudDcHost = cloudDcHost; }
+
+    public boolean isCloudPushEnabled() { return cloudPushEnabled; }
+    public void setCloudPushEnabled(boolean cloudPushEnabled) { this.cloudPushEnabled = cloudPushEnabled; }
+
+    public int getCloudPushIntervalSeconds() { return cloudPushIntervalSeconds; }
+    public void setCloudPushIntervalSeconds(int cloudPushIntervalSeconds) { this.cloudPushIntervalSeconds = cloudPushIntervalSeconds; }
+
+    public String getCloudAuthToken() { return cloudAuthToken; }
+    public void setCloudAuthToken(String cloudAuthToken) { this.cloudAuthToken = cloudAuthToken; }
 }

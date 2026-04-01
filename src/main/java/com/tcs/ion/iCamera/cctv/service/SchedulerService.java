@@ -16,7 +16,7 @@ public class SchedulerService {
     private static final Logger log = LoggerFactory.getLogger(SchedulerService.class);
 
     private final ScheduledExecutorService executor =
-            Executors.newScheduledThreadPool(4, r -> {
+            Executors.newScheduledThreadPool(5, r -> {
                 Thread t = new Thread(r, "iCamera-Scheduler");
                 t.setDaemon(true);
                 return t;
@@ -28,6 +28,7 @@ public class SchedulerService {
     private final AtomicBoolean alertPollRunning    = new AtomicBoolean(false);
     private final AtomicBoolean vmsPollRunning      = new AtomicBoolean(false);
     private final AtomicBoolean urlCheckRunning     = new AtomicBoolean(false);
+    private final AtomicBoolean cloudPushRunning    = new AtomicBoolean(false);
 
     private final JmxService           jmxService;
     private final OshiService          oshiService;
@@ -36,10 +37,11 @@ public class SchedulerService {
     private final WindowsServiceReader wsReader;
     private final VmsDetectionService  vmsService;
     private final UrlCheckService      urlCheckService = new UrlCheckService();
+    private final CloudPushService     cloudPushService;
     private final DataStore            store = DataStore.getInstance();
 
     private ScheduledFuture<?> jmxFuture, oshiFuture, ffprobeFuture, alertFuture,
-                                staleFuture, vmsFuture, urlCheckFuture;
+                                staleFuture, vmsFuture, urlCheckFuture, cloudPushFuture;
 
     public SchedulerService(JmxService jmxService,
                             OshiService oshiService,
@@ -52,6 +54,7 @@ public class SchedulerService {
         this.alertService    = alertService;
         this.wsReader        = wsReader;
         this.vmsService      = new VmsDetectionService();
+        this.cloudPushService = new CloudPushService(new HttpService());
     }
 
     public void start() {
@@ -104,11 +107,13 @@ public class SchedulerService {
             }
         }, 5, pollSec, TimeUnit.SECONDS);
 
-        // Alert evaluation (every 10 seconds)
+        // Alert evaluation (every 10 seconds) + immediate critical alert push
         alertFuture = executor.scheduleAtFixedRate(() -> {
             if (alertPollRunning.compareAndSet(false, true)) {
                 try {
                     alertService.evaluate();
+                    // Piggyback critical alert push on alert evaluation cycle
+                    cloudPushService.pushCriticalAlertsIfAny();
                 } catch (Exception e) {
                     log.error("Alert scheduler error", e);
                 } finally {
@@ -152,11 +157,27 @@ public class SchedulerService {
             }
         }, 5, 60, TimeUnit.SECONDS);
 
-        log.info("SchedulerService started (pollInterval={}s)", pollSec);
+        // Cloud Data Centre heartbeat push (default every 60 s; server-directed override supported)
+        long cloudPushSec = cfg.getCloudPushIntervalSeconds();
+        cloudPushFuture = executor.scheduleAtFixedRate(() -> {
+            if (cloudPushRunning.compareAndSet(false, true)) {
+                try {
+                    cloudPushService.pushHeartbeat();
+                } catch (Exception e) {
+                    log.error("Cloud push scheduler error", e);
+                } finally {
+                    cloudPushRunning.set(false);
+                }
+            } else {
+                log.debug("Cloud push skipped – previous cycle still running");
+            }
+        }, 10, cloudPushSec, TimeUnit.SECONDS);
+
+        log.info("SchedulerService started (pollInterval={}s, cloudPush={}s)", pollSec, cloudPushSec);
     }
 
     public void stop() {
-        cancelIfNotNull(jmxFuture, oshiFuture, ffprobeFuture, alertFuture, staleFuture, vmsFuture, urlCheckFuture);
+        cancelIfNotNull(jmxFuture, oshiFuture, ffprobeFuture, alertFuture, staleFuture, vmsFuture, urlCheckFuture, cloudPushFuture);
         executor.shutdown();
         try { executor.awaitTermination(5, TimeUnit.SECONDS); } catch (InterruptedException ignored) {}
         log.info("SchedulerService stopped");
