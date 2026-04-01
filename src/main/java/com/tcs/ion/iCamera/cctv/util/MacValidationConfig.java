@@ -12,43 +12,34 @@ import java.nio.file.StandardOpenOption;
 import java.util.Properties;
 
 /**
- * Loads MAC validation endpoint configuration from
- * {@code <app-dir>/application.properties}.
+ * Loads cloud data-centre configuration from {@code <app-dir>/application.properties}.
  *
- * <p>The same {@code application.properties} file at the executable location
- * serves as the single external configuration file for all configurable
- * parameters.  If the file does not exist, built-in defaults are used and a
- * fully commented template is written to disk so operators can discover and
- * customise settings without repackaging the application.
+ * <p>The {@code cloud.dc.host} property is the single hostname used as the base
+ * for all remote REST API calls (MAC validation, cloud alerts, etc.).  The
+ * servlet paths for individual APIs are hardcoded in their respective services.
  *
- * <p>Recognised properties (MAC validation section):
- * <ul>
- *   <li>{@code mac.validation.host} – hostname used both for outbound-interface
- *       detection and for building the HTTPS API URL
- *       (default: {@value #DEFAULT_HOST}).</li>
- *   <li>{@code mac.validation.servlet.path} – path component appended to
- *       {@code https://<host>} to form the full endpoint URL
- *       (default: {@value #DEFAULT_SERVLET_PATH}).</li>
- * </ul>
+ * <p>If the file does not exist, built-in defaults are used and a fully commented
+ * template is written to disk so operators can customise settings without
+ * repackaging the application.
  */
 public final class MacValidationConfig {
 
     private static final Logger log = LoggerFactory.getLogger(MacValidationConfig.class);
 
-    public static final String DEFAULT_HOST         = "g01.tcsion.com";
-    public static final String DEFAULT_SERVLET_PATH =
+    /** Default cloud DC hostname. */
+    public static final String DEFAULT_CLOUD_DC_HOST = "g01.tcsion.com";
+
+    /** Hardcoded servlet path for the MAC validation API. */
+    public static final String MAC_VALIDATION_SERVLET_PATH =
             "/iCAMERAStreamingFW/GetProxyMacValidationDataServlet";
 
-    /** External config file – same name used by all configurable parameters. */
     private static final String FILE_NAME   = "application.properties";
     private static final Path   CONFIG_FILE = AppDirs.getAppDir().resolve(FILE_NAME);
 
-    private final String host;
-    private final String servletPath;
+    private final String cloudDcHost;
 
-    private MacValidationConfig(String host, String servletPath) {
-        this.host        = host;
-        this.servletPath = servletPath;
+    private MacValidationConfig(String cloudDcHost) {
+        this.cloudDcHost = cloudDcHost;
     }
 
     // ---- Factory -----------------------------------------------------------
@@ -64,7 +55,7 @@ public final class MacValidationConfig {
         if (Files.exists(CONFIG_FILE)) {
             try (InputStream in = Files.newInputStream(CONFIG_FILE)) {
                 props.load(in);
-                log.info("MAC validation config loaded from {}", CONFIG_FILE);
+                log.info("Config loaded from {}", CONFIG_FILE);
             } catch (IOException e) {
                 log.warn("Failed to read {}: {} – using built-in defaults",
                         CONFIG_FILE, e.getMessage());
@@ -73,28 +64,17 @@ public final class MacValidationConfig {
             writeTemplate();
         }
 
-        String host = trim(props.getProperty("mac.validation.host", DEFAULT_HOST));
-        String path = trim(props.getProperty("mac.validation.servlet.path", DEFAULT_SERVLET_PATH));
-
+        String host = trim(props.getProperty("cloud.dc.host", DEFAULT_CLOUD_DC_HOST));
         if (host.isEmpty()) {
-            log.warn("mac.validation.host is empty – falling back to {}", DEFAULT_HOST);
-            host = DEFAULT_HOST;
-        }
-        if (path.isEmpty()) {
-            log.warn("mac.validation.servlet.path is empty – falling back to {}",
-                    DEFAULT_SERVLET_PATH);
-            path = DEFAULT_SERVLET_PATH;
+            log.warn("cloud.dc.host is empty – falling back to {}", DEFAULT_CLOUD_DC_HOST);
+            host = DEFAULT_CLOUD_DC_HOST;
         }
 
-        return new MacValidationConfig(host, path);
+        return new MacValidationConfig(host);
     }
 
     // ---- Template writer ---------------------------------------------------
 
-    /**
-     * Writes a fully commented {@code application.properties} template to
-     * {@code <app-dir>} covering all known configurable parameters.
-     */
     private static void writeTemplate() {
         String nl = System.lineSeparator();
         String template =
@@ -128,16 +108,10 @@ public final class MacValidationConfig {
                 "font.family=Segoe UI" + nl +
                 "font.size=13" + nl +
                 nl +
-                "# --- MAC Validation ---" + nl +
-                "# Hostname used for:" + nl +
-                "#   1. Detecting the local outbound network interface" + nl +
-                "#      (a no-op UDP probe is made – no data is transmitted)" + nl +
-                "#   2. Building the HTTPS API URL:" + nl +
-                "#      https://<mac.validation.host><mac.validation.servlet.path>" + nl +
-                "mac.validation.host=" + DEFAULT_HOST + nl +
-                "#" + nl +
-                "# Servlet path appended to https://<mac.validation.host>." + nl +
-                "mac.validation.servlet.path=" + DEFAULT_SERVLET_PATH + nl;
+                "# --- Cloud Data Centre ---" + nl +
+                "# Base hostname for all remote REST API calls" + nl +
+                "# (MAC validation, cloud alerts, etc.)." + nl +
+                "cloud.dc.host=" + DEFAULT_CLOUD_DC_HOST + nl;
 
         try {
             Files.write(CONFIG_FILE,
@@ -155,17 +129,15 @@ public final class MacValidationConfig {
     // ---- Accessors ---------------------------------------------------------
 
     /**
-     * Full HTTPS API URL, e.g.
+     * Full HTTPS MAC validation API URL, e.g.
      * {@code https://g01.tcsion.com/iCAMERAStreamingFW/GetProxyMacValidationDataServlet}.
      */
-    public String getApiUrl() {
-        return "https://" + host + servletPath;
+    public String getMacValidationApiUrl() {
+        return "https://" + cloudDcHost + MAC_VALIDATION_SERVLET_PATH;
     }
 
-    /** Hostname component only (used for interface detection). */
-    public String getHost() { return host; }
-
-    public String getServletPath() { return servletPath; }
+    /** Cloud DC hostname (used for interface detection and as the API base). */
+    public String getCloudDcHost() { return cloudDcHost; }
 
     // ---- Helpers -----------------------------------------------------------
 

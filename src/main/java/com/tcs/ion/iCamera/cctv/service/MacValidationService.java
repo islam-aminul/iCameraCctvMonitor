@@ -86,7 +86,7 @@ public class MacValidationService {
                     "Failed to load mac-validation.properties: " + e.getMessage());
         }
 
-        String host = cfg.getHost();
+        String host = cfg.getCloudDcHost();
 
         // Step 1 – detect outbound interface & read MAC
         InterfaceInfo iface;
@@ -110,15 +110,15 @@ public class MacValidationService {
 
         String responseBody;
         try {
-            responseBody = httpService.postForm(cfg.getApiUrl(), formParams, headers);
+            responseBody = httpService.postForm(cfg.getMacValidationApiUrl(), formParams, headers);
         } catch (Exception e) {
-            log.error("API call to {} failed: {}", cfg.getApiUrl(), e.getMessage());
+            log.error("API call to {} failed: {}", cfg.getMacValidationApiUrl(), e.getMessage());
             return failed(host, iface.name, iface.macAddress,
                     "API call failed: " + e.getMessage());
         }
 
         if (responseBody == null || responseBody.trim().isEmpty()) {
-            log.error("Empty response from MAC validation API at {}", cfg.getApiUrl());
+            log.error("Empty response from MAC validation API at {}", cfg.getMacValidationApiUrl());
             return failed(host, iface.name, iface.macAddress,
                     "Empty or null response from API");
         }
