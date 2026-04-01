@@ -13,11 +13,11 @@
             <!-- Header bar: TC info, proxy ID, clock, last updated — entire background colored by RAG -->
             <HBox fx:id="headerBar" styleClass="header-bar" alignment="CENTER_LEFT" spacing="12">
                 <Label fx:id="lblTitle" styleClass="app-title" text="iCamera CCTV Monitor"/>
-                <Separator orientation="VERTICAL" styleClass="header-sep"/>
+                <Region HBox.hgrow="ALWAYS"/>
                 <Label fx:id="lblTcCode" styleClass="header-info-label" text="TC: --"/>
                 <Separator orientation="VERTICAL" styleClass="header-sep"/>
                 <Label fx:id="lblProxyId" styleClass="header-info-label" text="Proxy: --"/>
-                <Region HBox.hgrow="ALWAYS"/>
+                <Separator orientation="VERTICAL" styleClass="header-sep"/>
                 <Label fx:id="lblClock" styleClass="header-clock" text="--"/>
                 <Separator orientation="VERTICAL" styleClass="header-sep"/>
                 <Label fx:id="lblLastRefresh" styleClass="header-info-label" text="Updated: --"/>

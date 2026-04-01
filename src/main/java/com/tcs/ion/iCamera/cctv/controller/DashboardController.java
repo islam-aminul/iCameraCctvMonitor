@@ -13,55 +13,89 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 /**
- * Dashboard page – hierarchical health tiles with tri-state RAG (GREEN/AMBER/RED)
+ * Dashboard page – hierarchical health tiles with tri-state RAG
+ * (GREEN/AMBER/RED)
  * supporting DEGRADED status for Proxy and HSQLDB.
  */
 public class DashboardController implements Initializable {
 
     // --- Proxy Tile ---
-    @FXML private Label lblProxyStatus;
-    @FXML private Label lblProxyId;
-    @FXML private Label lblProxyName;
-    @FXML private VBox paneProxyTile;
-    @FXML private Label lblServiceStatus;
-    @FXML private Label lblJmxStatus;
+    @FXML
+    private Label lblProxyStatus;
+    @FXML
+    private Label lblProxyId;
+    @FXML
+    private Label lblProxyName;
+    @FXML
+    private VBox paneProxyTile;
+    @FXML
+    private Label lblServiceStatus;
+    @FXML
+    private Label lblJmxStatus;
 
     // --- HSQLDB Tile ---
-    @FXML private Label lblHsqldbStatus;
-    @FXML private VBox paneHsqldbTile;
-    @FXML private Label lblHsqldbServiceStatus;
-    @FXML private Label lblHsqldbDirect;
+    @FXML
+    private Label lblHsqldbStatus;
+    @FXML
+    private VBox paneHsqldbTile;
+    @FXML
+    private Label lblHsqldbServiceStatus;
+    @FXML
+    private Label lblHsqldbDirect;
 
     // --- CCTV Tile ---
-    @FXML private Label lblCctvActive;
-    @FXML private Label lblCctvTotal;
-    @FXML private ProgressBar pbCctvActive;
-    @FXML private Label lblCctvWarning;
+    @FXML
+    private Label lblCctvActive;
+    @FXML
+    private Label lblCctvTotal;
+    @FXML
+    private ProgressBar pbCctvActive;
+    @FXML
+    private Label lblCctvWarning;
+    @FXML
+    private VBox paneCctvTile;
 
     // --- CPU ---
-    @FXML private Label lblCpuPercent;
-    @FXML private ProgressBar pbCpu;
-    @FXML private VBox paneCpuTile;
+    @FXML
+    private Label lblCpuPercent;
+    @FXML
+    private ProgressBar pbCpu;
+    @FXML
+    private VBox paneCpuTile;
 
     // --- Memory ---
-    @FXML private Label lblMemPercent;
-    @FXML private ProgressBar pbMem;
-    @FXML private VBox paneMemTile;
+    @FXML
+    private Label lblMemPercent;
+    @FXML
+    private ProgressBar pbMem;
+    @FXML
+    private VBox paneMemTile;
 
     // --- Disk ---
-    @FXML private Label lblDiskPercent;
-    @FXML private Label lblDiskSummary;
-    @FXML private ProgressBar pbDisk;
-    @FXML private VBox paneDiskTile;
+    @FXML
+    private Label lblDiskPercent;
+    @FXML
+    private Label lblDiskSummary;
+    @FXML
+    private ProgressBar pbDisk;
+    @FXML
+    private VBox paneDiskTile;
 
     // --- Network ---
-    @FXML private Label lblNetworkSpeed;
-    @FXML private VBox paneNetworkTile;
+    @FXML
+    private Label lblNetworkSpeed;
+    @FXML
+    private VBox paneNetworkTile;
 
     // --- MAC ---
-    @FXML private Label lblCurrentMac;
-    @FXML private Label lblLastMac;
-    @FXML private Label lblMacWarning;
+    @FXML
+    private Label lblCurrentMac;
+    @FXML
+    private Label lblLastMac;
+    @FXML
+    private Label lblMacWarning;
+    @FXML
+    private VBox paneMacTile;
 
     private final DataStore store = DataStore.getInstance();
     private Timeline refreshTimeline;
@@ -115,6 +149,10 @@ public class DashboardController implements Initializable {
             lblCurrentMac.setText("Current: " + nvl(pd.getCurrentMacAddress()));
             lblLastMac.setText("Last:    " + nvl(pd.getLastMacAddress()));
             lblMacWarning.setVisible(pd.isMacMismatch());
+
+            // MAC tile coloring
+            paneMacTile.getStyleClass().removeAll("tile-up", "tile-down", "tile-warn");
+            paneMacTile.getStyleClass().add(pd.isMacMismatch() ? "tile-down" : "tile-up");
         } else {
             lblProxyStatus.setText("Awaiting data...");
             lblProxyId.setText("ID: --");
@@ -145,6 +183,12 @@ public class DashboardController implements Initializable {
             lblCctvWarning.setManaged(false);
         }
 
+        // CCTV tile coloring based on active ratio
+        if (total > 0) {
+            double activePct = (double) active / total * 100.0;
+            applyThreshold(paneCctvTile, 100.0 - activePct); // invert: 0% inactive = green
+        }
+
         // ---- System / CPU / Memory ----
         if (sm != null) {
             double cpu = sm.getSystemCpuPercent();
@@ -166,7 +210,8 @@ public class DashboardController implements Initializable {
 
             SystemMetrics.DriveInfo targetDrive = null;
             for (SystemMetrics.DriveInfo di : sm.getDrives()) {
-                if (proxyDrive != null && !di.getName().toUpperCase().startsWith(proxyDrive)) continue;
+                if (proxyDrive != null && !di.getName().toUpperCase().startsWith(proxyDrive))
+                    continue;
                 targetDrive = di;
                 break;
             }
@@ -186,17 +231,23 @@ public class DashboardController implements Initializable {
                 }
 
                 lblDiskPercent.setText(String.format("%.1f%%", usedPct));
-                lblDiskSummary.setText(driveName + "  " + usedGb + " / " + totalGb + " GB");
+                lblDiskSummary.setText(driveName + ": " + usedGb + " / " + totalGb + " GB Used");
                 pbDisk.setProgress(usedPct / 100.0);
                 applyThreshold(paneDiskTile, usedPct);
-            } else {
-                lblDiskPercent.setText("--");
-                lblDiskSummary.setText("No drive data");
-                pbDisk.setProgress(0);
             }
+            // else: keep previous values – avoids flicker and tile resize
 
-            // Network
-            lblNetworkSpeed.setText(String.format("%.2f MB/s", sm.getNetworkSpeedMbps()));
+            // Network tile coloring based on speed
+            double speed = sm.getNetworkSpeedMbps();
+            lblNetworkSpeed.setText(String.format("%.2f MB/s", speed));
+            paneNetworkTile.getStyleClass().removeAll("tile-up", "tile-down", "tile-warn");
+            if (speed < 1.0) {
+                paneNetworkTile.getStyleClass().add("tile-down");
+            } else if (speed < 5.0) {
+                paneNetworkTile.getStyleClass().add("tile-warn");
+            } else {
+                paneNetworkTile.getStyleClass().add("tile-up");
+            }
         }
     }
 
@@ -211,7 +262,8 @@ public class DashboardController implements Initializable {
         String jmxStatus = pd.getHsqldbJmxStatus();
         boolean directReachable = pd.isHsqldbDirectlyReachable();
 
-        if (!"UP".equals(svcStatus)) return "DOWN";
+        if (!"UP".equals(svcStatus))
+            return "DOWN";
 
         // Service is UP
         if ("DOWN".equals(jmxStatus) && directReachable) {
@@ -260,5 +312,7 @@ public class DashboardController implements Initializable {
         tile.getStyleClass().add(value > 85 ? "tile-down" : value > 60 ? "tile-warn" : "tile-up");
     }
 
-    private String nvl(String s) { return s != null ? s : "N/A"; }
+    private String nvl(String s) {
+        return s != null ? s : "N/A";
+    }
 }

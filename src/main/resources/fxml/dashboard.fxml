@@ -48,7 +48,7 @@
             </VBox>
 
             <!-- CCTV tile -->
-            <VBox styleClass="tile" HBox.hgrow="ALWAYS" spacing="6">
+            <VBox fx:id="paneCctvTile" styleClass="tile" HBox.hgrow="ALWAYS" spacing="6">
                 <padding><Insets topRightBottomLeft="12"/></padding>
                 <Label text="CCTV CAMERAS" styleClass="tile-header"/>
                 <Label fx:id="lblCctvActive" styleClass="tile-value-large text-green"/>
@@ -58,7 +58,7 @@
             </VBox>
 
             <!-- MAC Address tile (moved from Network section) -->
-            <VBox styleClass="tile" HBox.hgrow="ALWAYS" spacing="6">
+            <VBox fx:id="paneMacTile" styleClass="tile" HBox.hgrow="ALWAYS" spacing="6">
                 <padding><Insets topRightBottomLeft="12"/></padding>
                 <Label text="MAC ADDRESS" styleClass="tile-header"/>
                 <Label fx:id="lblCurrentMac" styleClass="tile-sublabel"/>
@@ -92,7 +92,7 @@
                 <padding><Insets topRightBottomLeft="12"/></padding>
                 <Label text="DISK USAGE" styleClass="tile-header"/>
                 <Label fx:id="lblDiskPercent" styleClass="tile-value-large" text="--"/>
-                <Label fx:id="lblDiskSummary" styleClass="tile-sublabel"/>
+                <Label fx:id="lblDiskSummary" styleClass="tile-sublabel" text="Loading..."/>
                 <ProgressBar fx:id="pbDisk" progress="0" maxWidth="Infinity"/>
             </VBox>
         </HBox>

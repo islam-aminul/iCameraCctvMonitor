@@ -63,7 +63,16 @@ public class Launcher extends Application {
     private void showMainWindow(Stage stage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
         Scene scene = new Scene(loader.load(), 1440, 800);
-        scene.getStylesheets().add(getClass().getResource("/css/dark-theme.css").toExternalForm());
+
+        // Load theme based on saved setting
+        AppSettings settings = DataStore.getInstance().getSettings();
+        String cssFile = "LIGHT".equalsIgnoreCase(settings.getTheme()) ? "light-theme.css" : "dark-theme.css";
+        java.net.URL cssUrl = getClass().getResource("/css/" + cssFile);
+        if (cssUrl != null) {
+            scene.getStylesheets().add(cssUrl.toExternalForm());
+        } else {
+            scene.getStylesheets().add(getClass().getResource("/css/dark-theme.css").toExternalForm());
+        }
 
         stage.setTitle("iCamera CCTV Monitor");
         stage.setScene(scene);

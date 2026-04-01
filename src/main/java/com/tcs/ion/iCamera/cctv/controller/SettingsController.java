@@ -71,20 +71,39 @@ public class SettingsController implements Initializable {
 
         String font = cmbFontFamily.getValue();
         double size = spFontSize.getValue();
+        String accent = toHex(cpAccent.getValue());
+        String theme = cmbTheme.getValue();
 
         // Save to settings
         AppSettings s = store.getSettings();
         if (font != null) s.setFontFamily(font);
         s.setFontSize(size);
-        s.setAccentColor(toHex(cpAccent.getValue()));
-        s.setTheme(cmbTheme.getValue());
+        s.setAccentColor(accent);
+        s.setTheme(theme);
         SettingsManager.save(s);
 
         // Apply to scene immediately
         if (cmbFontFamily.getScene() != null && cmbFontFamily.getScene().getRoot() != null) {
-            cmbFontFamily.getScene().getRoot().setStyle(
+            javafx.scene.Parent root = cmbFontFamily.getScene().getRoot();
+
+            // Font family + size + accent color override
+            root.setStyle(
                     "-fx-font-family: \"" + (font != null ? font : "Segoe UI") + "\"; " +
-                    "-fx-font-size: " + size + "px;");
+                    "-fx-font-size: " + size + "px; " +
+                    "-fx-accent: " + accent + ";");
+
+            // Theme stylesheet swap
+            javafx.scene.Scene scene = cmbFontFamily.getScene();
+            scene.getStylesheets().clear();
+            String cssFile = "LIGHT".equalsIgnoreCase(theme) ? "light-theme.css" : "dark-theme.css";
+            java.net.URL cssUrl = getClass().getResource("/css/" + cssFile);
+            if (cssUrl != null) {
+                scene.getStylesheets().add(cssUrl.toExternalForm());
+            } else {
+                // Fallback: if light theme doesn't exist yet, use dark
+                cssUrl = getClass().getResource("/css/dark-theme.css");
+                if (cssUrl != null) scene.getStylesheets().add(cssUrl.toExternalForm());
+            }
         }
     }
 
