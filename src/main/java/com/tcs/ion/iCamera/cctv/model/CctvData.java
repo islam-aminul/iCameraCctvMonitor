@@ -128,6 +128,7 @@ public class CctvData {
     }
 
     public String getIpAddress() { return ipAddress; }
+    public void setIpAddress(String ipAddress) { this.ipAddress = ipAddress; }
 
     public boolean isReachable() { return reachable; }
     public void setReachable(boolean reachable) { this.reachable = reachable; }
