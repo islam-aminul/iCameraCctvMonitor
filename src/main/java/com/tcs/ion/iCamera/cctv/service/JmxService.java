@@ -165,6 +165,7 @@ public class JmxService {
 
     private boolean pollViaTypedProxy(ProxyData pd, SystemMetrics sm) {
         pd.setProxyId((int) proxy.getProxyId());
+        pd.setOrgId(proxy.getOrgId());
         pd.setProxyName(proxy.getProxyName() != null ? proxy.getProxyName() : "N/A");
         pd.setTcCode(String.valueOf(proxy.getTcCode()));
         pd.setStatus("UP");

@@ -8,6 +8,7 @@ import java.time.Instant;
 public class ProxyData {
 
     private int proxyId;
+    private long orgId;
     private String proxyName;
     private String tcCode;
     private String status;           // "UP" | "DEGRADED" | "DOWN" | "UNKNOWN"
@@ -49,6 +50,9 @@ public class ProxyData {
 
     public int getProxyId() { return proxyId; }
     public void setProxyId(int proxyId) { this.proxyId = proxyId; }
+
+    public long getOrgId() { return orgId; }
+    public void setOrgId(long orgId) { this.orgId = orgId; }
 
     public String getProxyName() { return proxyName; }
     public void setProxyName(String proxyName) { this.proxyName = proxyName; }

@@ -3,14 +3,18 @@ package com.tcs.ion.iCamera.cctv.service;
 import com.google.gson.Gson;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.*;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.*;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -67,6 +71,44 @@ public class HttpService {
             }
         } catch (IOException e) {
             log.error("POST {} failed: {}", url, e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * HTTP POST with {@code application/x-www-form-urlencoded} body and optional
+     * custom headers.  Returns the response body as a String, or null on error.
+     *
+     * @param url     endpoint URL
+     * @param params  form parameters (insertion-ordered map)
+     * @param headers additional HTTP headers to set (may be null or empty)
+     */
+    public String postForm(String url, Map<String, String> params, Map<String, String> headers) {
+        try {
+            HttpPost request = new HttpPost(url);
+
+            if (headers != null) {
+                for (Map.Entry<String, String> h : headers.entrySet()) {
+                    request.setHeader(h.getKey(), h.getValue());
+                }
+            }
+
+            List<BasicNameValuePair> form = new ArrayList<>();
+            if (params != null) {
+                for (Map.Entry<String, String> e : params.entrySet()) {
+                    form.add(new BasicNameValuePair(e.getKey(), e.getValue()));
+                }
+            }
+            request.setEntity(new UrlEncodedFormEntity(form, "UTF-8"));
+
+            try (CloseableHttpResponse resp = httpClient.execute(request)) {
+                int code = resp.getStatusLine().getStatusCode();
+                String body = EntityUtils.toString(resp.getEntity());
+                log.debug("POST (form) {} -> {} {}", url, code, body);
+                return body;
+            }
+        } catch (IOException e) {
+            log.error("POST (form) {} failed: {}", url, e.getMessage());
             return null;
         }
     }
