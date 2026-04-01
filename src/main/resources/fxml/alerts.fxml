@@ -7,9 +7,6 @@
       styleClass="page-root" spacing="12">
     <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
 
-    <Label text="Alerts" styleClass="page-title"/>
-    <Separator/>
-
     <!-- Summary + filter row -->
     <HBox spacing="16" alignment="CENTER_LEFT">
         <Label fx:id="lblTotalAlerts" styleClass="summary-chip"/>
@@ -17,15 +14,14 @@
         <Label fx:id="lblWarnings"   styleClass="summary-chip text-yellow"/>
         <Region HBox.hgrow="ALWAYS"/>
         <TextField fx:id="txtSearch" promptText="Search…" prefWidth="200" styleClass="search-field"/>
-        <ComboBox fx:id="cmbFilter" prefWidth="130" styleClass="search-field"/>
+        <ComboBox fx:id="cmbFilter" prefWidth="160" styleClass="search-field"/>
     </HBox>
 
     <!-- Action buttons -->
     <HBox spacing="8">
-        <Button text="Resolve Selected" onAction="#onResolveSelected" styleClass="btn-primary"/>
-        <Button fx:id="btnClearResolved" text="Clear Resolved" onAction="#onClearResolved" styleClass="btn-secondary"/>
-        <Button fx:id="btnExportAlerts"  text="Export JSON"   onAction="#onExportAlerts"  styleClass="btn-secondary"/>
-        <Button fx:id="btnPushToCloud"   text="Push to Cloud" onAction="#onPushToCloud"   styleClass="btn-warning"/>
+        <Button text="Resolve Selected" onAction="#onResolveSelected" styleClass="btn-success"/>
+        <Button fx:id="btnClearResolved" text="Clear Resolved" onAction="#onClearResolved" styleClass="btn-danger"/>
+        <Button fx:id="btnExportAlerts"  text="Export Excel"   onAction="#onExportAlertsExcel"  styleClass="btn-primary"/>
     </HBox>
 
     <!-- Alerts table -->

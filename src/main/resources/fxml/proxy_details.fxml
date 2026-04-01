@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<ScrollPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.tcs.ion.iCamera.cctv.controller.ProxyDetailsController"
+            fitToWidth="true" styleClass="page-scroll">
+    <VBox styleClass="page-root" spacing="16">
+        <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+
+        <!-- Proxy Status Tile -->
+        <Pane fx:id="paneProxyStatus" styleClass="tile">
+            <VBox spacing="8" style="-fx-padding:16;">
+                <Label text="iCamera Proxy" styleClass="section-header"/>
+                <GridPane hgap="16" vgap="8">
+                    <Label text="Proxy ID:"       GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="detail-label"/>
+                    <Label fx:id="lblProxyId"      GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="detail-value"/>
+                    <Label text="Name:"            GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="detail-label"/>
+                    <Label fx:id="lblProxyName"    GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="detail-value"/>
+                    <Label text="TC Code:"         GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="detail-label"/>
+                    <Label fx:id="lblTcCode"       GridPane.columnIndex="1" GridPane.rowIndex="2" styleClass="detail-value text-blue"/>
+                    <Label text="Status:"          GridPane.columnIndex="0" GridPane.rowIndex="3" styleClass="detail-label"/>
+                    <Label fx:id="lblProxyStatus"  GridPane.columnIndex="1" GridPane.rowIndex="3" styleClass="detail-value"/>
+                    <Label text="Service:"         GridPane.columnIndex="0" GridPane.rowIndex="4" styleClass="detail-label"/>
+                    <Label fx:id="lblServiceStatus" GridPane.columnIndex="1" GridPane.rowIndex="4" styleClass="detail-value"/>
+                    <Label text="JMX Connection:"  GridPane.columnIndex="0" GridPane.rowIndex="5" styleClass="detail-label"/>
+                    <Label fx:id="lblJmxStatus"    GridPane.columnIndex="1" GridPane.rowIndex="5" styleClass="detail-value"/>
+                    <Label text="Started:"         GridPane.columnIndex="0" GridPane.rowIndex="6" styleClass="detail-label"/>
+                    <Label fx:id="lblStartTime"    GridPane.columnIndex="1" GridPane.rowIndex="6" styleClass="detail-value"/>
+                    <Label text="Uptime:"          GridPane.columnIndex="0" GridPane.rowIndex="7" styleClass="detail-label"/>
+                    <Label fx:id="lblUptime"       GridPane.columnIndex="1" GridPane.rowIndex="7" styleClass="detail-value text-green"/>
+                </GridPane>
+
+                <!-- Down Reason (hidden when UP) -->
+                <HBox fx:id="lblDownReasonRow" spacing="8" visible="false">
+                    <Label text="Down Reason:" styleClass="detail-label"/>
+                    <Label fx:id="lblDownReason" styleClass="detail-value text-red"/>
+                </HBox>
+
+                <!-- CPU / Memory bars -->
+                <GridPane hgap="16" vgap="8">
+                    <Label fx:id="lblCpuUsage" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="detail-value" minWidth="280"/>
+                    <ProgressBar fx:id="pbProxyCpu" progress="0" prefWidth="200"
+                                 GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <Label fx:id="lblMemUsage" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="detail-value"/>
+                    <ProgressBar fx:id="pbProxyMem" progress="0" prefWidth="200"
+                                 GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                </GridPane>
+            </VBox>
+        </Pane>
+    </VBox>
+</ScrollPane>

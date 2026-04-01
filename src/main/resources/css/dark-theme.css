@@ -92,9 +92,9 @@
     -fx-padding: 0 16 0 16;
     -fx-min-height: 48;
     -fx-max-height: 48;
-    -fx-border-color: #2196F3;
-    -fx-border-width: 0 0 2 0;
-    -fx-effect: dropshadow(gaussian, rgba(33,150,243,0.4), 10, 0, 0, 2);
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 6, 0, 0, 1);
 }
 
 .app-title {
@@ -263,7 +263,7 @@
 }
 
 .separator {
-    -fx-background-color: #1E2040;
+    -fx-background-color: #151525;
 }
 
 /* ============================================================
@@ -271,7 +271,7 @@
    ============================================================ */
 .issues-panel {
     -fx-background-color: #0D0D1A;
-    -fx-border-color: #1E2040;
+    -fx-border-color: #151525;
     -fx-border-width: 0 0 0 1;
 }
 
@@ -435,10 +435,10 @@
 .tile {
     -fx-background-color: #13131F;
     -fx-background-radius: 8;
-    -fx-border-color: #1E2040;
+    -fx-border-color: transparent;
     -fx-border-radius: 8;
-    -fx-border-width: 1;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 8, 0, 0, 2);
+    -fx-border-width: 0;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 6, 0, 0, 2);
     -fx-padding: 12;
 }
 
@@ -563,15 +563,15 @@
    ============================================================ */
 .data-table {
     -fx-background-color: #13131F;
-    -fx-border-color: #1E2040;
+    -fx-border-color: transparent;
     -fx-border-radius: 6;
-    -fx-border-width: 1;
+    -fx-border-width: 0;
 }
 
 .data-table .column-header {
     -fx-background-color: #0D0D1A;
-    -fx-border-color: #1E2040;
-    -fx-border-width: 0 0 2 0;
+    -fx-border-color: #1A1A30;
+    -fx-border-width: 0 0 1 0;
 }
 
 .data-table .column-header .label {
@@ -665,6 +665,26 @@
 }
 
 .btn-warning:hover { -fx-background-color: #F57C00; }
+
+.btn-success {
+    -fx-background-color: #2E7D32;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+    -fx-padding: 8 16 8 16;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+}
+.btn-success:hover { -fx-background-color: #388E3C; }
+
+.btn-danger {
+    -fx-background-color: #C62828;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+    -fx-padding: 8 16 8 16;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+}
+.btn-danger:hover { -fx-background-color: #D32F2F; }
 
 /* --- Charts --- */
 .network-chart {
@@ -778,9 +798,11 @@
 
 .tab-pane .tab:selected,
 .tab-pane:focused .tab:selected {
-    -fx-background-color: #2196F3, #13131F;
-    -fx-background-insets: 0, 0 0 3 0;
-    -fx-background-radius: 4 4 0 0, 3 3 0 0;
+    -fx-background-color: #13131F;
+    -fx-background-insets: 0;
+    -fx-background-radius: 4 4 0 0;
+    -fx-border-color: transparent transparent #2196F3 transparent;
+    -fx-border-width: 0 0 2 0;
 }
 
 .tab-pane .tab:selected .tab-label,

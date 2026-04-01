@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<ScrollPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.tcs.ion.iCamera.cctv.controller.MacDetailsController"
+            fitToWidth="true" styleClass="page-scroll">
+    <VBox styleClass="page-root" spacing="16">
+        <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+
+        <Pane fx:id="paneMacSection" styleClass="tile">
+            <VBox spacing="8" style="-fx-padding:16;">
+                <Label text="MAC Address" styleClass="section-header"/>
+                <GridPane hgap="16" vgap="8">
+                    <Label text="Current MAC:" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="detail-label"/>
+                    <Label fx:id="lblCurrentMac" GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="detail-value"/>
+                    <Label text="Last MAC:"     GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="detail-label"/>
+                    <Label fx:id="lblLastMac"    GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="detail-value"/>
+                </GridPane>
+                <Label fx:id="lblMacMismatch" text="⚠ MAC address mismatch detected!" styleClass="text-yellow" visible="false"/>
+                <Button fx:id="btnSyncMac" text="Sync MAC Address" onAction="#onSyncMac"
+                        styleClass="btn-primary" visible="false"/>
+            </VBox>
+        </Pane>
+    </VBox>
+</ScrollPane>

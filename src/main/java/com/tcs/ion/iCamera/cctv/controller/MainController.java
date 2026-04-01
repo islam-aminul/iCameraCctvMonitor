@@ -74,7 +74,9 @@ public class MainController implements Initializable {
 
     // --- Sub-tab definitions ---
     private static final String[][] APPLICATION_SUBTABS = {
-            {"Proxy & HSQLDB",   "application_details"},
+            {"Proxy",            "proxy_details"},
+            {"HSQLDB",           "hsqldb_details"},
+            {"MAC Address",      "mac_details"},
             {"CCTV Details",     "cctv_details"},
             {"Stream Analytics", "stream_analytics"},
             {"VMS Detection",    "vms_detection"}
@@ -404,22 +406,29 @@ public class MainController implements Initializable {
         content.setPadding(new Insets(16));
         content.setPrefWidth(450);
 
-        // Severity & alert info
-        Label severityLabel = new Label("Severity: " + alert.getSeverity().name()
-                + "  |  Category: " + alert.getCategory().name());
-        severityLabel.getStyleClass().add("detail-value");
+        // Severity
+        Label sevHeader = new Label("Severity:");
+        sevHeader.getStyleClass().add("section-header");
+        Label sevText = new Label(alert.getSeverity().name());
+        sevText.getStyleClass().add("detail-value");
+        sevText.getStyleClass().add(alert.getSeverity() == AlertData.Severity.CRITICAL ? "text-red" : "text-yellow");
 
-        // Root cause
-        Label causeHeader = new Label("Root Cause:");
-        causeHeader.getStyleClass().add("section-header");
-        Label causeText = new Label(resolution.getRootCause());
-        causeText.setWrapText(true);
-        causeText.getStyleClass().add("detail-value");
+        // Category
+        Label catHeader = new Label("Category:");
+        catHeader.getStyleClass().add("section-header");
+        Label catText = new Label(alert.getCategory().name());
+        catText.getStyleClass().add("detail-value");
 
-        // Resolution steps
+        // Alert Message
+        Label msgHeader = new Label("Alert Message:");
+        msgHeader.getStyleClass().add("section-header");
+        Label msgText = new Label(alert.getMessage());
+        msgText.setWrapText(true);
+        msgText.getStyleClass().add("detail-value");
+
+        // Resolution Steps
         Label stepsHeader = new Label("Resolution Steps:");
         stepsHeader.getStyleClass().add("section-header");
-
         VBox stepsList = new VBox(6);
         List<String> steps = resolution.getSteps();
         for (int i = 0; i < steps.size(); i++) {
@@ -430,17 +439,11 @@ public class MainController implements Initializable {
             stepsList.getChildren().add(step);
         }
 
-        // Alert message
-        Label msgHeader = new Label("Alert Message:");
-        msgHeader.getStyleClass().add("section-header");
-        Label msgText = new Label(alert.getMessage());
-        msgText.setWrapText(true);
-        msgText.getStyleClass().add("detail-value");
-
-        content.getChildren().addAll(severityLabel, new Separator(),
-                causeHeader, causeText, new Separator(),
-                stepsHeader, stepsList, new Separator(),
-                msgHeader, msgText);
+        content.getChildren().addAll(
+                sevHeader, sevText, new Separator(),
+                catHeader, catText, new Separator(),
+                msgHeader, msgText, new Separator(),
+                stepsHeader, stepsList);
 
         ScrollPane scroll = new ScrollPane(content);
         scroll.setFitToWidth(true);
@@ -462,10 +465,10 @@ public class MainController implements Initializable {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save iCamera Report");
 
-        // Default to user's Documents folder
-        File documentsDir = new File(System.getProperty("user.home"), "Documents");
-        if (documentsDir.exists() && documentsDir.isDirectory()) {
-            fileChooser.setInitialDirectory(documentsDir);
+        // Default to user's Downloads folder
+        File downloadsDir = new File(System.getProperty("user.home"), "Downloads");
+        if (downloadsDir.exists() && downloadsDir.isDirectory()) {
+            fileChooser.setInitialDirectory(downloadsDir);
         } else {
             fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         }

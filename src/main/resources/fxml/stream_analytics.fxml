@@ -7,9 +7,6 @@
       styleClass="page-root" spacing="12">
     <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
 
-    <Label text="Stream Analytics" styleClass="page-title"/>
-    <Separator/>
-
     <HBox spacing="16" alignment="CENTER_LEFT">
         <Label fx:id="lblTotalStreams" styleClass="summary-chip"/>
         <Label fx:id="lblLastProbeTime" styleClass="detail-value"/>

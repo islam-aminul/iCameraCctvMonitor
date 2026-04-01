@@ -2,27 +2,33 @@ package com.tcs.ion.iCamera.cctv.controller;
 
 import com.tcs.ion.iCamera.cctv.model.AlertData;
 import com.tcs.ion.iCamera.cctv.service.DataStore;
-import com.tcs.ion.iCamera.cctv.service.HttpService;
+import com.tcs.ion.iCamera.cctv.util.ExcelExporter;
 import javafx.animation.*;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.*;
 import javafx.collections.transformation.*;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
 
 /**
- * Alerts page – filterable/searchable table of all alerts with blink effect.
- * Alerts can be resolved here and optionally pushed to cloud.
+ * Alerts page – filterable/searchable table of all alerts with Excel export.
  */
 public class AlertsController implements Initializable {
+
+    private static final DateTimeFormatter EXPORT_FMT = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
     @FXML private Label           lblTotalAlerts;
     @FXML private Label           lblCritical;
@@ -38,14 +44,11 @@ public class AlertsController implements Initializable {
     @FXML private TableColumn<AlertData, String> colResolved;
     @FXML private Button btnClearResolved;
     @FXML private Button btnExportAlerts;
-    @FXML private Button btnPushToCloud;
 
     private final DataStore store = DataStore.getInstance();
-    private final HttpService httpService = new HttpService();
     private final ObservableList<AlertData> allAlerts = FXCollections.observableArrayList();
     private FilteredList<AlertData> filtered;
     private Timeline timeline;
-    private Timeline blinkTimeline;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -160,29 +163,42 @@ public class AlertsController implements Initializable {
         refresh();
     }
 
-    @FXML private void onExportAlerts() {
-        StringBuilder sb = new StringBuilder();
-        for (AlertData a : store.getAlerts()) sb.append(a.toJson()).append("\n");
-        // Show in dialog
-        TextArea ta = new TextArea(sb.toString());
-        ta.setEditable(false);
-        ta.setPrefRowCount(20);
-        Alert dialog = new Alert(Alert.AlertType.INFORMATION);
-        dialog.setTitle("Alerts JSON Export");
-        dialog.setHeaderText("Alert data in JSON format");
-        dialog.getDialogPane().setContent(ta);
-        dialog.showAndWait();
-    }
+    @FXML private void onExportAlertsExcel() {
+        Stage stage = (Stage) tableAlerts.getScene().getWindow();
 
-    @FXML private void onPushToCloud() {
-        List<AlertData> unresolvedAlerts = store.getUnresolvedAlerts();
-        if (unresolvedAlerts.isEmpty()) {
-            new Alert(Alert.AlertType.INFORMATION, "No unresolved alerts to push.").showAndWait();
-            return;
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Export Alerts to Excel");
+
+        File downloadsDir = new File(System.getProperty("user.home"), "Downloads");
+        if (downloadsDir.exists() && downloadsDir.isDirectory()) {
+            fileChooser.setInitialDirectory(downloadsDir);
+        } else {
+            fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         }
-        for (AlertData a : unresolvedAlerts) {
-            httpService.pushAlertToCloud(a.toJson());
+
+        String defaultName = "iCamera Alerts " + LocalDateTime.now().format(EXPORT_FMT) + ".xlsx";
+        fileChooser.setInitialFileName(defaultName);
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Excel Workbook (*.xlsx)", "*.xlsx"));
+
+        File selectedFile = fileChooser.showSaveDialog(stage);
+        if (selectedFile == null) return;
+
+        try {
+            ExcelExporter.exportAlertsToFile(store.getAlerts(), selectedFile);
+            Alert info = new Alert(Alert.AlertType.INFORMATION);
+            info.setTitle("Export Complete");
+            info.setHeaderText("Alerts exported successfully");
+            info.setContentText(selectedFile.getAbsolutePath());
+            info.initOwner(stage);
+            info.showAndWait();
+        } catch (IOException ex) {
+            Alert error = new Alert(Alert.AlertType.ERROR);
+            error.setTitle("Export Failed");
+            error.setHeaderText("Could not export alerts");
+            error.setContentText("Error: " + ex.getMessage());
+            error.initOwner(stage);
+            error.showAndWait();
         }
-        new Alert(Alert.AlertType.INFORMATION, unresolvedAlerts.size() + " alerts pushed to cloud endpoint.").showAndWait();
     }
 }

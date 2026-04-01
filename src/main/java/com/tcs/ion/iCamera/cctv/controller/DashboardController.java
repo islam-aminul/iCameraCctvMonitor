@@ -30,7 +30,6 @@ public class DashboardController implements Initializable {
     @FXML private Label lblHsqldbStatus;
     @FXML private VBox paneHsqldbTile;
     @FXML private Label lblHsqldbServiceStatus;
-    @FXML private Label lblHsqldbJmxStatus;
     @FXML private Label lblHsqldbDirect;
 
     // --- CCTV Tile ---
@@ -50,8 +49,9 @@ public class DashboardController implements Initializable {
     @FXML private VBox paneMemTile;
 
     // --- Disk ---
+    @FXML private Label lblDiskPercent;
     @FXML private Label lblDiskSummary;
-    @FXML private VBox vboxDisks;
+    @FXML private ProgressBar pbDisk;
     @FXML private VBox paneDiskTile;
 
     // --- Network ---
@@ -62,9 +62,6 @@ public class DashboardController implements Initializable {
     @FXML private Label lblCurrentMac;
     @FXML private Label lblLastMac;
     @FXML private Label lblMacWarning;
-
-    // --- TC Code Banner ---
-    @FXML private Label lblTcCodeBanner;
 
     private final DataStore store = DataStore.getInstance();
     private Timeline refreshTimeline;
@@ -86,7 +83,6 @@ public class DashboardController implements Initializable {
         if (pd != null) {
             lblProxyId.setText("ID: " + pd.getProxyId());
             lblProxyName.setText(pd.getProxyName());
-            lblTcCodeBanner.setText("TC Code: " + pd.getTcCode());
 
             String status = pd.getStatus() != null ? pd.getStatus() : "UNKNOWN";
             lblProxyStatus.setText(status);
@@ -111,10 +107,6 @@ public class DashboardController implements Initializable {
             lblHsqldbServiceStatus.setText(hsqlSvc);
             applySubItemColor(lblHsqldbServiceStatus, "UP".equals(hsqlSvc));
 
-            String hsqlJmx = pd.getHsqldbJmxStatus() != null ? pd.getHsqldbJmxStatus() : "N/A";
-            lblHsqldbJmxStatus.setText(hsqlJmx);
-            applySubItemColor(lblHsqldbJmxStatus, "UP".equals(hsqlJmx));
-
             boolean directReachable = pd.isHsqldbDirectlyReachable();
             lblHsqldbDirect.setText(directReachable ? "Reachable" : "Unreachable");
             applySubItemColor(lblHsqldbDirect, directReachable);
@@ -127,12 +119,10 @@ public class DashboardController implements Initializable {
             lblProxyStatus.setText("Awaiting data...");
             lblProxyId.setText("ID: --");
             lblProxyName.setText("--");
-            lblTcCodeBanner.setText("TC Code: --");
             lblServiceStatus.setText("--");
             lblJmxStatus.setText("--");
             lblHsqldbStatus.setText("--");
             lblHsqldbServiceStatus.setText("--");
-            lblHsqldbJmxStatus.setText("--");
             lblHsqldbDirect.setText("--");
             lblCurrentMac.setText("Current: --");
             lblLastMac.setText("Last: --");
@@ -168,45 +158,41 @@ public class DashboardController implements Initializable {
             pbMem.setProgress(mem / 100.0);
             applyThreshold(paneMemTile, mem);
 
-            // Disk summary — only show proxy install drive
+            // Disk summary — only show proxy install drive, styled like CPU/Memory
             String proxyDrive = null;
             if (pd != null && pd.getInstallPath() != null && pd.getInstallPath().length() >= 2) {
                 proxyDrive = pd.getInstallPath().substring(0, 2).toUpperCase();
             }
 
-            vboxDisks.getChildren().clear();
-            boolean driveFound = false;
+            SystemMetrics.DriveInfo targetDrive = null;
             for (SystemMetrics.DriveInfo di : sm.getDrives()) {
                 if (proxyDrive != null && !di.getName().toUpperCase().startsWith(proxyDrive)) continue;
-
-                HBox row = new HBox(8);
-                Label lName = new Label(di.getName());
-                lName.getStyleClass().add("tile-sublabel");
-                ProgressBar pb = new ProgressBar(di.getUsedPercent() / 100.0);
-                pb.setPrefWidth(120);
-                Label lPct = new Label(String.format("%.1f%%", di.getUsedPercent()));
-                lPct.getStyleClass().add(di.getUsedPercent() > 85 ? "text-red"
-                        : di.getUsedPercent() > 60 ? "text-yellow" : "text-green");
-                row.getChildren().addAll(lName, pb, lPct);
-                vboxDisks.getChildren().add(row);
-                applyThreshold(paneDiskTile, di.getUsedPercent());
-                driveFound = true;
+                targetDrive = di;
+                break;
+            }
+            // Fallback: first drive if install path unknown
+            if (targetDrive == null && !sm.getDrives().isEmpty()) {
+                targetDrive = sm.getDrives().get(0);
             }
 
-            // Fallback: if installPath unknown, show all drives
-            if (!driveFound && proxyDrive == null) {
-                for (SystemMetrics.DriveInfo di : sm.getDrives()) {
-                    HBox row = new HBox(8);
-                    Label lName = new Label(di.getName());
-                    lName.getStyleClass().add("tile-sublabel");
-                    ProgressBar pb = new ProgressBar(di.getUsedPercent() / 100.0);
-                    pb.setPrefWidth(120);
-                    Label lPct = new Label(String.format("%.1f%%", di.getUsedPercent()));
-                    lPct.getStyleClass().add(di.getUsedPercent() > 85 ? "text-red"
-                            : di.getUsedPercent() > 60 ? "text-yellow" : "text-green");
-                    row.getChildren().addAll(lName, pb, lPct);
-                    vboxDisks.getChildren().add(row);
+            if (targetDrive != null) {
+                double usedPct = targetDrive.getUsedPercent();
+                long usedGb = (targetDrive.getTotalSpaceMb() - targetDrive.getFreeSpaceMb()) / 1024;
+                long totalGb = targetDrive.getTotalSpaceMb() / 1024;
+                // Normalize drive letter: strip trailing backslash (e.g. "C:\" -> "C:")
+                String driveName = targetDrive.getName();
+                if (driveName != null && driveName.endsWith("\\")) {
+                    driveName = driveName.substring(0, driveName.length() - 1);
                 }
+
+                lblDiskPercent.setText(String.format("%.1f%%", usedPct));
+                lblDiskSummary.setText(driveName + "  " + usedGb + " / " + totalGb + " GB");
+                pbDisk.setProgress(usedPct / 100.0);
+                applyThreshold(paneDiskTile, usedPct);
+            } else {
+                lblDiskPercent.setText("--");
+                lblDiskSummary.setText("No drive data");
+                pbDisk.setProgress(0);
             }
 
             // Network

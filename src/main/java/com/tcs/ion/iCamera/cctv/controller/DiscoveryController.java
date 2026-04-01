@@ -19,13 +19,9 @@ public class DiscoveryController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         lblUnderDevelopment.setText(
                 "CCTV Auto-Discovery\n\n" +
-                "This feature is currently under development.\n\n" +
-                "Upcoming capabilities:\n" +
-                "  • Automatic CCTV discovery across configured network subnets\n" +
-                "  • ONVIF and RTSP probe support\n" +
-                "  • Credential-based authentication (username/password)\n" +
-                "  • Network range scanner with CCTV fingerprinting\n" +
-                "  • Bulk import of discovered cameras\n\n" +
-                "Please check back in a future release.");
+                "Automatically discovers CCTV cameras across configured network subnets\n" +
+                "using ONVIF and RTSP protocols, with support for credential-based\n" +
+                "authentication and bulk import of discovered cameras.\n\n" +
+                "This feature will be available in a future release.");
     }
 }

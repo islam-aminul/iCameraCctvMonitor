@@ -8,13 +8,10 @@
     <VBox styleClass="page-root" spacing="12">
         <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
 
-        <!-- Header -->
-        <HBox alignment="CENTER_LEFT" spacing="12">
-            <Label text="VMS Detection" styleClass="page-title"/>
+        <HBox alignment="CENTER_RIGHT" spacing="12">
             <Region HBox.hgrow="ALWAYS"/>
             <Button fx:id="btnRescan" text="Re-scan Now" onAction="#onRescan" styleClass="btn-primary"/>
         </HBox>
-        <Separator/>
 
         <!-- Summary bar -->
         <HBox spacing="20" styleClass="summary-bar" alignment="CENTER_LEFT">

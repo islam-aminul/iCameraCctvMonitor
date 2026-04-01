@@ -9,14 +9,6 @@
     <VBox styleClass="page-root" spacing="20">
         <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
 
-        <!-- Page title -->
-        <HBox alignment="CENTER_LEFT" spacing="12">
-            <Label text="Dashboard" styleClass="page-title"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Label fx:id="lblTcCodeBanner" styleClass="tc-code-banner"/>
-        </HBox>
-        <Separator/>
-
         <!-- ===== Section 1: Application Health ===== -->
         <Label text="APPLICATION HEALTH" styleClass="tile-section-header"/>
 
@@ -48,10 +40,6 @@
                 <HBox spacing="8" styleClass="hierarchy-indent">
                     <Label text="Service:" styleClass="detail-label"/>
                     <Label fx:id="lblHsqldbServiceStatus" styleClass="detail-value" text="--"/>
-                </HBox>
-                <HBox spacing="8" styleClass="hierarchy-indent">
-                    <Label text="JMX Report:" styleClass="detail-label"/>
-                    <Label fx:id="lblHsqldbJmxStatus" styleClass="detail-value" text="--"/>
                 </HBox>
                 <HBox spacing="8" styleClass="hierarchy-indent">
                     <Label text="Direct:" styleClass="detail-label"/>
@@ -99,12 +87,13 @@
                 <ProgressBar fx:id="pbMem" progress="0" maxWidth="Infinity"/>
             </VBox>
 
-            <!-- Disk tile -->
+            <!-- Disk tile (similar to CPU/Memory) -->
             <VBox fx:id="paneDiskTile" styleClass="tile" HBox.hgrow="ALWAYS" spacing="6">
                 <padding><Insets topRightBottomLeft="12"/></padding>
                 <Label text="DISK USAGE" styleClass="tile-header"/>
+                <Label fx:id="lblDiskPercent" styleClass="tile-value-large" text="--"/>
                 <Label fx:id="lblDiskSummary" styleClass="tile-sublabel"/>
-                <VBox fx:id="vboxDisks" spacing="4"/>
+                <ProgressBar fx:id="pbDisk" progress="0" maxWidth="Infinity"/>
             </VBox>
         </HBox>
 
