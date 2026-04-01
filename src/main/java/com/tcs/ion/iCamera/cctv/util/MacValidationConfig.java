@@ -36,10 +36,15 @@ public final class MacValidationConfig {
     private static final String FILE_NAME   = "application.properties";
     private static final Path   CONFIG_FILE = AppDirs.getAppDir().resolve(FILE_NAME);
 
-    private final String cloudDcHost;
+    /** Default auto-validation interval (900s = 15 minutes). */
+    public static final int DEFAULT_MAC_VALIDATION_INTERVAL = 900;
 
-    private MacValidationConfig(String cloudDcHost) {
+    private final String cloudDcHost;
+    private final int    macValidationIntervalSeconds;
+
+    private MacValidationConfig(String cloudDcHost, int macValidationIntervalSeconds) {
         this.cloudDcHost = cloudDcHost;
+        this.macValidationIntervalSeconds = macValidationIntervalSeconds;
     }
 
     // ---- Factory -----------------------------------------------------------
@@ -70,7 +75,18 @@ public final class MacValidationConfig {
             host = DEFAULT_CLOUD_DC_HOST;
         }
 
-        return new MacValidationConfig(host);
+        int validationInterval = DEFAULT_MAC_VALIDATION_INTERVAL;
+        String intervalStr = trim(props.getProperty("mac.validation.interval.seconds", ""));
+        if (!intervalStr.isEmpty()) {
+            try {
+                validationInterval = Integer.parseInt(intervalStr);
+                if (validationInterval < 0) validationInterval = 0;
+            } catch (NumberFormatException e) {
+                log.warn("Invalid mac.validation.interval.seconds '{}' – disabled", intervalStr);
+            }
+        }
+
+        return new MacValidationConfig(host, validationInterval);
     }
 
     // ---- Template writer ---------------------------------------------------
@@ -111,7 +127,12 @@ public final class MacValidationConfig {
                 "# --- Cloud Data Centre ---" + nl +
                 "# Base hostname for all remote REST API calls" + nl +
                 "# (MAC validation, cloud alerts, etc.)." + nl +
-                "cloud.dc.host=" + DEFAULT_CLOUD_DC_HOST + nl;
+                "cloud.dc.host=" + DEFAULT_CLOUD_DC_HOST + nl +
+                nl +
+                "# --- MAC Validation ---" + nl +
+                "# Auto-validate MAC against cloud at this interval (seconds)." + nl +
+                "# Set to 0 to disable auto-validation (manual only)." + nl +
+                "mac.validation.interval.seconds=900" + nl;
 
         try {
             Files.write(CONFIG_FILE,
@@ -138,6 +159,12 @@ public final class MacValidationConfig {
 
     /** Cloud DC hostname (used for interface detection and as the API base). */
     public String getCloudDcHost() { return cloudDcHost; }
+
+    /**
+     * Auto-validation interval in seconds.  A value of {@code 0} means
+     * auto-validation is disabled and validation is manual-only.
+     */
+    public int getMacValidationIntervalSeconds() { return macValidationIntervalSeconds; }
 
     // ---- Helpers -----------------------------------------------------------
 

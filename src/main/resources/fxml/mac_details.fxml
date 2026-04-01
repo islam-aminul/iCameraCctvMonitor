@@ -2,68 +2,142 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.*?>
-<ScrollPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+<ScrollPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.tcs.ion.iCamera.cctv.controller.MacDetailsController"
             fitToWidth="true" styleClass="page-scroll">
     <VBox styleClass="page-root" spacing="16">
         <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
 
-        <!-- Existing MAC address section (from JMX / OS) -->
+        <!-- ═══════════════════════════════════════════════════════════
+             Section 1 — JMX MAC Address Overview
+             ═══════════════════════════════════════════════════════════ -->
         <Pane fx:id="paneMacSection" styleClass="tile">
-            <VBox spacing="8" style="-fx-padding:16;">
-                <Label text="MAC Address" styleClass="section-header"/>
+            <VBox spacing="10" style="-fx-padding:16;">
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <Label text="JMX MAC Address" styleClass="section-header"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="lblMacStatus" styleClass="mac-status-pill"/>
+                </HBox>
+
                 <GridPane hgap="16" vgap="8">
-                    <Label text="Current MAC:" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="detail-label"/>
-                    <Label fx:id="lblCurrentMac" GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="detail-value"/>
-                    <Label text="Last MAC:"     GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="detail-label"/>
-                    <Label fx:id="lblLastMac"    GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="detail-value"/>
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="140" prefWidth="150"/>
+                        <ColumnConstraints hgrow="ALWAYS"/>
+                        <ColumnConstraints minWidth="30"/>
+                    </columnConstraints>
+
+                    <Label text="Proxy ID:"       GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="detail-label"/>
+                    <Label fx:id="lblProxyId"      GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="detail-value" GridPane.columnSpan="2"/>
+
+                    <Label text="Proxy Name:"     GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="detail-label"/>
+                    <Label fx:id="lblProxyName"    GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="detail-value" GridPane.columnSpan="2"/>
+
+                    <Label text="Current MAC:"    GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="detail-label"/>
+                    <Label fx:id="lblCurrentMac"   GridPane.columnIndex="1" GridPane.rowIndex="2" styleClass="detail-value mac-value"/>
+                    <Button fx:id="btnCopyCurrentMac" text="⎘" onAction="#onCopyCurrentMac"
+                            styleClass="btn-icon" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+
+                    <Label text="Last MAC:"       GridPane.columnIndex="0" GridPane.rowIndex="3" styleClass="detail-label"/>
+                    <Label fx:id="lblLastMac"      GridPane.columnIndex="1" GridPane.rowIndex="3" styleClass="detail-value mac-value" GridPane.columnSpan="2"/>
                 </GridPane>
-                <Label fx:id="lblMacMismatch" text="⚠ MAC address mismatch detected!" styleClass="text-yellow" visible="false"/>
-                <Button fx:id="btnSyncMac" text="Sync MAC Address" onAction="#onSyncMac"
-                        styleClass="btn-primary" visible="false"/>
+
+                <!-- Mismatch warning + Sync button -->
+                <HBox fx:id="hboxMismatchRow" spacing="12" alignment="CENTER_LEFT" visible="false" managed="false">
+                    <Label fx:id="lblMacMismatch" text="⚠  MAC address mismatch detected"
+                           styleClass="text-yellow" style="-fx-font-weight:bold;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="btnSyncMac" text="Sync MAC Address" onAction="#onSyncMac"
+                            styleClass="btn-warning"/>
+                </HBox>
             </VBox>
         </Pane>
 
-        <!-- Cloud MAC Validation section -->
-        <Pane fx:id="paneMacValidation" styleClass="tile">
-            <VBox spacing="10" style="-fx-padding:16;">
-                <Label text="Cloud MAC Validation" styleClass="section-header"/>
+        <!-- ═══════════════════════════════════════════════════════════
+             Section 2 — Cloud MAC Validation
+             ═══════════════════════════════════════════════════════════ -->
+        <Pane fx:id="paneValidation" styleClass="tile">
+            <VBox spacing="12" style="-fx-padding:16;">
+                <HBox alignment="CENTER_LEFT" spacing="12">
+                    <Label text="Cloud MAC Validation" styleClass="section-header"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="lblLastValidated" styleClass="detail-label" style="-fx-font-size:11px;"/>
+                </HBox>
 
+                <!-- Action row -->
                 <HBox spacing="12" alignment="CENTER_LEFT">
                     <Button fx:id="btnValidateMac" text="Validate MAC" onAction="#onValidateMac"
                             styleClass="btn-primary"/>
-                    <Label fx:id="lblValidatingSpinner" text="Validating…"
-                           styleClass="detail-label" visible="false"/>
+                    <Label fx:id="lblValidatingSpinner" text="⟳  Validating…"
+                           styleClass="detail-label" visible="false" style="-fx-font-size:12px;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="btnScenarioAction" text="" onAction="#onScenarioAction"
+                            visible="false" managed="false"/>
                 </HBox>
 
-                <!-- Network / API context -->
-                <GridPane hgap="16" vgap="6">
+                <!-- Result grid -->
+                <GridPane fx:id="gridValidationResult" hgap="16" vgap="8" visible="false" managed="false">
                     <columnConstraints>
                         <ColumnConstraints minWidth="160" prefWidth="160"/>
                         <ColumnConstraints hgrow="ALWAYS"/>
+                        <ColumnConstraints minWidth="30"/>
                     </columnConstraints>
 
-                    <Label text="Outbound Interface:" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="detail-label"/>
-                    <Label fx:id="lblOutboundIface"    GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="detail-value"/>
+                    <Label text="Destination Host:" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="detail-label"/>
+                    <Label fx:id="lblDestHost"       GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="detail-value" GridPane.columnSpan="2"/>
 
-                    <Label text="Local MAC:"          GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="detail-label"/>
-                    <Label fx:id="lblLocalMac"         GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="detail-value"/>
+                    <Label text="Outbound Interface:" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="detail-label"/>
+                    <Label fx:id="lblOutboundIface"    GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="detail-value" GridPane.columnSpan="2"/>
 
-                    <Label text="Cloud MAC:"          GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="detail-label"/>
-                    <Label fx:id="lblCloudMac"         GridPane.columnIndex="1" GridPane.rowIndex="2" styleClass="detail-value"/>
+                    <Label text="Local MAC:"          GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="detail-label"/>
+                    <Label fx:id="lblLocalMac"         GridPane.columnIndex="1" GridPane.rowIndex="2" styleClass="detail-value mac-value"/>
+                    <Button fx:id="btnCopyLocalMac" text="⎘" onAction="#onCopyLocalMac"
+                            styleClass="btn-icon" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+
+                    <Label text="Cloud MAC:"          GridPane.columnIndex="0" GridPane.rowIndex="3" styleClass="detail-label"/>
+                    <Label fx:id="lblCloudMac"         GridPane.columnIndex="1" GridPane.rowIndex="3" styleClass="detail-value mac-value" GridPane.columnSpan="2"/>
                 </GridPane>
 
-                <!-- Alert outcome -->
-                <Label fx:id="lblValidationAlert" text="" wrapText="true"
-                       styleClass="detail-value" visible="false"/>
+                <!-- Scenario outcome banner -->
+                <Label fx:id="lblScenarioBanner" wrapText="true"
+                       styleClass="scenario-banner" visible="false" managed="false"/>
 
-                <!-- Conflicting proxies (shown only when non-empty) -->
-                <VBox fx:id="vboxConflicts" spacing="4" visible="false" managed="false">
-                    <Label text="Conflicting Proxies:" styleClass="detail-label"/>
-                    <TextArea fx:id="txtConflicts" editable="false" prefRowCount="4"
-                              wrapText="true" styleClass="detail-value"/>
-                </VBox>
+                <!-- Error detail (for VALIDATION_FAILED) -->
+                <Label fx:id="lblErrorDetail" wrapText="true"
+                       styleClass="detail-value text-red" visible="false" managed="false"
+                       style="-fx-font-size:12px; -fx-padding:4 0 0 0;"/>
             </VBox>
         </Pane>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             Section 3 — Conflicting Proxies (dynamic, hidden by default)
+             ═══════════════════════════════════════════════════════════ -->
+        <Pane fx:id="paneConflicts" styleClass="tile" visible="false" managed="false">
+            <VBox spacing="10" style="-fx-padding:16;">
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <Label text="Conflicting Proxies" styleClass="section-header"/>
+                    <Label fx:id="lblConflictCount" styleClass="alert-badge"/>
+                </HBox>
+                <Label text="The following proxies are registered with the same MAC address:"
+                       styleClass="detail-label" wrapText="true"/>
+                <VBox fx:id="vboxConflictCards" spacing="6"/>
+            </VBox>
+        </Pane>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             Section 4 — Guidance & Resolution (dynamic, hidden by default)
+             ═══════════════════════════════════════════════════════════ -->
+        <Pane fx:id="paneGuidance" styleClass="tile" visible="false" managed="false">
+            <VBox spacing="10" style="-fx-padding:16;">
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <Label fx:id="lblGuidanceTitle" styleClass="section-header"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Hyperlink fx:id="lnkToggleSteps" text="Show Steps" onAction="#onToggleGuidance"
+                               styleClass="issue-expand-link"/>
+                </HBox>
+                <Label fx:id="lblGuidanceCause" wrapText="true" styleClass="detail-label"/>
+                <VBox fx:id="vboxGuidanceSteps" spacing="4" visible="false" managed="false"/>
+            </VBox>
+        </Pane>
+
     </VBox>
 </ScrollPane>

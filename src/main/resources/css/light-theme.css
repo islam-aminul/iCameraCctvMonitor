@@ -893,3 +893,109 @@
     -fx-background-color: #1976D2;
     -fx-text-fill: #FFFFFF;
 }
+
+/* ============================================================
+   MAC DETAILS PAGE
+   ============================================================ */
+
+/* Monospace MAC address display */
+.mac-value {
+    -fx-font-family: "Consolas", "Courier New", monospace;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #212121;
+}
+
+/* Status pill (match / mismatch / unknown) */
+.mac-status-pill {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 2 10 2 10;
+    -fx-background-radius: 10;
+}
+
+.mac-status-match {
+    -fx-background-color: #E8F5E9;
+    -fx-text-fill: #2E7D32;
+    -fx-border-color: #4CAF50;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+}
+
+.mac-status-mismatch {
+    -fx-background-color: #FFF8E1;
+    -fx-text-fill: #E65100;
+    -fx-border-color: #FF9800;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+}
+
+.mac-status-unknown {
+    -fx-background-color: #ECEFF1;
+    -fx-text-fill: #78909C;
+    -fx-border-color: #B0BEC5;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+}
+
+/* Scenario outcome banners */
+.scenario-banner {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 16 10 16;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-border-width: 1;
+}
+
+.scenario-match {
+    -fx-background-color: #E8F5E9;
+    -fx-text-fill: #2E7D32;
+    -fx-border-color: #4CAF50;
+}
+
+.scenario-warning {
+    -fx-background-color: #FFF8E1;
+    -fx-text-fill: #E65100;
+    -fx-border-color: #FF9800;
+}
+
+.scenario-critical {
+    -fx-background-color: #FFEBEE;
+    -fx-text-fill: #C62828;
+    -fx-border-color: #F44336;
+}
+
+/* Conflict cards */
+.conflict-card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 6;
+    -fx-border-color: #F44336;
+    -fx-border-width: 0 0 0 3;
+    -fx-border-radius: 6;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 4, 0, 0, 1);
+}
+
+.conflict-card:hover {
+    -fx-background-color: #FAFAFA;
+}
+
+/* Small icon button (copy) */
+.btn-icon {
+    -fx-background-color: #ECEFF1;
+    -fx-text-fill: #546E7A;
+    -fx-font-size: 14px;
+    -fx-padding: 4 8 4 8;
+    -fx-background-radius: 4;
+    -fx-border-color: #CFD8DC;
+    -fx-border-radius: 4;
+    -fx-cursor: hand;
+    -fx-min-width: 28;
+    -fx-min-height: 28;
+}
+
+.btn-icon:hover {
+    -fx-background-color: #E0E0E0;
+    -fx-text-fill: #212121;
+    -fx-border-color: #1976D2;
+}

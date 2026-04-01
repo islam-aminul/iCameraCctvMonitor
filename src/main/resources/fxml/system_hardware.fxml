@@ -2,7 +2,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.*?>
-<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.tcs.ion.iCamera.cctv.controller.SystemHardwareController"
       styleClass="page-root" spacing="0">
     <padding><Insets top="8" left="8" right="8" bottom="8"/></padding>
