@@ -8,6 +8,7 @@
     <VBox styleClass="page-root" spacing="16">
         <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
 
+        <!-- Existing MAC address section (from JMX / OS) -->
         <Pane fx:id="paneMacSection" styleClass="tile">
             <VBox spacing="8" style="-fx-padding:16;">
                 <Label text="MAC Address" styleClass="section-header"/>
@@ -20,6 +21,51 @@
                 <Label fx:id="lblMacMismatch" text="⚠ MAC address mismatch detected!" styleClass="text-yellow" visible="false"/>
                 <Button fx:id="btnSyncMac" text="Sync MAC Address" onAction="#onSyncMac"
                         styleClass="btn-primary" visible="false"/>
+            </VBox>
+        </Pane>
+
+        <!-- Cloud MAC Validation section -->
+        <Pane fx:id="paneMacValidation" styleClass="tile">
+            <VBox spacing="10" style="-fx-padding:16;">
+                <Label text="Cloud MAC Validation" styleClass="section-header"/>
+
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <Button fx:id="btnValidateMac" text="Validate MAC" onAction="#onValidateMac"
+                            styleClass="btn-primary"/>
+                    <Label fx:id="lblValidatingSpinner" text="Validating…"
+                           styleClass="detail-label" visible="false"/>
+                </HBox>
+
+                <!-- Network / API context -->
+                <GridPane hgap="16" vgap="6">
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="160" prefWidth="160"/>
+                        <ColumnConstraints hgrow="ALWAYS"/>
+                    </columnConstraints>
+
+                    <Label text="Destination Host:"   GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="detail-label"/>
+                    <Label fx:id="lblDestHost"         GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="detail-value"/>
+
+                    <Label text="Outbound Interface:" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="detail-label"/>
+                    <Label fx:id="lblOutboundIface"    GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="detail-value"/>
+
+                    <Label text="Local MAC:"          GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="detail-label"/>
+                    <Label fx:id="lblLocalMac"         GridPane.columnIndex="1" GridPane.rowIndex="2" styleClass="detail-value"/>
+
+                    <Label text="Cloud MAC:"          GridPane.columnIndex="0" GridPane.rowIndex="3" styleClass="detail-label"/>
+                    <Label fx:id="lblCloudMac"         GridPane.columnIndex="1" GridPane.rowIndex="3" styleClass="detail-value"/>
+                </GridPane>
+
+                <!-- Alert outcome -->
+                <Label fx:id="lblValidationAlert" text="" wrapText="true"
+                       styleClass="detail-value" visible="false"/>
+
+                <!-- Conflicting proxies (shown only when non-empty) -->
+                <VBox fx:id="vboxConflicts" spacing="4" visible="false" managed="false">
+                    <Label text="Conflicting Proxies:" styleClass="detail-label"/>
+                    <TextArea fx:id="txtConflicts" editable="false" prefRowCount="4"
+                              wrapText="true" styleClass="detail-value"/>
+                </VBox>
             </VBox>
         </Pane>
     </VBox>
