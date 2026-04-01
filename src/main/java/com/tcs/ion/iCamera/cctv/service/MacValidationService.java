@@ -4,12 +4,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
 import com.tcs.ion.iCamera.cctv.model.AlertData;
 import com.tcs.ion.iCamera.cctv.model.MacValidationResult;
 import com.tcs.ion.iCamera.cctv.util.MacValidationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.StringReader;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -89,10 +91,11 @@ public class MacValidationService {
         String host = cfg.getCloudDcHost();
 
         // Step 1 – detect outbound interface & read MAC
+        log.info("MAC validation API URL: {}", cfg.getMacValidationApiUrl());
         InterfaceInfo iface;
         try {
             iface = detectOutboundInterface(host);
-            log.info("Outbound interface for {}: {} ({})", host, iface.name, iface.macAddress);
+            log.info("Outbound network adapter for {}: name={} mac={}", host, iface.name, iface.macAddress);
         } catch (Exception e) {
             log.error("Interface detection failed for host {}: {}", host, e.getMessage());
             return failed(host, null, null,
@@ -193,7 +196,9 @@ public class MacValidationService {
     private ParsedResponse parseResponse(String json) {
         JsonObject root;
         try {
-            root = JsonParser.parseString(json).getAsJsonObject();
+            JsonReader reader = new JsonReader(new StringReader(json));
+            reader.setLenient(true);
+            root = JsonParser.parseReader(reader).getAsJsonObject();
         } catch (Exception e) {
             throw new IllegalArgumentException("Response is not valid JSON: " + e.getMessage());
         }
