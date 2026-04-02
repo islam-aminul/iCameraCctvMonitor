@@ -17,7 +17,6 @@
                     <Label fx:id="lblCpuCores"   styleClass="detail-value"/>
                     <Label fx:id="lblCpuThreads" styleClass="detail-value"/>
                     <Label fx:id="lblCpuFreq"    styleClass="detail-value"/>
-                    <Separator/>
                     <Label fx:id="lblCpuUsage"       styleClass="detail-value"/>
                     <ProgressBar fx:id="pbCpuSystem" progress="0" maxWidth="Infinity"/>
                     <Label fx:id="lblProxyCpuUsage"  styleClass="detail-value text-blue"/>
@@ -33,7 +32,6 @@
                     <Label fx:id="lblRamTotal"       styleClass="detail-value"/>
                     <Label fx:id="lblRamAvail"       styleClass="detail-value"/>
                     <Label fx:id="lblRamType"        styleClass="detail-value"/>
-                    <Separator/>
                     <Label fx:id="lblRamUsage"       styleClass="detail-value"/>
                     <ProgressBar fx:id="pbRam"       progress="0" maxWidth="Infinity"/>
                     <Label fx:id="lblProxyRamUsage"  styleClass="detail-value text-blue"/>
