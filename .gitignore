@@ -11,6 +11,8 @@ proxy-common-utils/target/
 *.swp
 *.swo
 .vscode/
+.claude/
+.claude
 
 # OS
 Thumbs.db
